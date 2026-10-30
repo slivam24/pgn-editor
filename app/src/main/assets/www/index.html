@@ -21,8 +21,6 @@
   unicode-range: U+0100-02BA, U+02BD-02C5, U+02C7-02CC, U+02CE-02D7, U+02DD-02FF, U+0304, U+0308, U+0329, U+1D00-1DBF, U+1E00-1E9F, U+1EF2-1EFF, U+2020, U+20A0-20AB, U+20AD-20C0, U+2113, U+2C60-2C7F, U+A720-A7FF; }
 @font-face { font-family: 'IBM Plex Mono'; font-style: normal; font-weight: 600; font-display: swap; src: url(fonts/ibm-plex-mono-latin-600-normal.woff2) format('woff2');
   unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+0304, U+0308, U+0329, U+2000-206F, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD; }
-@font-face { font-family: 'Noto Sans Symbols 2'; font-style: normal; font-weight: 400; font-display: swap; src: url(fonts/noto-sans-symbols-2-symbols-400-normal.woff2) format('woff2');
-  unicode-range: U+2654-265F; }
 </style>
 <style>
 /* Layout: šachovnice nahoře, pod ní ovládání a zápis; na širokém displeji dva sloupce. Barvy převzaté z turnajové rolovací šachovnice. */
@@ -43,7 +41,6 @@
   --sq-check: #e0614a;
   --font-ui: "IBM Plex Sans", system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
   --font-mono: "IBM Plex Mono", ui-monospace, "SFMono-Regular", Menlo, Consolas, monospace;
-  --font-piece: "Noto Sans Symbols 2", "DejaVu Sans", "Segoe UI Symbol", "Arial Unicode MS", sans-serif;
 }
 @media (prefers-color-scheme: dark) {
   :root:not([data-theme="light"]) {
@@ -80,7 +77,20 @@ body {
 .sq.sel::before { content: ""; position: absolute; inset: 0; background: var(--sq-sel); opacity: .85; }
 .sq.check::before { content: ""; position: absolute; inset: 0; background: radial-gradient(circle, var(--sq-check) 0%, rgba(224,97,74,.6) 45%, transparent 75%); }
 .sq:focus-visible { outline: 3px solid #1f6feb; outline-offset: -3px; z-index: 2; }
-.piece { position: absolute; inset: 0; display: grid; place-items: center; font-family: var(--font-piece); font-size: 10.6cqw; line-height: 1; pointer-events: none; font-variant-emoji: text; }
+.piece { position: absolute; inset: 0; pointer-events: none; background: center / 100% 100% no-repeat; }
+/* Figury: sada cburnett (Colin M. L. Burnett, GPL), stejně velké a vycentrované */
+.p-wp { background-image: url('data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSI0NSIgaGVpZ2h0PSI0NSI+PHBhdGggZD0iTTIyLjUgOWMtMi4yMSAwLTQgMS43OS00IDQgMCAuODkuMjkgMS43MS43OCAyLjM4QzE3LjMzIDE2LjUgMTYgMTguNTkgMTYgMjFjMCAyLjAzLjk0IDMuODQgMi40MSA1LjAzLTMgMS4wNi03LjQxIDUuNTUtNy40MSAxMy40N2gyM2MwLTcuOTItNC40MS0xMi40MS03LjQxLTEzLjQ3IDEuNDctMS4xOSAyLjQxLTMgMi40MS01LjAzIDAtMi40MS0xLjMzLTQuNS0zLjI4LTUuNjIuNDktLjY3Ljc4LTEuNDkuNzgtMi4zOCAwLTIuMjEtMS43OS00LTQtNHoiIGZpbGw9IiNmZmYiIHN0cm9rZT0iIzAwMCIgc3Ryb2tlLXdpZHRoPSIxLjUiIHN0cm9rZS1saW5lY2FwPSJyb3VuZCIvPjwvc3ZnPg=='); }
+.p-wb { background-image: url('data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSI0NSIgaGVpZ2h0PSI0NSI+PGcgZmlsbD0ibm9uZSIgZmlsbC1ydWxlPSJldmVub2RkIiBzdHJva2U9IiMwMDAiIHN0cm9rZS13aWR0aD0iMS41IiBzdHJva2UtbGluZWNhcD0icm91bmQiIHN0cm9rZS1saW5lam9pbj0icm91bmQiPjxnIGZpbGw9IiNmZmYiIHN0cm9rZS1saW5lY2FwPSJidXR0Ij48cGF0aCBkPSJNOSAzNmMzLjM5LS45NyAxMC4xMS40MyAxMy41LTIgMy4zOSAyLjQzIDEwLjExIDEuMDMgMTMuNSAyIDAgMCAxLjY1LjU0IDMgMi0uNjguOTctMS42NS45OS0zIC41LTMuMzktLjk3LTEwLjExLjQ2LTEzLjUtMS0zLjM5IDEuNDYtMTAuMTEuMDMtMTMuNSAxLTEuMzU0LjQ5LTIuMzIzLjQ3LTMtLjUgMS4zNTQtMS45NCAzLTIgMy0yeiIvPjxwYXRoIGQ9Ik0xNSAzMmMyLjUgMi41IDEyLjUgMi41IDE1IDAgLjUtMS41IDAtMiAwLTIgMC0yLjUtMi41LTQtMi41LTQgNS41LTEuNSA2LTExLjUtNS0xNS41LTExIDQtMTAuNSAxNC01IDE1LjUgMCAwLTIuNSAxLjUtMi41IDQgMCAwLS41LjUgMCAyeiIvPjxwYXRoIGQ9Ik0yNSA4YTIuNSAyLjUgMCAxIDEtNSAwIDIuNSAyLjUgMCAxIDEgNSAweiIvPjwvZz48cGF0aCBkPSJNMTcuNSAyNmgxME0xNSAzMGgxNW0tNy41LTE0LjV2NU0yMCAxOGg1IiBzdHJva2UtbGluZWpvaW49Im1pdGVyIi8+PC9nPjwvc3ZnPg=='); }
+.p-wn { background-image: url('data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSI0NSIgaGVpZ2h0PSI0NSI+PGcgZmlsbD0ibm9uZSIgZmlsbC1ydWxlPSJldmVub2RkIiBzdHJva2U9IiMwMDAiIHN0cm9rZS13aWR0aD0iMS41IiBzdHJva2UtbGluZWNhcD0icm91bmQiIHN0cm9rZS1saW5lam9pbj0icm91bmQiPjxwYXRoIGQ9Ik0yMiAxMGMxMC41IDEgMTYuNSA4IDE2IDI5SDE1YzAtOSAxMC02LjUgOC0yMSIgZmlsbD0iI2ZmZiIvPjxwYXRoIGQ9Ik0yNCAxOGMuMzggMi45MS01LjU1IDcuMzctOCA5LTMgMi0yLjgyIDQuMzQtNSA0LTEuMDQyLS45NCAxLjQxLTMuMDQgMC0zLTEgMCAuMTkgMS4yMy0xIDItMSAwLTQuMDAzIDEtNC00IDAtMiA2LTEyIDYtMTJzMS44OS0xLjkgMi0zLjVjLS43My0uOTk0LS41LTItLjUtMyAxLTEgMyAyLjUgMyAyLjVoMnMuNzgtMS45OTIgMi41LTNjMSAwIDEgMyAxIDMiIGZpbGw9IiNmZmYiLz48cGF0aCBkPSJNOS41IDI1LjVhLjUuNSAwIDEgMS0xIDAgLjUuNSAwIDEgMSAxIDB6bTUuNDMzLTkuNzVhLjUgMS41IDMwIDEgMS0uODY2LS41LjUgMS41IDMwIDEgMSAuODY2LjV6IiBmaWxsPSIjMDAwIi8+PC9nPjwvc3ZnPg=='); }
+.p-wr { background-image: url('data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSI0NSIgaGVpZ2h0PSI0NSI+PGcgZmlsbD0iI2ZmZiIgZmlsbC1ydWxlPSJldmVub2RkIiBzdHJva2U9IiMwMDAiIHN0cm9rZS13aWR0aD0iMS41IiBzdHJva2UtbGluZWNhcD0icm91bmQiIHN0cm9rZS1saW5lam9pbj0icm91bmQiPjxwYXRoIGQ9Ik05IDM5aDI3di0zSDl2M3ptMy0zdi00aDIxdjRIMTJ6bS0xLTIyVjloNHYyaDVWOWg1djJoNVY5aDR2NSIgc3Ryb2tlLWxpbmVjYXA9ImJ1dHQiLz48cGF0aCBkPSJNMzQgMTRsLTMgM0gxNGwtMy0zIi8+PHBhdGggZD0iTTMxIDE3djEyLjVIMTRWMTciIHN0cm9rZS1saW5lY2FwPSJidXR0IiBzdHJva2UtbGluZWpvaW49Im1pdGVyIi8+PHBhdGggZD0iTTMxIDI5LjVsMS41IDIuNWgtMjBsMS41LTIuNSIvPjxwYXRoIGQ9Ik0xMSAxNGgyMyIgZmlsbD0ibm9uZSIgc3Ryb2tlLWxpbmVqb2luPSJtaXRlciIvPjwvZz48L3N2Zz4='); }
+.p-wq { background-image: url('data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSI0NSIgaGVpZ2h0PSI0NSI+PGcgZmlsbD0iI2ZmZiIgZmlsbC1ydWxlPSJldmVub2RkIiBzdHJva2U9IiMwMDAiIHN0cm9rZS13aWR0aD0iMS41IiBzdHJva2UtbGluZWNhcD0icm91bmQiIHN0cm9rZS1saW5lam9pbj0icm91bmQiPjxwYXRoIGQ9Ik04IDEyYTIgMiAwIDEgMS00IDAgMiAyIDAgMSAxIDQgMHptMTYuNS00LjVhMiAyIDAgMSAxLTQgMCAyIDIgMCAxIDEgNCAwek00MSAxMmEyIDIgMCAxIDEtNCAwIDIgMiAwIDEgMSA0IDB6TTE2IDguNWEyIDIgMCAxIDEtNCAwIDIgMiAwIDEgMSA0IDB6TTMzIDlhMiAyIDAgMSAxLTQgMCAyIDIgMCAxIDEgNCAweiIvPjxwYXRoIGQ9Ik05IDI2YzguNS0xLjUgMjEtMS41IDI3IDBsMi0xMi03IDExVjExbC01LjUgMTMuNS0zLTE1LTMgMTUtNS41LTE0VjI1TDcgMTRsMiAxMnoiIHN0cm9rZS1saW5lY2FwPSJidXR0Ii8+PHBhdGggZD0iTTkgMjZjMCAyIDEuNSAyIDIuNSA0IDEgMS41IDEgMSAuNSAzLjUtMS41IDEtMS41IDIuNS0xLjUgMi41LTEuNSAxLjUuNSAyLjUuNSAyLjUgNi41IDEgMTYuNSAxIDIzIDAgMCAwIDEuNS0xIDAtMi41IDAgMCAuNS0xLjUtMS0yLjUtLjUtMi41LS41LTIgLjUtMy41IDEtMiAyLjUtMiAyLjUtNC04LjUtMS41LTE4LjUtMS41LTI3IDB6IiBzdHJva2UtbGluZWNhcD0iYnV0dCIvPjxwYXRoIGQ9Ik0xMS41IDMwYzMuNS0xIDE4LjUtMSAyMiAwTTEyIDMzLjVjNi0xIDE1LTEgMjEgMCIgZmlsbD0ibm9uZSIvPjwvZz48L3N2Zz4='); }
+.p-wk { background-image: url('data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSI0NSIgaGVpZ2h0PSI0NSI+PGcgZmlsbD0ibm9uZSIgZmlsbC1ydWxlPSJldmVub2RkIiBzdHJva2U9IiMwMDAiIHN0cm9rZS13aWR0aD0iMS41IiBzdHJva2UtbGluZWNhcD0icm91bmQiIHN0cm9rZS1saW5lam9pbj0icm91bmQiPjxwYXRoIGQ9Ik0yMi41IDExLjYzVjZNMjAgOGg1IiBzdHJva2UtbGluZWpvaW49Im1pdGVyIi8+PHBhdGggZD0iTTIyLjUgMjVzNC41LTcuNSAzLTEwLjVjMCAwLTEtMi41LTMtMi41cy0zIDIuNS0zIDIuNWMtMS41IDMgMyAxMC41IDMgMTAuNSIgZmlsbD0iI2ZmZiIgc3Ryb2tlLWxpbmVjYXA9ImJ1dHQiIHN0cm9rZS1saW5lam9pbj0ibWl0ZXIiLz48cGF0aCBkPSJNMTEuNSAzN2M1LjUgMy41IDE1LjUgMy41IDIxIDB2LTdzOS00LjUgNi0xMC41Yy00LTYuNS0xMy41LTMuNS0xNiA0VjI3di0zLjVjLTMuNS03LjUtMTMtMTAuNS0xNi00LTMgNiA1IDEwIDUgMTBWMzd6IiBmaWxsPSIjZmZmIi8+PHBhdGggZD0iTTExLjUgMzBjNS41LTMgMTUuNS0zIDIxIDBtLTIxIDMuNWM1LjUtMyAxNS41LTMgMjEgMG0tMjEgMy41YzUuNS0zIDE1LjUtMyAyMSAwIi8+PC9nPjwvc3ZnPg=='); }
+.p-bp { background-image: url('data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSI0NSIgaGVpZ2h0PSI0NSI+PHBhdGggZD0iTTIyLjUgOWMtMi4yMSAwLTQgMS43OS00IDQgMCAuODkuMjkgMS43MS43OCAyLjM4QzE3LjMzIDE2LjUgMTYgMTguNTkgMTYgMjFjMCAyLjAzLjk0IDMuODQgMi40MSA1LjAzLTMgMS4wNi03LjQxIDUuNTUtNy40MSAxMy40N2gyM2MwLTcuOTItNC40MS0xMi40MS03LjQxLTEzLjQ3IDEuNDctMS4xOSAyLjQxLTMgMi40MS01LjAzIDAtMi40MS0xLjMzLTQuNS0zLjI4LTUuNjIuNDktLjY3Ljc4LTEuNDkuNzgtMi4zOCAwLTIuMjEtMS43OS00LTQtNHoiIHN0cm9rZT0iIzAwMCIgc3Ryb2tlLXdpZHRoPSIxLjUiIHN0cm9rZS1saW5lY2FwPSJyb3VuZCIvPjwvc3ZnPg=='); }
+.p-bb { background-image: url('data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSI0NSIgaGVpZ2h0PSI0NSI+PGcgZmlsbD0ibm9uZSIgZmlsbC1ydWxlPSJldmVub2RkIiBzdHJva2U9IiMwMDAiIHN0cm9rZS13aWR0aD0iMS41IiBzdHJva2UtbGluZWNhcD0icm91bmQiIHN0cm9rZS1saW5lam9pbj0icm91bmQiPjxnIGZpbGw9IiMwMDAiIHN0cm9rZS1saW5lY2FwPSJidXR0Ij48cGF0aCBkPSJNOSAzNmMzLjM5LS45NyAxMC4xMS40MyAxMy41LTIgMy4zOSAyLjQzIDEwLjExIDEuMDMgMTMuNSAyIDAgMCAxLjY1LjU0IDMgMi0uNjguOTctMS42NS45OS0zIC41LTMuMzktLjk3LTEwLjExLjQ2LTEzLjUtMS0zLjM5IDEuNDYtMTAuMTEuMDMtMTMuNSAxLTEuMzU0LjQ5LTIuMzIzLjQ3LTMtLjUgMS4zNTQtMS45NCAzLTIgMy0yeiIvPjxwYXRoIGQ9Ik0xNSAzMmMyLjUgMi41IDEyLjUgMi41IDE1IDAgLjUtMS41IDAtMiAwLTIgMC0yLjUtMi41LTQtMi41LTQgNS41LTEuNSA2LTExLjUtNS0xNS41LTExIDQtMTAuNSAxNC01IDE1LjUgMCAwLTIuNSAxLjUtMi41IDQgMCAwLS41LjUgMCAyeiIvPjxwYXRoIGQ9Ik0yNSA4YTIuNSAyLjUgMCAxIDEtNSAwIDIuNSAyLjUgMCAxIDEgNSAweiIvPjwvZz48cGF0aCBkPSJNMTcuNSAyNmgxME0xNSAzMGgxNW0tNy41LTE0LjV2NU0yMCAxOGg1IiBzdHJva2U9IiNlY2VjZWMiIHN0cm9rZS1saW5lam9pbj0ibWl0ZXIiLz48L2c+PC9zdmc+'); }
+.p-bn { background-image: url('data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSI0NSIgaGVpZ2h0PSI0NSI+PGcgZmlsbD0ibm9uZSIgZmlsbC1ydWxlPSJldmVub2RkIiBzdHJva2U9IiMwMDAiIHN0cm9rZS13aWR0aD0iMS41IiBzdHJva2UtbGluZWNhcD0icm91bmQiIHN0cm9rZS1saW5lam9pbj0icm91bmQiPjxwYXRoIGQ9Ik0yMiAxMGMxMC41IDEgMTYuNSA4IDE2IDI5SDE1YzAtOSAxMC02LjUgOC0yMSIgZmlsbD0iIzAwMCIvPjxwYXRoIGQ9Ik0yNCAxOGMuMzggMi45MS01LjU1IDcuMzctOCA5LTMgMi0yLjgyIDQuMzQtNSA0LTEuMDQyLS45NCAxLjQxLTMuMDQgMC0zLTEgMCAuMTkgMS4yMy0xIDItMSAwLTQuMDAzIDEtNC00IDAtMiA2LTEyIDYtMTJzMS44OS0xLjkgMi0zLjVjLS43My0uOTk0LS41LTItLjUtMyAxLTEgMyAyLjUgMyAyLjVoMnMuNzgtMS45OTIgMi41LTNjMSAwIDEgMyAxIDMiIGZpbGw9IiMwMDAiLz48cGF0aCBkPSJNOS41IDI1LjVhLjUuNSAwIDEgMS0xIDAgLjUuNSAwIDEgMSAxIDB6bTUuNDMzLTkuNzVhLjUgMS41IDMwIDEgMS0uODY2LS41LjUgMS41IDMwIDEgMSAuODY2LjV6IiBmaWxsPSIjZWNlY2VjIiBzdHJva2U9IiNlY2VjZWMiLz48cGF0aCBkPSJNMjQuNTUgMTAuNGwtLjQ1IDEuNDUuNS4xNWMzLjE1IDEgNS42NSAyLjQ5IDcuOSA2Ljc1UzM1Ljc1IDI5LjA2IDM1LjI1IDM5bC0uMDUuNWgyLjI1bC4wNS0uNWMuNS0xMC4wNi0uODgtMTYuODUtMy4yNS0yMS4zNC0yLjM3LTQuNDktNS43OS02LjY0LTkuMTktNy4xNmwtLjUxLS4xeiIgZmlsbD0iI2VjZWNlYyIgc3Ryb2tlPSJub25lIi8+PC9nPjwvc3ZnPg=='); }
+.p-br { background-image: url('data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSI0NSIgaGVpZ2h0PSI0NSI+PGcgZmlsbC1ydWxlPSJldmVub2RkIiBzdHJva2U9IiMwMDAiIHN0cm9rZS13aWR0aD0iMS41IiBzdHJva2UtbGluZWNhcD0icm91bmQiIHN0cm9rZS1saW5lam9pbj0icm91bmQiPjxwYXRoIGQ9Ik05IDM5aDI3di0zSDl2M3ptMy41LTdsMS41LTIuNWgxN2wxLjUgMi41aC0yMHptLS41IDR2LTRoMjF2NEgxMnoiIHN0cm9rZS1saW5lY2FwPSJidXR0Ii8+PHBhdGggZD0iTTE0IDI5LjV2LTEzaDE3djEzSDE0eiIgc3Ryb2tlLWxpbmVjYXA9ImJ1dHQiIHN0cm9rZS1saW5lam9pbj0ibWl0ZXIiLz48cGF0aCBkPSJNMTQgMTYuNUwxMSAxNGgyM2wtMyAyLjVIMTR6TTExIDE0VjloNHYyaDVWOWg1djJoNVY5aDR2NUgxMXoiIHN0cm9rZS1saW5lY2FwPSJidXR0Ii8+PHBhdGggZD0iTTEyIDM1LjVoMjFtLTIwLTRoMTltLTE4LTJoMTdtLTE3LTEzaDE3TTExIDE0aDIzIiBmaWxsPSJub25lIiBzdHJva2U9IiNlY2VjZWMiIHN0cm9rZS13aWR0aD0iMSIgc3Ryb2tlLWxpbmVqb2luPSJtaXRlciIvPjwvZz48L3N2Zz4='); }
+.p-bq { background-image: url('data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSI0NSIgaGVpZ2h0PSI0NSI+PGcgZmlsbC1ydWxlPSJldmVub2RkIiBzdHJva2U9IiMwMDAiIHN0cm9rZS13aWR0aD0iMS41IiBzdHJva2UtbGluZWNhcD0icm91bmQiIHN0cm9rZS1saW5lam9pbj0icm91bmQiPjxnIHN0cm9rZT0ibm9uZSI+PGNpcmNsZSBjeD0iNiIgY3k9IjEyIiByPSIyLjc1Ii8+PGNpcmNsZSBjeD0iMTQiIGN5PSI5IiByPSIyLjc1Ii8+PGNpcmNsZSBjeD0iMjIuNSIgY3k9IjgiIHI9IjIuNzUiLz48Y2lyY2xlIGN4PSIzMSIgY3k9IjkiIHI9IjIuNzUiLz48Y2lyY2xlIGN4PSIzOSIgY3k9IjEyIiByPSIyLjc1Ii8+PC9nPjxwYXRoIGQ9Ik05IDI2YzguNS0xLjUgMjEtMS41IDI3IDBsMi41LTEyLjVMMzEgMjVsLS4zLTE0LjEtNS4yIDEzLjYtMy0xNC41LTMgMTQuNS01LjItMTMuNkwxNCAyNSA2LjUgMTMuNSA5IDI2eiIgc3Ryb2tlLWxpbmVjYXA9ImJ1dHQiLz48cGF0aCBkPSJNOSAyNmMwIDIgMS41IDIgMi41IDQgMSAxLjUgMSAxIC41IDMuNS0xLjUgMS0xLjUgMi41LTEuNSAyLjUtMS41IDEuNS41IDIuNS41IDIuNSA2LjUgMSAxNi41IDEgMjMgMCAwIDAgMS41LTEgMC0yLjUgMCAwIC41LTEuNS0xLTIuNS0uNS0yLjUtLjUtMiAuNS0zLjUgMS0yIDIuNS0yIDIuNS00LTguNS0xLjUtMTguNS0xLjUtMjcgMHoiIHN0cm9rZS1saW5lY2FwPSJidXR0Ii8+PHBhdGggZD0iTTExIDM4LjVhMzUgMzUgMSAwIDAgMjMgMCIgZmlsbD0ibm9uZSIgc3Ryb2tlLWxpbmVjYXA9ImJ1dHQiLz48cGF0aCBkPSJNMTEgMjlhMzUgMzUgMSAwIDEgMjMgMG0tMjEuNSAyLjVoMjBtLTIxIDNhMzUgMzUgMSAwIDAgMjIgMG0tMjMgM2EzNSAzNSAxIDAgMCAyNCAwIiBmaWxsPSJub25lIiBzdHJva2U9IiNlY2VjZWMiLz48L2c+PC9zdmc+'); }
+.p-bk { background-image: url('data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSI0NSIgaGVpZ2h0PSI0NSI+PGcgZmlsbD0ibm9uZSIgZmlsbC1ydWxlPSJldmVub2RkIiBzdHJva2U9IiMwMDAiIHN0cm9rZS13aWR0aD0iMS41IiBzdHJva2UtbGluZWNhcD0icm91bmQiIHN0cm9rZS1saW5lam9pbj0icm91bmQiPjxwYXRoIGQ9Ik0yMi41IDExLjYzVjYiIHN0cm9rZS1saW5lam9pbj0ibWl0ZXIiLz48cGF0aCBkPSJNMjIuNSAyNXM0LjUtNy41IDMtMTAuNWMwIDAtMS0yLjUtMy0yLjVzLTMgMi41LTMgMi41Yy0xLjUgMyAzIDEwLjUgMyAxMC41IiBmaWxsPSIjMDAwIiBzdHJva2UtbGluZWNhcD0iYnV0dCIgc3Ryb2tlLWxpbmVqb2luPSJtaXRlciIvPjxwYXRoIGQ9Ik0xMS41IDM3YzUuNSAzLjUgMTUuNSAzLjUgMjEgMHYtN3M5LTQuNSA2LTEwLjVjLTQtNi41LTEzLjUtMy41LTE2IDRWMjd2LTMuNWMtMy41LTcuNS0xMy0xMC41LTE2LTQtMyA2IDUgMTAgNSAxMFYzN3oiIGZpbGw9IiMwMDAiLz48cGF0aCBkPSJNMjAgOGg1IiBzdHJva2UtbGluZWpvaW49Im1pdGVyIi8+PHBhdGggZD0iTTMyIDI5LjVzOC41LTQgNi4wMy05LjY1QzM0LjE1IDE0IDI1IDE4IDIyLjUgMjQuNWwuMDEgMi4xLS4wMS0yLjFDMjAgMTggOS45MDYgMTQgNi45OTcgMTkuODVjLTIuNDk3IDUuNjUgNC44NTMgOSA0Ljg1MyA5IiBzdHJva2U9IiNlY2VjZWMiLz48cGF0aCBkPSJNMTEuNSAzMGM1LjUtMyAxNS41LTMgMjEgMG0tMjEgMy41YzUuNS0zIDE1LjUtMyAyMSAwbS0yMSAzLjVjNS41LTMgMTUuNS0zIDIxIDAiIHN0cm9rZT0iI2VjZWNlYyIvPjwvZz48L3N2Zz4='); }
 .pc-w { color: #fbfbf8; text-shadow: 0 0 1px #111, 0 0 1px #111, 0 1px 1px #111, 1px 0 1px #111, -1px 0 1px #111, 0 -1px 1px #111; }
 .pc-b { color: #1c1c1c; text-shadow: 0 0 1px rgba(255,255,255,.35); }
 .dot { position: absolute; left: 35%; top: 35%; width: 30%; height: 30%; border-radius: 50%; background: rgba(0,0,0,.22); pointer-events: none; }
@@ -89,7 +99,7 @@ body {
 .coord.file { right: 6%; bottom: 5%; }
 .coord.rank { left: 6%; top: 5%; }
 .sq.from .piece { opacity: .25; }
-.ghost { position: fixed; z-index: 40; pointer-events: none; font-family: var(--font-piece); line-height: 1; transform: translate(-50%, -60%); font-variant-emoji: text; }
+.ghost { position: fixed; z-index: 40; pointer-events: none; transform: translate(-50%, -60%); background: center / 100% 100% no-repeat; }
 .switch { display: flex; align-items: center; gap: 10px; cursor: pointer; }
 .switch input { width: 20px; height: 20px; flex: none; accent-color: var(--accent); }
 .send-info { display: grid; gap: 4px; min-width: 0; overflow-wrap: anywhere; }
@@ -127,7 +137,33 @@ a.btn { display: inline-flex; align-items: center; text-decoration: none; font-w
 .promo-box { background: var(--surface); border-radius: 8px; padding: 12px; display: grid; gap: 8px; text-align: center; box-shadow: 0 6px 24px rgba(0,0,0,.3); }
 .promo-box p { margin: 0; font-weight: 500; }
 .promo-row { display: flex; gap: 6px; }
-.promo-row button { width: 56px; height: 56px; border-radius: 6px; border: 1px solid var(--line); background: var(--sq-light); cursor: pointer; font-family: var(--font-piece); font-size: 40px; line-height: 1; }
+.promo-row button { position: relative; width: 56px; height: 56px; border-radius: 6px; border: 1px solid var(--line); background: var(--sq-light); cursor: pointer; padding: 0; }
+.promo-row button .piece { inset: 6%; }
+
+/* Horní lišta a jména hráčů */
+.topbar { display: flex; align-items: center; gap: 8px; max-width: 520px; }
+.icon-btn { flex: none; width: 44px; height: 44px; display: grid; place-items: center; padding: 0; border-radius: 8px; border: 1px solid var(--line); background: var(--surface); color: var(--fg); cursor: pointer; }
+.icon-btn:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
+.player { flex: 1; min-width: 0; display: flex; align-items: center; gap: 8px; font-weight: 500; }
+.player .nm { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.player.empty .nm { color: var(--muted); font-weight: 400; }
+.player.bottom { max-width: 520px; margin-top: -4px; }
+.stone { flex: none; width: 13px; height: 13px; border-radius: 50%; border: 1.5px solid var(--muted); }
+.stone.w { background: #fbfbf8; }
+.stone.b { background: #1c1c1c; }
+
+/* Menu vysouvané zleva */
+.drawer-bg { position: fixed; inset: 0; z-index: 44; background: rgba(0,0,0,.45); }
+.drawer { position: fixed; top: 0; bottom: 0; left: 0; z-index: 45; width: min(88vw, 400px); background: var(--bg); overflow-y: auto; overscroll-behavior: contain;
+  display: grid; gap: 12px; align-content: start; padding: max(12px, env(safe-area-inset-top, 0px)) 12px 32px max(12px, env(safe-area-inset-left, 0px));
+  box-shadow: 4px 0 24px rgba(0,0,0,.25); transform: translateX(-105%); visibility: hidden; transition: transform .2s ease, visibility 0s linear .2s; }
+.drawer.open { transform: none; visibility: visible; transition: transform .2s ease; }
+.drawer-head { display: flex; align-items: center; justify-content: space-between; }
+.drawer-head h2 { margin: 0; font-size: 18px; font-weight: 600; }
+@media (prefers-reduced-motion: reduce) { .drawer, .drawer.open { transition: none; } }
+
+.toast { position: fixed; left: 50%; bottom: max(20px, env(safe-area-inset-bottom, 0px)); transform: translateX(-50%); z-index: 60; max-width: min(92vw, 420px); background: var(--fg); color: var(--bg); padding: 10px 14px; border-radius: 8px; font-size: 14px; box-shadow: 0 6px 20px rgba(0,0,0,.3); }
+.toast.err { background: var(--warn); color: #fff; }
 
 /* Ovládání */
 .counter { color: var(--muted); font-size: 14px; font-variant-numeric: tabular-nums; text-align: center; }
@@ -185,6 +221,11 @@ textarea { font-family: var(--font-mono); font-size: 13px; min-height: 160px; re
 
 <div class="app">
   <div class="col">
+    <div class="topbar">
+      <button class="icon-btn" id="menuBtn" type="button" aria-label="Menu" aria-controls="drawer" aria-expanded="false"><svg viewBox="0 0 24 24" width="24" height="24" aria-hidden="true"><path d="M4 6h16M4 12h16M4 18h16" stroke="currentColor" stroke-width="2" stroke-linecap="round" fill="none"/></svg></button>
+      <div class="player" id="playerTop"></div>
+      <button class="icon-btn" id="sendIcon" type="button" aria-label="Odeslat e-mailem" title="Odeslat e-mailem" hidden><svg viewBox="0 0 24 24" width="24" height="24" aria-hidden="true"><rect x="3" y="5.5" width="18" height="13" rx="2" stroke="currentColor" stroke-width="2" fill="none"/><path d="M3.5 7l8.5 6 8.5-6" stroke="currentColor" stroke-width="2" stroke-linejoin="round" fill="none"/></svg></button>
+    </div>
     <div class="board-wrap">
       <div class="board" id="board" role="grid" aria-label="Šachovnice"></div>
       <div class="promo" id="promo" hidden>
@@ -195,6 +236,7 @@ textarea { font-family: var(--font-mono); font-size: 13px; min-height: 160px; re
         </div>
       </div>
     </div>
+    <div class="player bottom" id="playerBottom"></div>
     <div class="counter" id="counter"></div>
     <p class="cur-comment" id="curComment" hidden></p>
     <div class="nav">
@@ -245,6 +287,15 @@ textarea { font-family: var(--font-mono); font-size: 13px; min-height: 160px; re
       </div>
     </details>
 
+  </div>
+</div>
+
+<div class="drawer-bg" id="drawerBg" hidden></div>
+<aside class="drawer" id="drawer" aria-label="Menu">
+  <div class="drawer-head">
+    <h2>Menu</h2>
+    <button class="icon-btn" id="drawerClose" type="button" aria-label="Zavřít menu"><svg viewBox="0 0 24 24" width="22" height="22" aria-hidden="true"><path d="M6 6l12 12M18 6L6 18" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg></button>
+  </div>
     <details class="panel" id="pFile">
       <summary><h2>Soubor</h2></summary>
       <div class="panel-body">
@@ -299,6 +350,7 @@ textarea { font-family: var(--font-mono); font-size: 13px; min-height: 160px; re
           <div class="toggles">
             <label class="switch"><input type="checkbox" id="optUndo"> Tlačítko ↶ pro vrácení posledních akcí</label>
             <label class="switch"><input type="checkbox" id="optComments"> Komentáře k tahům (tlačítko ✎)</label>
+            <label class="switch"><input type="checkbox" id="optSend"> Ikona pro rychlé odeslání e-mailem vpravo nahoře</label>
             <label class="switch"><input type="checkbox" id="czNotation"> Zobrazovat tahy v české notaci (J, S, V, D, K)</label>
           </div>
           <p class="note">Česká notace mění jen zobrazení v aplikaci. Do souboru se tahy vždy ukládají anglicky, jak vyžaduje standard PGN.</p>
@@ -309,20 +361,22 @@ textarea { font-family: var(--font-mono); font-size: 13px; min-height: 160px; re
     <details class="panel" id="pAbout">
       <summary><h2>O aplikaci</h2></summary>
       <div class="panel-body prose">
-        <p><strong>PGN editor</strong> <span class="ver-badge">verze 0.9</span></p>
+        <p><strong>PGN editor</strong> <span class="ver-badge">verze 0.10</span></p>
         <p>Jednoduchý editor pro zápis a úpravu šachových partií ve formátu PGN, určený hlavně pro telefon s Androidem. Aplikaci programuje Claude (umělá inteligence od společnosti Anthropic) ve spolupráci s Michalem Slivou, který určuje, co má aplikace umět a jak má vypadat.</p>
         <h3>Co aplikace umí</h3>
         <ul>
           <li>Zadávání tahů klepnutím nebo tažením figury, aplikace hlídá pravidla včetně rošády, braní mimochodem a proměny pěšce.</li>
-          <li>Listování partií, skok na libovolný tah v zápisu, otočení šachovnice.</li>
+          <li>Listování partií, skok na libovolný tah v zápisu, otočení šachovnice. Jména hráčů z hlavičky jsou u šachovnice na straně svých figur.</li>
+          <li>Pod šachovnicí je jen zápis a hlavička partie, vše ostatní je v menu ☰ vlevo nahoře.</li>
           <li>Hlavička partie: turnaj, místo, kolo, datum, hráči a výsledek. Výsledek se při matu nebo patu doplní sám.</li>
           <li>Otevření souboru PGN nebo vloženého textu, uložení do souboru .pgn, kopírování do schránky.</li>
-          <li>Odeslání partie e-mailem: otevře se poštovní aplikace s připraveným e-mailem, PGN je v textu i jako příloha.</li>
+          <li>Odeslání partie e-mailem: otevře se poštovní aplikace s připraveným e-mailem, PGN je v textu i jako příloha. V Nastavení lze zapnout ikonu pro rychlé odeslání vpravo nahoře.</li>
           <li>Funguje bez připojení k internetu.</li>
           <li>Potvrzení před smazáním nebo přepsáním partie.</li>
           <li>Volitelně (zapíná se v Nastavení): tlačítko ↶ pro vrácení posledních akcí a komentáře k tahům tlačítkem ✎.</li>
           <li>Rozpracovaná partie se pamatuje i po zavření aplikace.</li>
           <li>Volba barev šachovnice v Nastavení: pět připravených sad nebo vlastní barvy.</li>
+          <li>Figury jsou ze sady cburnett od Colina M. L. Burnetta (licence GPL), kterou používá například Lichess.</li>
         </ul>
         <h3>Na čem jsme se dohodli</h3>
         <ul>
@@ -343,6 +397,16 @@ textarea { font-family: var(--font-mono); font-size: 13px; min-height: 160px; re
     <details class="panel" id="pChanges">
       <summary><h2>Verze a změny</h2></summary>
       <div class="panel-body log">
+        <section>
+          <div class="head"><span class="ver-badge">0.10</span><span class="date">30. 10. 2026</span></div>
+          <ul>
+            <li>Nové menu pod tlačítkem ☰ vlevo nahoře: Soubor, Odeslat, PGN text, Nastavení, O aplikaci a Verze a změny. Pod šachovnicí zůstal zápis a hlavička partie.</li>
+            <li>Jména hráčů z hlavičky nad a pod šachovnicí, každé na straně svých figur. Po otočení šachovnice se prohodí.</li>
+            <li>Ikona pro rychlé odeslání e-mailem vpravo nahoře, zapíná se v Nastavení.</li>
+            <li>Nové figury: menší, přesně uprostřed polí a se správnými proporcemi.</li>
+            <li>Zprávy o uložení, otevření a odeslání se při zavřeném menu ukážou krátce ve spodní části obrazovky.</li>
+          </ul>
+        </section>
         <section>
           <div class="head"><span class="ver-badge">0.9</span><span class="date">30. 10. 2026</span></div>
           <ul>
@@ -424,8 +488,9 @@ textarea { font-family: var(--font-mono); font-size: 13px; min-height: 160px; re
         </section>
       </div>
     </details>
-  </div>
-</div>
+</aside>
+
+<div class="toast" id="toast" role="status" hidden></div>
 
 <div class="modal" id="cModal" hidden>
   <div class="modal-box" role="dialog" aria-modal="true" aria-labelledby="cTitle">
@@ -458,8 +523,6 @@ textarea { font-family: var(--font-mono); font-size: 13px; min-height: 160px; re
   const TAGS = ['Event', 'Site', 'Date', 'Round', 'White', 'Black', 'Result'];
   const SIMPLE = ['Event', 'Site', 'Date', 'Round', 'Result'];
   const DEFAULTS = { Event: '?', Site: '?', Date: '????.??.??', Round: '?', White: '?', Black: '?', Result: '*' };
-  const GLYPH = { k: '♚', q: '♛', r: '♜', b: '♝', n: '♞', p: '♟' };
-  const VS = '︎';
   const STORE_KEY = 'pgn-editor-draft-v1';
   const NAMES = { k: 'král', q: 'dáma', r: 'věž', b: 'střelec', n: 'jezdec', p: 'pěšec' };
   /* V aplikaci pro Android je k dispozici most window.Android (MainActivity.java) */
@@ -470,7 +533,7 @@ textarea { font-family: var(--font-mono); font-size: 13px; min-height: 160px; re
   let pendingPromo = null;
   let history = [];
   let czech = false;
-  let opts = { undo: false, comments: false };
+  let opts = { undo: false, comments: false, sendIcon: false };
   try { const o = JSON.parse(localStorage.getItem('pgn-opts') || 'null'); if (o) opts = Object.assign(opts, o); } catch (e) {}
 
   function snapshot() {
@@ -514,6 +577,7 @@ textarea { font-family: var(--font-mono); font-size: 13px; min-height: 160px; re
 
   /* ---------- Šachovnice ---------- */
   function renderBoard() {
+    if (typeof renderPlayers === 'function') renderPlayers();
     const g = gameAt(state.ply);
     const last = lastMoveAt(state.ply);
     const board = g.board();
@@ -538,8 +602,7 @@ textarea { font-family: var(--font-mono); font-size: 13px; min-height: 160px; re
         let label = sq;
         if (p) {
           const s = document.createElement('span');
-          s.className = 'piece pc-' + p.color;
-          s.textContent = GLYPH[p.type] + VS;
+          s.className = 'piece p-' + p.color + p.type;
           btn.appendChild(s);
           label += ', ' + (p.color === 'w' ? 'bílý ' : 'černý ') + NAMES[p.type];
         }
@@ -584,8 +647,9 @@ textarea { font-family: var(--font-mono); font-size: 13px; min-height: 160px; re
     [['q', 'dáma'], ['r', 'věž'], ['b', 'střelec'], ['n', 'jezdec']].forEach(([t, name]) => {
       const b = document.createElement('button');
       b.type = 'button';
-      b.className = 'pc-' + color;
-      b.textContent = GLYPH[t] + VS;
+      const pi = document.createElement('span');
+      pi.className = 'piece p-' + color + t;
+      b.appendChild(pi);
       b.setAttribute('aria-label', name);
       b.addEventListener('click', () => {
         $('promo').hidden = true;
@@ -856,7 +920,10 @@ textarea { font-family: var(--font-mono); font-size: 13px; min-height: 160px; re
   }
 
   /* ---------- Soubor ---------- */
-  function showMsg(text, isErr) { const m = $('msg'); m.textContent = text; m.className = 'msg' + (isErr ? ' err' : ''); }
+  function showMsg(text, isErr) {
+    const m = $('msg'); m.textContent = text; m.className = 'msg' + (isErr ? ' err' : '');
+    if (!drawerOpen() && text) toast(text, isErr ? 'err' : '');
+  }
 
   async function confirmReplace() {
     if (!state.moves.length) return true;
@@ -870,7 +937,7 @@ textarea { font-family: var(--font-mono); font-size: 13px; min-height: 160px; re
     reader.onload = () => {
       const res = loadPgnText(reader.result);
       if (!res.ok) { showMsg(res.error, true); return; }
-      fillTags(); renderAll();
+      fillTags(); renderAll(); if (drawerOpen()) setDrawer(false);
       showMsg('Načteno: ' + f.name + (res.count > 1 ? '. Soubor obsahuje ' + res.count + ' partie, zatím otevírám jen první.' : ''), false);
     };
     reader.onerror = () => showMsg('Soubor se nepodařilo přečíst.', true);
@@ -943,7 +1010,7 @@ textarea { font-family: var(--font-mono); font-size: 13px; min-height: 160px; re
     snapshot();
     const flipped = state.flipped;
     state = freshState(); state.flipped = flipped; selected = null;
-    fillTags(); renderAll(); showMsg('Nová partie.', false);
+    fillTags(); renderAll(); if (drawerOpen()) setDrawer(false); showMsg('Nová partie.', false);
   });
 
   $('undoLast').addEventListener('click', () => {
@@ -985,6 +1052,7 @@ textarea { font-family: var(--font-mono); font-size: 13px; min-height: 160px; re
     for (const [box, btn] of [['modal', 'modalCancel'], ['cModal', 'cCancel'], ['promo', 'promoCancel']]) {
       if (!$(box).hidden) { $(btn).click(); return true; }
     }
+    if (drawerOpen()) { setDrawer(false); return true; }
     return false;
   };
 
@@ -1013,10 +1081,13 @@ textarea { font-family: var(--font-mono); font-size: 13px; min-height: 160px; re
     $('commentBtn').hidden = !opts.comments;
     $('optUndo').checked = opts.undo;
     $('optComments').checked = opts.comments;
+    $('sendIcon').hidden = !opts.sendIcon;
+    $('optSend').checked = opts.sendIcon;
   }
   function saveOpts() { try { localStorage.setItem('pgn-opts', JSON.stringify(opts)); } catch (e) {} }
   $('optUndo').addEventListener('change', e => { opts.undo = e.target.checked; saveOpts(); applyOpts(); });
   $('optComments').addEventListener('change', e => { opts.comments = e.target.checked; saveOpts(); applyOpts(); renderMoves(); renderCounter(); });
+  $('optSend').addEventListener('change', e => { opts.sendIcon = e.target.checked; saveOpts(); applyOpts(); });
   applyOpts();
 
   /* ---------- Komentář k tahu ---------- */
@@ -1111,8 +1182,32 @@ textarea { font-family: var(--font-mono); font-size: 13px; min-height: 160px; re
     for (let i = 0; i < bytes.length; i += 0x8000) bin += String.fromCharCode.apply(null, bytes.subarray(i, i + 0x8000));
     return btoa(bin);
   }
-  function sendMsg(text, kind) { const m = $('sendMsg'); m.textContent = text; m.className = 'msg' + (kind ? ' ' + kind : ''); }
+  let toastTimer = null;
+  function toast(text, kind) {
+    const t = $('toast'); t.textContent = text; t.className = 'toast' + (kind === 'err' ? ' err' : ''); t.hidden = false;
+    clearTimeout(toastTimer); toastTimer = setTimeout(() => { t.hidden = true; }, 3500);
+  }
+  function sendMsg(text, kind) {
+    const m = $('sendMsg'); m.textContent = text; m.className = 'msg' + (kind ? ' ' + kind : '');
+    if (!drawerOpen() && text && text !== 'Odesílám…') toast(text, kind);
+  }
+  function renderPlayers() {
+    const side = (el, color) => {
+      const p = splitName(state.headers[color === 'w' ? 'White' : 'Black']);
+      const name = [p[1], p[0]].filter(Boolean).join(' ');
+      el.innerHTML = '';
+      const st = document.createElement('span'); st.className = 'stone ' + color;
+      const nm = document.createElement('span'); nm.className = 'nm'; nm.textContent = name || (color === 'w' ? 'Bílý' : 'Černý');
+      el.classList.toggle('empty', !name);
+      el.append(st, nm);
+      el.setAttribute('aria-label', (color === 'w' ? 'Bílý: ' : 'Černý: ') + (name || 'nevyplněno'));
+    };
+    // Jméno je vždy na straně svých figur, po otočení šachovnice se prohodí
+    side($('playerTop'), state.flipped ? 'w' : 'b');
+    side($('playerBottom'), state.flipped ? 'b' : 'w');
+  }
   function renderSend() {
+    renderPlayers();
     $('sendTo').textContent = email || '(není vyplněno)';
     $('sendSubject').textContent = mailSubject();
     const pgn = buildPgn();
@@ -1175,6 +1270,22 @@ textarea { font-family: var(--font-mono); font-size: 13px; min-height: 160px; re
     }
   });
 
+  $('sendIcon').addEventListener('click', () => $('sendMail').click());
+
+  /* ---------- Menu ---------- */
+  function drawerOpen() { return $('drawer').classList.contains('open'); }
+  function setDrawer(open) {
+    $('drawer').classList.toggle('open', open);
+    $('drawerBg').hidden = !open;
+    $('menuBtn').setAttribute('aria-expanded', open ? 'true' : 'false');
+    if (open) $('drawerClose').focus(); else $('menuBtn').focus();
+  }
+  $('menuBtn').addEventListener('click', () => setDrawer(true));
+  if (location.hash === '#menu') setTimeout(() => setDrawer(true), 0); // náhled menu pro kontrolu vzhledu
+  $('drawerClose').addEventListener('click', () => setDrawer(false));
+  $('drawerBg').addEventListener('click', () => setDrawer(false));
+  $('drawer').addEventListener('keydown', e => { if (e.key === 'Escape' && $('modal').hidden) setDrawer(false); });
+
   /* ---------- Tahání figur prstem nebo myší ---------- */
   let drag = null;
   let suppressClick = false;
@@ -1184,7 +1295,7 @@ textarea { font-family: var(--font-mono); font-size: 13px; min-height: 160px; re
     const g = gameAt(state.ply);
     const p = g.get(btn.dataset.sq);
     if (!p || p.color !== g.turn()) return;
-    drag = { from: btn.dataset.sq, x: e.clientX, y: e.clientY, started: false, ghost: null, glyph: GLYPH[p.type] + VS, color: p.color };
+    drag = { from: btn.dataset.sq, x: e.clientX, y: e.clientY, started: false, ghost: null, cls: 'p-' + p.color + p.type };
   });
   window.addEventListener('pointermove', e => {
     if (!drag) return;
@@ -1196,9 +1307,9 @@ textarea { font-family: var(--font-mono); font-size: 13px; min-height: 160px; re
       const fromEl = boardEl.querySelector('[data-sq="' + drag.from + '"]');
       if (fromEl) fromEl.classList.add('from');
       const g = document.createElement('div');
-      g.className = 'ghost pc-' + drag.color;
-      g.textContent = drag.glyph;
-      g.style.fontSize = (boardEl.clientWidth / 8 * 0.95) + 'px';
+      g.className = 'ghost ' + drag.cls;
+      const size = Math.round(boardEl.clientWidth / 8 * 1.1);
+      g.style.width = size + 'px'; g.style.height = size + 'px';
       document.body.appendChild(g);
       drag.ghost = g;
     }

@@ -29,7 +29,7 @@ Soubor `app/pgn-editor.keystore` podepisuje aplikaci. Díky němu jde každá da
 |---|---|
 | `app/src/main/assets/www/index.html` | celá aplikace (vzhled i logika) |
 | `app/src/main/assets/www/chess.js` | pravidla šachu (chess.js 0.10.3) |
-| `app/src/main/assets/www/fonts/` | písma IBM Plex a Noto Sans Symbols 2 |
+| `app/src/main/assets/www/fonts/` | písma IBM Plex |
 | `app/src/main/java/.../MainActivity.java` | obal: otevírání a ukládání souborů, schránka, e-mail, tlačítko Zpět |
 | `app/build.gradle` | číslo verze, podpis |
 | `.github/workflows/build.yml` | návod pro GitHub, jak APK sestavit |

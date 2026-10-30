@@ -34,6 +34,22 @@ jobs:
           name: pgn-editor-${{ env.VER }}
           path: pgn-editor-*.apk
 
+      - name: Náhled obrazovky
+        continue-on-error: true
+        run: |
+          P="$PWD/app/src/main/assets/www/index.html"
+          for v in "nahled:" "nahled-menu:#menu"; do
+            google-chrome --headless=new --no-sandbox --hide-scrollbars --force-device-scale-factor=2 \
+              --window-size=412,915 --virtual-time-budget=3000 --screenshot="${v%%:*}.png" "file://$P${v#*:}"
+          done
+
+      - name: Uložit náhled
+        continue-on-error: true
+        uses: actions/upload-artifact@v4
+        with:
+          name: nahled-${{ env.VER }}
+          path: nahled*.png
+
       - name: Zveřejnit ke stažení (Releases)
         uses: softprops/action-gh-release@v2
         with:
