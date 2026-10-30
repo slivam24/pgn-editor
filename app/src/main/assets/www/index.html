@@ -1,0 +1,1282 @@
+<!doctype html><html><head><meta charset=utf8><meta name=viewport content="width=device-width,initial-scale=1,viewport-fit=cover"><style>:root{color-scheme:light;box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}html{scroll-padding-top:env(safe-area-inset-top,0px)}body{margin:0;padding:0;font:14px -apple-system,BlinkMacSystemFont,sans-serif;background:#fff;color:#000}img{max-width:100%}[hidden]:not([hidden=until-found i]){display:none!important}</style></head><body>
+<title>PGN editor</title>
+<style>
+@font-face { font-family: 'IBM Plex Sans'; font-style: normal; font-weight: 400; font-display: swap; src: url(fonts/ibm-plex-sans-latin-ext-400-normal.woff2) format('woff2');
+  unicode-range: U+0100-02BA, U+02BD-02C5, U+02C7-02CC, U+02CE-02D7, U+02DD-02FF, U+0304, U+0308, U+0329, U+1D00-1DBF, U+1E00-1E9F, U+1EF2-1EFF, U+2020, U+20A0-20AB, U+20AD-20C0, U+2113, U+2C60-2C7F, U+A720-A7FF; }
+@font-face { font-family: 'IBM Plex Sans'; font-style: normal; font-weight: 400; font-display: swap; src: url(fonts/ibm-plex-sans-latin-400-normal.woff2) format('woff2');
+  unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+0304, U+0308, U+0329, U+2000-206F, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD; }
+@font-face { font-family: 'IBM Plex Sans'; font-style: normal; font-weight: 500; font-display: swap; src: url(fonts/ibm-plex-sans-latin-ext-500-normal.woff2) format('woff2');
+  unicode-range: U+0100-02BA, U+02BD-02C5, U+02C7-02CC, U+02CE-02D7, U+02DD-02FF, U+0304, U+0308, U+0329, U+1D00-1DBF, U+1E00-1E9F, U+1EF2-1EFF, U+2020, U+20A0-20AB, U+20AD-20C0, U+2113, U+2C60-2C7F, U+A720-A7FF; }
+@font-face { font-family: 'IBM Plex Sans'; font-style: normal; font-weight: 500; font-display: swap; src: url(fonts/ibm-plex-sans-latin-500-normal.woff2) format('woff2');
+  unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+0304, U+0308, U+0329, U+2000-206F, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD; }
+@font-face { font-family: 'IBM Plex Sans'; font-style: normal; font-weight: 600; font-display: swap; src: url(fonts/ibm-plex-sans-latin-ext-600-normal.woff2) format('woff2');
+  unicode-range: U+0100-02BA, U+02BD-02C5, U+02C7-02CC, U+02CE-02D7, U+02DD-02FF, U+0304, U+0308, U+0329, U+1D00-1DBF, U+1E00-1E9F, U+1EF2-1EFF, U+2020, U+20A0-20AB, U+20AD-20C0, U+2113, U+2C60-2C7F, U+A720-A7FF; }
+@font-face { font-family: 'IBM Plex Sans'; font-style: normal; font-weight: 600; font-display: swap; src: url(fonts/ibm-plex-sans-latin-600-normal.woff2) format('woff2');
+  unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+0304, U+0308, U+0329, U+2000-206F, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD; }
+@font-face { font-family: 'IBM Plex Mono'; font-style: normal; font-weight: 400; font-display: swap; src: url(fonts/ibm-plex-mono-latin-ext-400-normal.woff2) format('woff2');
+  unicode-range: U+0100-02BA, U+02BD-02C5, U+02C7-02CC, U+02CE-02D7, U+02DD-02FF, U+0304, U+0308, U+0329, U+1D00-1DBF, U+1E00-1E9F, U+1EF2-1EFF, U+2020, U+20A0-20AB, U+20AD-20C0, U+2113, U+2C60-2C7F, U+A720-A7FF; }
+@font-face { font-family: 'IBM Plex Mono'; font-style: normal; font-weight: 400; font-display: swap; src: url(fonts/ibm-plex-mono-latin-400-normal.woff2) format('woff2');
+  unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+0304, U+0308, U+0329, U+2000-206F, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD; }
+@font-face { font-family: 'IBM Plex Mono'; font-style: normal; font-weight: 600; font-display: swap; src: url(fonts/ibm-plex-mono-latin-ext-600-normal.woff2) format('woff2');
+  unicode-range: U+0100-02BA, U+02BD-02C5, U+02C7-02CC, U+02CE-02D7, U+02DD-02FF, U+0304, U+0308, U+0329, U+1D00-1DBF, U+1E00-1E9F, U+1EF2-1EFF, U+2020, U+20A0-20AB, U+20AD-20C0, U+2113, U+2C60-2C7F, U+A720-A7FF; }
+@font-face { font-family: 'IBM Plex Mono'; font-style: normal; font-weight: 600; font-display: swap; src: url(fonts/ibm-plex-mono-latin-600-normal.woff2) format('woff2');
+  unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+0304, U+0308, U+0329, U+2000-206F, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD; }
+@font-face { font-family: 'Noto Sans Symbols 2'; font-style: normal; font-weight: 400; font-display: swap; src: url(fonts/noto-sans-symbols-2-symbols-400-normal.woff2) format('woff2');
+  unicode-range: U+2654-265F; }
+</style>
+<style>
+/* Layout: šachovnice nahoře, pod ní ovládání a zápis; na širokém displeji dva sloupce. Barvy převzaté z turnajové rolovací šachovnice. */
+:root {
+  --bg: #f3f5f2;
+  --surface: #ffffff;
+  --fg: #1d2420;
+  --muted: #5d6a62;
+  --line: #d5ddd7;
+  --accent: #2f6b4f;
+  --accent-fg: #ffffff;
+  --accent-soft: #e2efe7;
+  --warn: #a8461f;
+  --sq-light: #eeeed2;
+  --sq-dark: #769656;
+  --sq-sel: #f6f669;
+  --sq-last: rgba(246, 246, 105, .55);
+  --sq-check: #e0614a;
+  --font-ui: "IBM Plex Sans", system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+  --font-mono: "IBM Plex Mono", ui-monospace, "SFMono-Regular", Menlo, Consolas, monospace;
+  --font-piece: "Noto Sans Symbols 2", "DejaVu Sans", "Segoe UI Symbol", "Arial Unicode MS", sans-serif;
+}
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    --bg: #141a17; --surface: #1d2521; --fg: #e4ebe6; --muted: #98a69d; --line: #33403a;
+    --accent: #6fbf94; --accent-fg: #0f1a14; --accent-soft: #233a2e; --warn: #f08a5d;
+    color-scheme: dark;
+  }
+}
+:root[data-theme="dark"] {
+  --bg: #141a17; --surface: #1d2521; --fg: #e4ebe6; --muted: #98a69d; --line: #33403a;
+  --accent: #6fbf94; --accent-fg: #0f1a14; --accent-soft: #233a2e; --warn: #f08a5d;
+  color-scheme: dark;
+}
+* { box-sizing: border-box; }
+body {
+  background: var(--bg); color: var(--fg); font-family: var(--font-ui); font-size: 15px; line-height: 1.45;
+  padding-left: max(16px, env(safe-area-inset-left, 0px));
+  padding-right: max(16px, env(safe-area-inset-right, 0px));
+  padding-block: 12px 32px;
+}
+.app { max-width: 1040px; margin: 0 auto; display: grid; gap: 16px; }
+@media (min-width: 860px) { .app { grid-template-columns: minmax(0, 520px) minmax(0, 1fr); align-items: start; } }
+
+.col { display: grid; gap: 12px; min-width: 0; }
+
+/* Šachovnice */
+.board-wrap { position: relative; width: 100%; max-width: 520px; container-type: inline-size; }
+.board { display: grid; grid-template-columns: repeat(8, minmax(0, 1fr)); grid-template-rows: repeat(8, minmax(0, 1fr)); aspect-ratio: 1 / 1; width: 100%; border-radius: 4px; overflow: hidden; box-shadow: 0 0 0 1px rgba(0,0,0,.25); touch-action: none; user-select: none; -webkit-user-select: none; }
+/* Pole nemá žádný obsah v toku dokumentu, vše je absolutně umístěné, takže figura velikost pole nikdy nezmění */
+.sq { position: relative; border: 0; padding: 0; margin: 0; width: 100%; height: 100%; aspect-ratio: 1 / 1; min-width: 0; min-height: 0; overflow: hidden; display: block; cursor: pointer; font: inherit; line-height: 0; -webkit-tap-highlight-color: transparent; }
+.sq.light { background: var(--sq-light); }
+.sq.dark { background: var(--sq-dark); }
+.sq.last::before { content: ""; position: absolute; inset: 0; background: var(--sq-last); }
+.sq.sel::before { content: ""; position: absolute; inset: 0; background: var(--sq-sel); opacity: .85; }
+.sq.check::before { content: ""; position: absolute; inset: 0; background: radial-gradient(circle, var(--sq-check) 0%, rgba(224,97,74,.6) 45%, transparent 75%); }
+.sq:focus-visible { outline: 3px solid #1f6feb; outline-offset: -3px; z-index: 2; }
+.piece { position: absolute; inset: 0; display: grid; place-items: center; font-family: var(--font-piece); font-size: 10.6cqw; line-height: 1; pointer-events: none; font-variant-emoji: text; }
+.pc-w { color: #fbfbf8; text-shadow: 0 0 1px #111, 0 0 1px #111, 0 1px 1px #111, 1px 0 1px #111, -1px 0 1px #111, 0 -1px 1px #111; }
+.pc-b { color: #1c1c1c; text-shadow: 0 0 1px rgba(255,255,255,.35); }
+.dot { position: absolute; left: 35%; top: 35%; width: 30%; height: 30%; border-radius: 50%; background: rgba(0,0,0,.22); pointer-events: none; }
+.ring { position: absolute; inset: 4%; border-radius: 50%; border: 5px solid rgba(0,0,0,.22); pointer-events: none; }
+.coord { position: absolute; font-size: 2.4cqw; line-height: 1; font-weight: 600; pointer-events: none; font-family: var(--font-ui); }
+.coord.file { right: 6%; bottom: 5%; }
+.coord.rank { left: 6%; top: 5%; }
+.sq.from .piece { opacity: .25; }
+.ghost { position: fixed; z-index: 40; pointer-events: none; font-family: var(--font-piece); line-height: 1; transform: translate(-50%, -60%); font-variant-emoji: text; }
+.switch { display: flex; align-items: center; gap: 10px; cursor: pointer; }
+.switch input { width: 20px; height: 20px; flex: none; accent-color: var(--accent); }
+.send-info { display: grid; gap: 4px; min-width: 0; overflow-wrap: anywhere; }
+.mono { font-family: var(--font-mono); font-size: 14px; }
+.field { display: grid; gap: 3px; font-size: 13px; color: var(--muted); }
+a.btn { display: inline-flex; align-items: center; text-decoration: none; font-weight: 500; border-radius: 6px; border: 1px solid var(--line); background: var(--surface); color: var(--fg); padding: 9px 14px; min-height: 42px; }
+.msg.ok { color: var(--accent); }
+.prose { display: grid; gap: 8px; max-width: 65ch; }
+.prose p { margin: 0; }
+.prose ul { margin: 0; padding-left: 20px; display: grid; gap: 4px; }
+.prose h3 { margin: 6px 0 0; font-size: 14px; font-weight: 600; }
+.ver-badge { display: inline-block; font-family: var(--font-mono); font-size: 13px; background: var(--accent-soft); color: var(--fg); border-radius: 4px; padding: 1px 7px; }
+.log { display: grid; gap: 14px; }
+.log section { display: grid; gap: 4px; padding-top: 12px; border-top: 1px solid var(--line); }
+.log section:first-child { border-top: 0; padding-top: 0; }
+.log .head { display: flex; gap: 8px; align-items: baseline; flex-wrap: wrap; }
+.log .date { color: var(--muted); font-size: 13px; }
+.log ul { margin: 0; padding-left: 20px; display: grid; gap: 3px; }
+.toggles { display: grid; gap: 10px; margin-top: 4px; }
+.cur-comment { margin: 0; font-size: 14px; color: var(--muted); font-style: italic; text-align: center; overflow-wrap: anywhere; }
+.moves .cm { font-family: var(--font-ui); font-style: italic; color: var(--muted); font-size: 14px; margin-right: 6px; cursor: pointer; }
+.c-text { font-family: var(--font-ui); font-size: 15px; min-height: 96px; }
+.modal-box .spacer { flex: 1; }
+.presets { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 4px; }
+.preset { display: inline-flex; align-items: center; gap: 8px; font: inherit; font-size: 14px; color: var(--fg); background: var(--surface); border: 1px solid var(--line); border-radius: 6px; padding: 6px 10px 6px 6px; cursor: pointer; min-height: 40px; }
+.preset[aria-pressed="true"] { border-color: var(--accent); box-shadow: inset 0 0 0 1px var(--accent); }
+.swatch { display: grid; grid-template-columns: 1fr 1fr; grid-template-rows: 1fr 1fr; width: 26px; height: 26px; border-radius: 3px; overflow: hidden; box-shadow: 0 0 0 1px rgba(0,0,0,.2); flex: none; }
+.colors { display: flex; flex-wrap: wrap; gap: 16px; margin-top: 8px; }
+.color-pick { display: inline-flex; align-items: center; gap: 8px; color: var(--fg); font-size: 14px; cursor: pointer; }
+.color-pick input { width: 44px; height: 32px; padding: 2px; border-radius: 6px; cursor: pointer; }
+.sq.light .coord { color: var(--sq-dark); }
+.sq.dark .coord { color: var(--sq-light); }
+
+.promo { position: absolute; inset: 0; display: grid; place-items: center; background: rgba(0,0,0,.45); border-radius: 4px; }
+.promo-box { background: var(--surface); border-radius: 8px; padding: 12px; display: grid; gap: 8px; text-align: center; box-shadow: 0 6px 24px rgba(0,0,0,.3); }
+.promo-box p { margin: 0; font-weight: 500; }
+.promo-row { display: flex; gap: 6px; }
+.promo-row button { width: 56px; height: 56px; border-radius: 6px; border: 1px solid var(--line); background: var(--sq-light); cursor: pointer; font-family: var(--font-piece); font-size: 40px; line-height: 1; }
+
+/* Ovládání */
+.counter { color: var(--muted); font-size: 14px; font-variant-numeric: tabular-nums; text-align: center; }
+.nav { display: flex; gap: 6px; flex-wrap: wrap; }
+button.btn { font: inherit; font-weight: 500; border-radius: 6px; border: 1px solid var(--line); background: var(--surface); color: var(--fg); padding: 9px 14px; cursor: pointer; min-height: 42px; }
+button.btn:hover { border-color: var(--accent); }
+button.btn:focus-visible, input:focus-visible, select:focus-visible, textarea:focus-visible, summary:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
+button.btn:disabled { opacity: .45; cursor: default; }
+button.btn.primary { background: var(--accent); color: var(--accent-fg); border-color: var(--accent); }
+button.btn.danger { color: var(--warn); }
+.nav button.btn { flex: 1 1 0; min-width: 48px; font-size: 17px; padding-inline: 6px; }
+.nav button.btn.flip { font-size: 15px; flex: 1.4 1 0; }
+
+.panel { background: var(--surface); border: 1px solid var(--line); border-radius: 8px; min-width: 0; }
+.panel > summary { list-style: none; display: flex; align-items: center; justify-content: space-between; gap: 8px; padding: 14px; cursor: pointer; min-height: 48px; }
+.panel > summary::-webkit-details-marker { display: none; }
+.panel > summary h2 { margin: 0; font-size: 13px; font-weight: 600; text-transform: uppercase; letter-spacing: .06em; color: var(--muted); }
+.panel > summary::after { content: ""; width: 8px; height: 8px; border-right: 2px solid var(--muted); border-bottom: 2px solid var(--muted); transform: rotate(45deg); margin-right: 4px; }
+.panel[open] > summary::after { transform: rotate(-135deg); }
+.panel-body { display: grid; gap: 10px; padding: 0 14px 14px; }
+
+.modal { position: fixed; inset: 0; z-index: 50; display: grid; place-items: center; background: rgba(0,0,0,.5); padding: 16px; }
+.modal-box { background: var(--surface); color: var(--fg); border-radius: 10px; padding: 18px; max-width: 360px; width: 100%; display: grid; gap: 14px; box-shadow: 0 10px 40px rgba(0,0,0,.35); }
+.modal-box h3 { margin: 0; font-size: 17px; }
+.modal-box p { margin: 0; white-space: pre-line; overflow-wrap: anywhere; }
+.modal-box .actions { justify-content: flex-end; }
+
+/* Zápis */
+.moves { font-family: var(--font-mono); font-size: 15px; line-height: 1.9; max-height: 260px; overflow-y: auto; overflow-wrap: anywhere; }
+@media (min-width: 860px) { .moves { max-height: 340px; } }
+.moves .no { color: var(--muted); margin-right: 2px; }
+.moves .mv { border: 0; background: none; font: inherit; color: inherit; padding: 1px 5px; margin-right: 3px; border-radius: 4px; cursor: pointer; }
+.moves .mv:hover { background: var(--accent-soft); }
+.moves .mv.cur { background: var(--accent); color: var(--accent-fg); }
+.moves .res { font-weight: 600; margin-left: 4px; }
+.moves .empty { font-family: var(--font-ui); color: var(--muted); line-height: 1.45; }
+
+/* Hlavička */
+.tags { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 10px 12px; }
+.tags label { display: grid; gap: 3px; font-size: 13px; color: var(--muted); min-width: 0; }
+.tags .wide { grid-column: 1 / -1; }
+.tags code { font-family: var(--font-mono); font-size: 12px; }
+input, select, textarea { font: inherit; color: var(--fg); background: var(--bg); border: 1px solid var(--line); border-radius: 6px; padding: 8px 10px; width: 100%; min-width: 0; }
+.date-row { display: flex; gap: 6px; }
+.date-row button.btn { min-height: 0; padding: 6px 10px; flex: none; }
+
+.actions { display: flex; gap: 8px; flex-wrap: wrap; }
+.note { font-size: 13px; color: var(--muted); margin: 0; }
+.msg { font-size: 14px; margin: 0; min-height: 1.2em; }
+.msg.err { color: var(--warn); }
+details > summary { cursor: pointer; font-weight: 500; }
+textarea { font-family: var(--font-mono); font-size: 13px; min-height: 160px; resize: vertical; }
+@media (prefers-reduced-motion: no-preference) { button.btn, .moves .mv { transition: background-color .12s, border-color .12s; } }
+</style>
+
+<div class="app">
+  <div class="col">
+    <div class="board-wrap">
+      <div class="board" id="board" role="grid" aria-label="Šachovnice"></div>
+      <div class="promo" id="promo" hidden>
+        <div class="promo-box">
+          <p>Proměna pěšce</p>
+          <div class="promo-row" id="promoRow"></div>
+          <button class="btn" id="promoCancel" type="button">Zrušit</button>
+        </div>
+      </div>
+    </div>
+    <div class="counter" id="counter"></div>
+    <p class="cur-comment" id="curComment" hidden></p>
+    <div class="nav">
+      <button class="btn" id="navStart" type="button" aria-label="Na začátek">⏮</button>
+      <button class="btn" id="navPrev" type="button" aria-label="O tah zpět">◀</button>
+      <button class="btn" id="navNext" type="button" aria-label="O tah vpřed">▶</button>
+      <button class="btn" id="navEnd" type="button" aria-label="Na konec">⏭</button>
+      <button class="btn" id="undo" type="button" aria-label="Vrátit poslední akci" title="Vrátit poslední akci" hidden>↶</button>
+      <button class="btn" id="commentBtn" type="button" aria-label="Komentář k tahu" title="Komentář k tahu" hidden>✎</button>
+      <button class="btn flip" id="flip" type="button">Otočit</button>
+    </div>
+  </div>
+
+  <div class="col">
+    <details class="panel" id="pMoves">
+      <summary><h2>Zápis partie</h2></summary>
+      <div class="panel-body">
+        <div class="moves" id="moves"></div>
+        <div class="actions">
+          <button class="btn danger" id="undoLast" type="button">Smazat poslední tah</button>
+        </div>
+      </div>
+    </details>
+
+    <details class="panel" id="pTags">
+      <summary><h2>Hlavička partie</h2></summary>
+      <div class="panel-body">
+        <div class="tags">
+          <label class="wide">Turnaj <code>Event</code><input id="tEvent" autocomplete="off"></label>
+          <label>Místo <code>Site</code><input id="tSite" autocomplete="off"></label>
+          <label>Kolo <code>Round</code><input id="tRound" autocomplete="off"></label>
+          <label class="wide">Datum <code>Date</code>
+            <span class="date-row"><input id="tDate" placeholder="RRRR.MM.DD" autocomplete="off"><button class="btn" id="today" type="button">Dnes</button></span>
+          </label>
+          <label>Bílý, příjmení<input id="tWhiteLast" autocomplete="off"></label>
+          <label>Bílý, jméno<input id="tWhiteFirst" autocomplete="off"></label>
+          <label>Černý, příjmení<input id="tBlackLast" autocomplete="off"></label>
+          <label>Černý, jméno<input id="tBlackFirst" autocomplete="off"></label>
+          <label class="wide">Výsledek <code>Result</code>
+            <select id="tResult">
+              <option value="*">* (nedohráno)</option>
+              <option value="1-0">1-0 (vyhrál bílý)</option>
+              <option value="0-1">0-1 (vyhrál černý)</option>
+              <option value="1/2-1/2">1/2-1/2 (remíza)</option>
+            </select>
+          </label>
+        </div>
+      </div>
+    </details>
+
+    <details class="panel" id="pFile">
+      <summary><h2>Soubor</h2></summary>
+      <div class="panel-body">
+        <div class="actions">
+          <button class="btn primary" id="openFile" type="button">Otevřít PGN</button>
+          <button class="btn" id="saveFile" type="button">Uložit</button>
+          <button class="btn" id="copyPgn" type="button">Kopírovat PGN</button>
+          <button class="btn danger" id="newGame" type="button">Nová partie</button>
+        </div>
+        <input type="file" id="fileInput" accept=".pgn,.txt,text/plain,application/x-chess-pgn" hidden>
+        <p class="msg" id="msg" role="status"></p>
+      </div>
+    </details>
+
+    <details class="panel" id="pSend">
+      <summary><h2>Odeslat</h2></summary>
+      <div class="panel-body">
+        <div class="send-info">
+          <div><span class="note">Komu:</span> <span id="sendTo" class="mono"></span></div>
+          <div><span class="note">Předmět:</span> <span id="sendSubject"></span></div>
+        </div>
+        <div class="actions">
+          <button class="btn primary" id="sendMail" type="button">Odeslat e-mailem</button>
+          <a class="btn" id="mailtoLink" href="#" target="_blank" rel="noopener" hidden>Otevřít v poštovní aplikaci</a>
+        </div>
+        <p class="note" id="sendNote">E-mail odejde z tvého Gmailu. PGN bude v textu zprávy i jako příloha. Adresu změníš v Nastavení.</p>
+        <p class="msg" id="sendMsg" role="status"></p>
+      </div>
+    </details>
+
+    <details class="panel" id="pText">
+      <summary><h2>PGN text</h2></summary>
+      <div class="panel-body">
+        <textarea id="pgnText" spellcheck="false" aria-label="PGN text"></textarea>
+        <div class="actions"><button class="btn" id="loadText" type="button">Načíst vložený text</button></div>
+      </div>
+    </details>
+
+    <details class="panel" id="pSettings">
+      <summary><h2>Nastavení</h2></summary>
+      <div class="panel-body">
+        <div class="field">Barvy šachovnice
+          <div class="presets" id="presets"></div>
+          <div class="colors">
+            <label class="color-pick"><input type="color" id="colLight"> Světlá pole</label>
+            <label class="color-pick"><input type="color" id="colDark"> Tmavá pole</label>
+          </div>
+        </div>
+        <label class="field">Adresa pro odesílání partií<input id="setEmail" type="email" autocomplete="email" inputmode="email"></label>
+        <div class="field">Další funkce
+          <p class="note">Ve výchozím stavu je aplikace co nejjednodušší. Tady si zapneš, co navíc potřebuješ.</p>
+          <div class="toggles">
+            <label class="switch"><input type="checkbox" id="optUndo"> Tlačítko ↶ pro vrácení posledních akcí</label>
+            <label class="switch"><input type="checkbox" id="optComments"> Komentáře k tahům (tlačítko ✎)</label>
+            <label class="switch"><input type="checkbox" id="czNotation"> Zobrazovat tahy v české notaci (J, S, V, D, K)</label>
+          </div>
+          <p class="note">Česká notace mění jen zobrazení v aplikaci. Do souboru se tahy vždy ukládají anglicky, jak vyžaduje standard PGN.</p>
+        </div>
+      </div>
+    </details>
+
+    <details class="panel" id="pAbout">
+      <summary><h2>O aplikaci</h2></summary>
+      <div class="panel-body prose">
+        <p><strong>PGN editor</strong> <span class="ver-badge">verze 0.9</span></p>
+        <p>Jednoduchý editor pro zápis a úpravu šachových partií ve formátu PGN, určený hlavně pro telefon s Androidem. Aplikaci programuje Claude (umělá inteligence od společnosti Anthropic) ve spolupráci s Michalem Slivou, který určuje, co má aplikace umět a jak má vypadat.</p>
+        <h3>Co aplikace umí</h3>
+        <ul>
+          <li>Zadávání tahů klepnutím nebo tažením figury, aplikace hlídá pravidla včetně rošády, braní mimochodem a proměny pěšce.</li>
+          <li>Listování partií, skok na libovolný tah v zápisu, otočení šachovnice.</li>
+          <li>Hlavička partie: turnaj, místo, kolo, datum, hráči a výsledek. Výsledek se při matu nebo patu doplní sám.</li>
+          <li>Otevření souboru PGN nebo vloženého textu, uložení do souboru .pgn, kopírování do schránky.</li>
+          <li>Odeslání partie e-mailem: otevře se poštovní aplikace s připraveným e-mailem, PGN je v textu i jako příloha.</li>
+          <li>Funguje bez připojení k internetu.</li>
+          <li>Potvrzení před smazáním nebo přepsáním partie.</li>
+          <li>Volitelně (zapíná se v Nastavení): tlačítko ↶ pro vrácení posledních akcí a komentáře k tahům tlačítkem ✎.</li>
+          <li>Rozpracovaná partie se pamatuje i po zavření aplikace.</li>
+          <li>Volba barev šachovnice v Nastavení: pět připravených sad nebo vlastní barvy.</li>
+        </ul>
+        <h3>Na čem jsme se dohodli</h3>
+        <ul>
+          <li>Základ aplikace má být co nejjednodušší: otevřít, naklikat tahy, vyplnit hlavičku a odeslat. Další funkce jsou ve výchozím stavu vypnuté a zapínají se v Nastavení.</li>
+          <li>Jména hráčů se do souboru zapisují podle standardu jako <code>Příjmení, Jméno</code>.</li>
+          <li>Tahy se do souboru zapisují vždy anglicky (N, B, R, Q, K). Česká notace je jen volba zobrazení.</li>
+          <li>Soubor obsahuje jen znaky bez diakritiky. Uvozovky se mění na apostrof, zpětné lomítko na lomítko a hranaté závorky na kulaté, aby soubor bez potíží četl ChessBase i jiné programy.</li>
+          <li>Pokud se vrátíš zpět a zahraješ jiný tah, zbytek partie se po potvrzení přepíše.</li>
+        </ul>
+        <h3>Známá omezení</h3>
+        <ul>
+          <li>Ze souboru s více partiemi se otevře jen první. Varianty se při otevření zatím zahodí.</li>
+          <li>Aplikace se instaluje ze souboru APK mimo Obchod Play, takže se sama neaktualizuje. Novou verzi stačí nainstalovat přes starou, partie i nastavení zůstanou.</li>
+        </ul>
+      </div>
+    </details>
+
+    <details class="panel" id="pChanges">
+      <summary><h2>Verze a změny</h2></summary>
+      <div class="panel-body log">
+        <section>
+          <div class="head"><span class="ver-badge">0.9</span><span class="date">30. 10. 2026</span></div>
+          <ul>
+            <li>První verze jako aplikace pro Android (instalační soubor APK).</li>
+            <li>Aplikace funguje bez internetu, pravidla šachu i písma jsou její součástí.</li>
+            <li>Uložení vytvoří rovnou soubor s koncovkou .pgn, místo uložení vybereš v telefonu.</li>
+            <li>Odeslat e-mailem otevře poštovní aplikaci s vyplněnou adresou, předmětem, textem a přílohou .pgn.</li>
+            <li>Systémové tlačítko Zpět zavře otevřené okno, jinak aplikaci zavře.</li>
+          </ul>
+        </section>
+        <section>
+          <div class="head"><span class="ver-badge">0.8</span><span class="date">29. 10. 2026</span></div>
+          <ul>
+            <li>Komentáře k tahům: tlačítko ✎ pod šachovnicí, komentář se zobrazí pod počítadlem a v zápisu partie a ukládá se do PGN (bez diakritiky).</li>
+            <li>Komentáře z otevřeného souboru se načtou a zachovají, i když je funkce vypnutá.</li>
+            <li>Tlačítko ↶ je nově ve výchozím stavu skryté a zapíná se v Nastavení.</li>
+            <li>Nová sekce Další funkce v Nastavení.</li>
+          </ul>
+        </section>
+        <section>
+          <div class="head"><span class="ver-badge">0.7</span><span class="date">29. 10. 2026</span></div>
+          <ul>
+            <li>Volba barev šachovnice v Nastavení: Zelená, Dřevo, Modrá, Šedá, Fialová nebo vlastní barvy světlých a tmavých polí.</li>
+          </ul>
+        </section>
+        <section>
+          <div class="head"><span class="ver-badge">0.6</span><span class="date">29. 10. 2026</span></div>
+          <ul>
+            <li>Nové panely O aplikaci a Verze a změny.</li>
+          </ul>
+        </section>
+        <section>
+          <div class="head"><span class="ver-badge">0.5</span><span class="date">29. 10. 2026</span></div>
+          <ul>
+            <li>Soubor PGN se ukládá bez diakritiky, aby byl jednotný a čitelný v ChessBase.</li>
+            <li>Uvozovky v hlavičce se mění na apostrof, zpětné lomítko na lomítko, hranaté závorky na kulaté.</li>
+            <li>Název ukládaného a přiloženého souboru je také bez diakritiky.</li>
+          </ul>
+        </section>
+        <section>
+          <div class="head"><span class="ver-badge">0.4</span><span class="date">29. 10. 2026</span></div>
+          <ul>
+            <li>Odeslání partie e-mailem přes Gmail, PGN v textu zprávy i jako příloha <code>.pgn</code>.</li>
+            <li>Předmět e-mailu se skládá z hráčů, výsledku, turnaje a kola.</li>
+            <li>Adresa pro odesílání v Nastavení, výchozí slivam24@gmail.com.</li>
+            <li>Potvrzovací okno před odesláním.</li>
+          </ul>
+        </section>
+        <section>
+          <div class="head"><span class="ver-badge">0.3</span><span class="date">29. 10. 2026</span></div>
+          <ul>
+            <li>Tahání figur prstem nebo myší.</li>
+            <li>Tlačítko ↶ pro vrácení posledních akcí (až 50 kroků).</li>
+            <li>Varování před otevřením jiné partie.</li>
+            <li>Volba české notace v Nastavení.</li>
+            <li>Souřadnice posunuté dovnitř polí, aby se neořezávaly.</li>
+            <li>Panel Odeslat.</li>
+          </ul>
+        </section>
+        <section>
+          <div class="head"><span class="ver-badge">0.2</span><span class="date">29. 10. 2026</span></div>
+          <ul>
+            <li>Pole šachovnice jsou pevné čtverce bez ohledu na figury.</li>
+            <li>Stránka začíná rovnou šachovnicí, pod ní počítadlo tahů.</li>
+            <li>Všechny nabídky jsou rozbalovací a pamatují si, které jsou otevřené.</li>
+            <li>Jméno a příjmení hráče zvlášť.</li>
+            <li>Potvrzení před přepsáním pokračování partie a před novou partií.</li>
+            <li>Odstraněn popisek, kdo je na tahu, šach a mat.</li>
+          </ul>
+        </section>
+        <section>
+          <div class="head"><span class="ver-badge">0.1</span><span class="date">29. 10. 2026</span></div>
+          <ul>
+            <li>První kostra: šachovnice s pravidly, zadávání tahů klepnutím, zápis partie, listování a otočení šachovnice.</li>
+            <li>Hlavička partie se sedmi povinnými údaji PGN.</li>
+            <li>Otevření, uložení a kopírování PGN.</li>
+            <li>Pamatování rozpracované partie v prohlížeči.</li>
+          </ul>
+        </section>
+      </div>
+    </details>
+  </div>
+</div>
+
+<div class="modal" id="cModal" hidden>
+  <div class="modal-box" role="dialog" aria-modal="true" aria-labelledby="cTitle">
+    <h3 id="cTitle">Komentář</h3>
+    <textarea id="cText" rows="4" class="c-text" aria-label="Text komentáře"></textarea>
+    <div class="actions">
+      <button class="btn danger" id="cDelete" type="button">Smazat</button>
+      <span class="spacer"></span>
+      <button class="btn" id="cCancel" type="button">Zrušit</button>
+      <button class="btn primary" id="cSave" type="button">Uložit</button>
+    </div>
+  </div>
+</div>
+
+<div class="modal" id="modal" hidden>
+  <div class="modal-box" role="dialog" aria-modal="true" aria-labelledby="modalTitle">
+    <h3 id="modalTitle"></h3>
+    <p id="modalText"></p>
+    <div class="actions">
+      <button class="btn" id="modalCancel" type="button">Zrušit</button>
+      <button class="btn primary" id="modalOk" type="button">Pokračovat</button>
+    </div>
+  </div>
+</div>
+
+<script src="chess.js"></script>
+<script>
+(function () {
+  const START = 'rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1';
+  const TAGS = ['Event', 'Site', 'Date', 'Round', 'White', 'Black', 'Result'];
+  const SIMPLE = ['Event', 'Site', 'Date', 'Round', 'Result'];
+  const DEFAULTS = { Event: '?', Site: '?', Date: '????.??.??', Round: '?', White: '?', Black: '?', Result: '*' };
+  const GLYPH = { k: '♚', q: '♛', r: '♜', b: '♝', n: '♞', p: '♟' };
+  const VS = '︎';
+  const STORE_KEY = 'pgn-editor-draft-v1';
+  const NAMES = { k: 'král', q: 'dáma', r: 'věž', b: 'střelec', n: 'jezdec', p: 'pěšec' };
+  /* V aplikaci pro Android je k dispozici most window.Android (MainActivity.java) */
+  const ANDROID = window.Android || null;
+
+  let state = freshState();
+  let selected = null;
+  let pendingPromo = null;
+  let history = [];
+  let czech = false;
+  let opts = { undo: false, comments: false };
+  try { const o = JSON.parse(localStorage.getItem('pgn-opts') || 'null'); if (o) opts = Object.assign(opts, o); } catch (e) {}
+
+  function snapshot() {
+    history.push(JSON.stringify(state));
+    if (history.length > 50) history.shift();
+  }
+  function undo() {
+    if (!history.length) return;
+    const flipped = state.flipped;
+    state = JSON.parse(history.pop());
+    state.flipped = flipped;
+    selected = null;
+    fillTags(); renderAll();
+  }
+
+  /* Česká notace jen pro zobrazení */
+  const CZ = { N: 'J', B: 'S', R: 'V', Q: 'D', K: 'K' };
+  function show(san) { return czech ? san.replace(/[NBRQK]/g, ch => CZ[ch]) : san; }
+
+  const $ = id => document.getElementById(id);
+  const boardEl = $('board');
+
+  function freshState() {
+    return { headers: Object.assign({}, DEFAULTS), extra: {}, startFen: START, moves: [], comments: {}, ply: 0, flipped: false };
+  }
+
+  /* ---------- Pozice ---------- */
+  function gameAt(ply) {
+    const g = new Chess(state.startFen);
+    for (let i = 0; i < ply; i++) g.move(state.moves[i]);
+    return g;
+  }
+  function lastMoveAt(ply) {
+    if (ply === 0) return null;
+    return gameAt(ply - 1).move(state.moves[ply - 1]);
+  }
+  function startInfo() {
+    const parts = state.startFen.split(' ');
+    return { turn: parts[1] || 'w', num: parseInt(parts[5], 10) || 1 };
+  }
+
+  /* ---------- Šachovnice ---------- */
+  function renderBoard() {
+    const g = gameAt(state.ply);
+    const last = lastMoveAt(state.ply);
+    const board = g.board();
+    const targets = selected ? g.moves({ square: selected, verbose: true }) : [];
+    const inCheck = g.in_check();
+    const turn = g.turn();
+    const files = 'abcdefgh';
+    boardEl.innerHTML = '';
+    for (let vr = 0; vr < 8; vr++) {
+      for (let vc = 0; vc < 8; vc++) {
+        const r = state.flipped ? 7 - vr : vr;
+        const c = state.flipped ? 7 - vc : vc;
+        const sq = files[c] + (8 - r);
+        const p = board[r][c];
+        const btn = document.createElement('button');
+        btn.type = 'button';
+        btn.className = 'sq ' + ((r + c) % 2 === 0 ? 'light' : 'dark');
+        btn.dataset.sq = sq;
+        if (last && (last.from === sq || last.to === sq)) btn.classList.add('last');
+        if (selected === sq) btn.classList.add('sel');
+        if (inCheck && p && p.type === 'k' && p.color === turn) btn.classList.add('check');
+        let label = sq;
+        if (p) {
+          const s = document.createElement('span');
+          s.className = 'piece pc-' + p.color;
+          s.textContent = GLYPH[p.type] + VS;
+          btn.appendChild(s);
+          label += ', ' + (p.color === 'w' ? 'bílý ' : 'černý ') + NAMES[p.type];
+        }
+        if (targets.some(m => m.to === sq)) {
+          const mark = document.createElement('span');
+          mark.className = p ? 'ring' : 'dot';
+          btn.appendChild(mark);
+        }
+        if (vr === 7) { const f = document.createElement('span'); f.className = 'coord file'; f.textContent = files[c]; btn.appendChild(f); }
+        if (vc === 0) { const k = document.createElement('span'); k.className = 'coord rank'; k.textContent = 8 - r; btn.appendChild(k); }
+        btn.setAttribute('aria-label', label);
+        boardEl.appendChild(btn);
+      }
+    }
+  }
+
+  boardEl.addEventListener('click', e => {
+    if (suppressClick) return;
+    const btn = e.target.closest('.sq');
+    if (btn) onSquare(btn.dataset.sq);
+  });
+
+  function onSquare(sq) {
+    const g = gameAt(state.ply);
+    if (selected) {
+      const cands = g.moves({ square: selected, verbose: true }).filter(m => m.to === sq);
+      if (cands.length) {
+        if (cands.some(m => m.flags.indexOf('p') !== -1)) openPromo(selected, sq, g.turn());
+        else playMove(selected, sq);
+        return;
+      }
+    }
+    const p = g.get(sq);
+    selected = (p && p.color === g.turn() && selected !== sq) ? sq : null;
+    renderBoard();
+  }
+
+  function openPromo(from, to, color) {
+    pendingPromo = { from, to };
+    const row = $('promoRow');
+    row.innerHTML = '';
+    [['q', 'dáma'], ['r', 'věž'], ['b', 'střelec'], ['n', 'jezdec']].forEach(([t, name]) => {
+      const b = document.createElement('button');
+      b.type = 'button';
+      b.className = 'pc-' + color;
+      b.textContent = GLYPH[t] + VS;
+      b.setAttribute('aria-label', name);
+      b.addEventListener('click', () => {
+        $('promo').hidden = true;
+        const pp = pendingPromo; pendingPromo = null;
+        playMove(pp.from, pp.to, t);
+      });
+      row.appendChild(b);
+    });
+    $('promo').hidden = false;
+    row.firstChild.focus();
+  }
+  $('promoCancel').addEventListener('click', () => { $('promo').hidden = true; pendingPromo = null; selected = null; renderBoard(); });
+
+  async function playMove(from, to, promotion) {
+    const g = gameAt(state.ply);
+    const m = g.move({ from, to, promotion: promotion || 'q' });
+    selected = null;
+    if (!m) { renderBoard(); return; }
+    if (state.ply < state.moves.length && state.moves[state.ply] === m.san) {
+      state.ply++;
+    } else {
+      const lost = state.moves.length - state.ply;
+      if (lost > 0) {
+        const ok = await askConfirm('Přepsat zbytek partie?',
+          'Tahem ' + show(m.san) + ' smažeš ' + lost + ' ' + plural(lost, 'následující půltah', 'následující půltahy', 'následujících půltahů') +
+          ' (od ' + show(state.moves[state.ply]) + ' do konce partie).', 'Přepsat');
+        if (!ok) { renderBoard(); return; }
+      }
+      snapshot();
+      state.moves = state.moves.slice(0, state.ply);
+      Object.keys(state.comments).forEach(k => { if (+k > state.ply) delete state.comments[k]; });
+      state.moves.push(m.san);
+      state.ply++;
+      if (g.in_checkmate()) setResult(g.turn() === 'w' ? '0-1' : '1-0', true);
+      else if (g.in_draw() || g.in_stalemate()) setResult('1/2-1/2', true);
+    }
+    renderAll();
+  }
+
+  function setResult(r, onlyIfOpen) {
+    if (onlyIfOpen && state.headers.Result !== '*') return;
+    state.headers.Result = r;
+    $('tResult').value = r;
+  }
+
+  /* ---------- Zápis ---------- */
+  function moveNumber(i) {
+    const si = startInfo();
+    return si.num + Math.floor((i + (si.turn === 'b' ? 1 : 0)) / 2);
+  }
+  function isWhiteMove(i) {
+    return startInfo().turn === 'w' ? i % 2 === 0 : i % 2 === 1;
+  }
+  function renderMoves() {
+    const box = $('moves');
+    box.innerHTML = '';
+    const addComment = k => {
+      if (!opts.comments || !state.comments[k]) return;
+      const c = document.createElement('span');
+      c.className = 'cm';
+      c.textContent = state.comments[k];
+      c.addEventListener('click', () => { go(k); openComment(); });
+      box.appendChild(c);
+    };
+    addComment(0);
+    if (!state.moves.length) {
+      const e = document.createElement('div');
+      e.className = 'empty';
+      e.textContent = 'Zatím žádné tahy. Klepni na figuru a potom na pole, kam má táhnout.';
+      box.appendChild(e);
+      return;
+    }
+    state.moves.forEach((san, i) => {
+      const white = isWhiteMove(i);
+      if (white || i === 0) {
+        const n = document.createElement('span');
+        n.className = 'no';
+        n.textContent = moveNumber(i) + (white ? '.' : '...');
+        box.appendChild(n);
+      }
+      const b = document.createElement('button');
+      b.type = 'button';
+      b.className = 'mv' + (i === state.ply - 1 ? ' cur' : '');
+      b.textContent = show(san);
+      b.addEventListener('click', () => go(i + 1));
+      box.appendChild(b);
+      addComment(i + 1);
+    });
+    const r = document.createElement('span');
+    r.className = 'res';
+    r.textContent = state.headers.Result;
+    box.appendChild(r);
+    const cur = box.querySelector('.cur');
+    if (cur && $('pMoves').open) cur.scrollIntoView({ block: 'nearest' });
+  }
+
+  function renderCounter() {
+    const si = startInfo();
+    const first = si.num;
+    const cur = state.ply === 0 ? 0 : moveNumber(state.ply - 1) - first + 1;
+    const total = state.moves.length === 0 ? 0 : moveNumber(state.moves.length - 1) - first + 1;
+    $('counter').textContent = 'Tah ' + cur + ' z ' + total;
+    $('navStart').disabled = $('navPrev').disabled = state.ply === 0;
+    $('navNext').disabled = $('navEnd').disabled = state.ply >= state.moves.length;
+    $('undoLast').disabled = state.moves.length === 0;
+    $('undo').disabled = history.length === 0;
+    const cc = $('curComment');
+    const txt = opts.comments ? (state.comments[state.ply] || '') : '';
+    cc.textContent = txt;
+    cc.hidden = !txt;
+    $('commentBtn').classList.toggle('primary', !!txt);
+  }
+
+  /* ---------- Hlavička ---------- */
+  // PGN zapisuje jméno hráče jako "Příjmení, Jméno"
+  function splitName(v) {
+    if (!v || v === '?') return ['', ''];
+    const i = v.indexOf(',');
+    return i === -1 ? [v.trim(), ''] : [v.slice(0, i).trim(), v.slice(i + 1).trim()];
+  }
+  function joinName(last, first) {
+    last = last.trim(); first = first.trim();
+    if (last && first) return last + ', ' + first;
+    return last || first || '?';
+  }
+  function fillTags() {
+    SIMPLE.forEach(t => {
+      const v = state.headers[t];
+      $('t' + t).value = (v === DEFAULTS[t] && t !== 'Result') ? '' : v;
+    });
+    ['White', 'Black'].forEach(t => {
+      const parts = splitName(state.headers[t]);
+      $('t' + t + 'Last').value = parts[0];
+      $('t' + t + 'First').value = parts[1];
+    });
+  }
+  function onTagChange() { renderMoves(); persist(); syncText(); renderSend(); }
+  SIMPLE.forEach(t => {
+    $('t' + t).addEventListener('input', e => {
+      state.headers[t] = e.target.value.trim() || DEFAULTS[t];
+      onTagChange();
+    });
+  });
+  ['White', 'Black'].forEach(t => {
+    const upd = () => { state.headers[t] = joinName($('t' + t + 'Last').value, $('t' + t + 'First').value); onTagChange(); };
+    $('t' + t + 'Last').addEventListener('input', upd);
+    $('t' + t + 'First').addEventListener('input', upd);
+  });
+  $('today').addEventListener('click', () => {
+    const d = new Date();
+    const s = d.getFullYear() + '.' + String(d.getMonth() + 1).padStart(2, '0') + '.' + String(d.getDate()).padStart(2, '0');
+    $('tDate').value = s; state.headers.Date = s; onTagChange();
+  });
+
+  /* ---------- PGN export ---------- */
+  // Do souboru jde jen čisté ASCII: bez diakritiky a bez znaků, které
+  // ChessBase a jiné programy v hlavičce špatně čtou (uvozovky, zpětné lomítko, hranaté závorky).
+  const SPECIAL = { 'ß': 'ss', 'ł': 'l', 'Ł': 'L', 'đ': 'd', 'Đ': 'D', 'ø': 'o', 'Ø': 'O', 'æ': 'ae', 'Æ': 'AE', 'œ': 'oe', 'Œ': 'OE', 'ı': 'i', 'þ': 'th', 'ð': 'd',
+    '\u2013': '-', '\u2014': '-', '\u2026': '...', '\u00A0': ' ' };
+  function toAscii(v) {
+    return String(v)
+      .replace(/[ßłŁđĐøØæÆœŒıþð\u2013\u2014\u2026\u00A0]/g, ch => SPECIAL[ch])
+      .normalize('NFD').replace(/[\u0300-\u036f]/g, '')
+      .replace(/["\u201C\u201D\u201E\u00AB\u00BB]/g, "'")
+      .replace(/[\u2018\u2019\u201A]/g, "'")
+      .replace(/\\/g, '/')
+      .replace(/\[/g, '(').replace(/\]/g, ')')
+      .replace(/[\t\r\n]+/g, ' ')
+      .replace(/[^\x20-\x7E]/g, '')
+      .replace(/ {2,}/g, ' ')
+      .trim();
+  }
+  function esc(v) { return toAscii(v) || '?'; }
+  function buildPgn() {
+    const lines = TAGS.map(t => '[' + t + ' "' + esc(state.headers[t] || DEFAULTS[t]) + '"]');
+    Object.keys(state.extra).forEach(k => lines.push('[' + k + ' "' + esc(state.extra[k]) + '"]'));
+    const tokens = [];
+    const pushComment = k => {
+      const c = state.comments[k] ? toAscii(state.comments[k]).replace(/[{}]/g, m => m === '{' ? '(' : ')') : '';
+      if (!c) return false;
+      const words = c.split(' ');
+      words[0] = '{' + words[0];
+      words[words.length - 1] += '}';
+      words.forEach(w => tokens.push(w));
+      return true;
+    };
+    pushComment(0);
+    let afterComment = false;
+    state.moves.forEach((san, i) => {
+      if (isWhiteMove(i)) tokens.push(moveNumber(i) + '.');
+      else if (i === 0 || afterComment) tokens.push(moveNumber(i) + '...');
+      tokens.push(san);
+      afterComment = pushComment(i + 1);
+    });
+    tokens.push(state.headers.Result);
+    const out = [];
+    let line = '';
+    tokens.forEach(tok => {
+      if (line && (line.length + 1 + tok.length) > 79) { out.push(line); line = tok; }
+      else line = line ? line + ' ' + tok : tok;
+    });
+    if (line) out.push(line);
+    return lines.join('\n') + '\n\n' + out.join('\n') + '\n';
+  }
+
+  /* ---------- PGN import ---------- */
+  // Komentáře hlavní linie: {…} za tahem patří k pozici po tom tahu; varianty v závorkách se zahodí
+  function extractComments(pgn, moveCount) {
+    const body = pgn.replace(/^\s*(\[[^\]]*\]\s*)+/, '');
+    let main = '', depth = 0, inC = false, buf = '';
+    const parts = [];
+    for (let i = 0; i < body.length; i++) {
+      const ch = body[i];
+      if (inC) {
+        if (ch === '}') { inC = false; if (depth === 0) parts.push({ c: buf.trim() }); buf = ''; }
+        else buf += ch;
+        continue;
+      }
+      if (ch === '{') { inC = true; buf = ''; if (depth === 0) { parts.push({ t: main }); main = ''; } continue; }
+      if (ch === ';' && depth === 0) { const end = body.indexOf('\n', i); const line = body.slice(i + 1, end === -1 ? body.length : end); parts.push({ t: main }); main = ''; parts.push({ c: line.trim() }); i = end === -1 ? body.length : end; continue; }
+      if (ch === '(') { depth++; continue; }
+      if (ch === ')') { depth = Math.max(0, depth - 1); continue; }
+      if (depth === 0) main += ch;
+    }
+    parts.push({ t: main });
+    const out = {};
+    let ply = 0;
+    for (const part of parts) {
+      if (part.c !== undefined) {
+        if (part.c) out[ply] = out[ply] ? out[ply] + ' ' + part.c : part.c;
+        continue;
+      }
+      const toks = part.t.replace(/\d+\.(\.\.)?/g, ' ').split(/\s+/).filter(Boolean);
+      for (const tk of toks) {
+        if (/^\$\d+$/.test(tk) || /^[!?]+$/.test(tk) || /^(1-0|0-1|1\/2-1\/2|\*)$/.test(tk)) continue;
+        ply++;
+      }
+    }
+    if (ply !== moveCount) return {};
+    return out;
+  }
+
+  function loadPgnText(text) {
+    text = String(text || '').replace(/^﻿/, '').replace(/\r\n?/g, '\n').trim();
+    if (!text) return { ok: false, error: 'Text je prázdný.' };
+    // Každá partie začíná značkou [Event ...]; zatím otevřeme jen první
+    const starts = [];
+    const re = /^\[Event\s/gm;
+    let mm;
+    while ((mm = re.exec(text))) starts.push(mm.index);
+    const count = Math.max(1, starts.length);
+    const first = starts.length > 1 ? text.slice(0, starts[1]).trim() : text;
+    const g = new Chess();
+    if (!g.load_pgn(first, { sloppy: true })) return { ok: false, error: 'Tento text se nepodařilo přečíst jako PGN. Zkontroluj, že obsahuje platné tahy.' };
+    const h = g.header();
+    const next = freshState();
+    TAGS.forEach(t => { if (h[t]) next.headers[t] = h[t]; });
+    Object.keys(h).forEach(k => { if (TAGS.indexOf(k) === -1) next.extra[k] = h[k]; });
+    next.startFen = h.FEN || START;
+    next.moves = g.history();
+    next.comments = extractComments(first, next.moves.length);
+    next.ply = next.moves.length;
+    next.flipped = state.flipped;
+    if (state.moves.length) snapshot();
+    state = next;
+    selected = null;
+    return { ok: true, count };
+  }
+
+  /* ---------- Soubor ---------- */
+  function showMsg(text, isErr) { const m = $('msg'); m.textContent = text; m.className = 'msg' + (isErr ? ' err' : ''); }
+
+  async function confirmReplace() {
+    if (!state.moves.length) return true;
+    return askConfirm('Otevřít jinou partii?', 'Rozepsaná partie se nahradí. Pokud ji chceš mít, nejdřív ji ulož.' + (opts.undo ? ' Omyl jde vrátit tlačítkem ↶.' : ''), 'Otevřít');
+  }
+  $('openFile').addEventListener('click', async () => { if (await confirmReplace()) $('fileInput').click(); });
+  $('fileInput').addEventListener('change', e => {
+    const f = e.target.files && e.target.files[0];
+    if (!f) return;
+    const reader = new FileReader();
+    reader.onload = () => {
+      const res = loadPgnText(reader.result);
+      if (!res.ok) { showMsg(res.error, true); return; }
+      fillTags(); renderAll();
+      showMsg('Načteno: ' + f.name + (res.count > 1 ? '. Soubor obsahuje ' + res.count + ' partie, zatím otevírám jen první.' : ''), false);
+    };
+    reader.onerror = () => showMsg('Soubor se nepodařilo přečíst.', true);
+    reader.readAsText(f);
+    e.target.value = '';
+  });
+
+  $('loadText').addEventListener('click', async () => {
+    const text = $('pgnText').value;
+    if (text.trim() === buildPgn().trim()) { showMsg('V textu není nic nového k načtení.', false); $('pFile').open = true; return; }
+    if (!(await confirmReplace())) return;
+    const res = loadPgnText(text);
+    if (!res.ok) { showMsg(res.error, true); $('pFile').open = true; return; }
+    fillTags(); renderAll(); $('pFile').open = true;
+    showMsg('Partie načtena z textu' + (res.count > 1 ? ' (jen první z ' + res.count + ').' : '.'), false);
+  });
+
+  function fileName() {
+    const clean = s => s ? toAscii(s).replace(/[^A-Za-z0-9]+/g, '_').replace(/^_|_$/g, '') : '';
+    const w = clean(splitName(state.headers.White)[0]), b = clean(splitName(state.headers.Black)[0]);
+    const base = (w || b) ? (w || 'bily') + '-' + (b || 'cerny') : 'partie';
+    return base + (ANDROID ? '.pgn' : '.pgn.txt');
+  }
+
+  let downloads = null;
+  (async () => {
+    try { if (window.claude && window.claude.use) downloads = await window.claude.use('downloads'); } catch (e) { downloads = null; }
+  })();
+
+  window.onAndroidSaved = (ok, name) => {
+    if (ok) showMsg('Uloženo jako ' + name + '.', false);
+    else if (name) showMsg('Uložit se nepodařilo: ' + name, true);
+    else showMsg('Ukládání zrušeno.', false);
+  };
+  $('saveFile').addEventListener('click', async () => {
+    const pgn = buildPgn();
+    if (ANDROID) { ANDROID.saveFile(fileName(), pgn); return; }
+    if (!downloads) { showMsg('Ukládání souboru tady není dostupné. Použij Kopírovat PGN a vlož text do souboru .pgn.', true); return; }
+    try {
+      await downloads.save({ filename: fileName(), data: pgn });
+      showMsg('Uloženo jako ' + fileName() + '. Koncovku .txt můžeš smazat, obsah je normální PGN.', false);
+    } catch (err) {
+      const code = err && err.code;
+      if (code === 'declined') showMsg('Ukládání zrušeno.', false);
+      else if (code === 'rate_limited') showMsg('Chvilku počkej a zkus to znovu.', true);
+      else showMsg('Uložit se nepodařilo. Použij Kopírovat PGN.', true);
+    }
+  });
+
+  $('copyPgn').addEventListener('click', () => {
+    const pgn = buildPgn();
+    const fallback = () => {
+      $('pText').open = true;
+      const ta = $('pgnText'); ta.value = pgn; ta.focus(); ta.select();
+      showMsg('Text je označený v panelu PGN text, zkopíruj ho ručně.', false);
+    };
+    if (ANDROID) {
+      try { ANDROID.copy(pgn); showMsg('PGN zkopírováno do schránky.', false); } catch (e) { fallback(); }
+      return;
+    }
+    try { navigator.clipboard.writeText(pgn).then(() => showMsg('PGN zkopírováno do schránky.', false), fallback); }
+    catch (e) { fallback(); }
+  });
+
+  $('newGame').addEventListener('click', async () => {
+    if (state.moves.length) {
+      const ok = await askConfirm('Začít novou partii?', 'Rozepsaná partie se smaže. Pokud ji chceš mít, nejdřív ji ulož.', 'Smazat a začít');
+      if (!ok) return;
+    }
+    snapshot();
+    const flipped = state.flipped;
+    state = freshState(); state.flipped = flipped; selected = null;
+    fillTags(); renderAll(); showMsg('Nová partie.', false);
+  });
+
+  $('undoLast').addEventListener('click', () => {
+    if (!state.moves.length) return;
+    snapshot();
+    delete state.comments[state.moves.length];
+    state.moves.pop();
+    if (state.ply > state.moves.length) state.ply = state.moves.length;
+    selected = null; renderAll();
+  });
+
+  /* ---------- Potvrzovací okno ---------- */
+  function plural(n, one, few, many) { return n === 1 ? one : (n >= 2 && n <= 4 ? few : many); }
+  function askConfirm(title, text, okLabel) {
+    return new Promise(resolve => {
+      const modal = $('modal'), ok = $('modalOk'), cancel = $('modalCancel');
+      $('modalTitle').textContent = title;
+      $('modalText').textContent = text;
+      ok.textContent = okLabel || 'Pokračovat';
+      const prev = document.activeElement;
+      const done = val => {
+        modal.hidden = true;
+        ok.removeEventListener('click', yes); cancel.removeEventListener('click', no);
+        modal.removeEventListener('click', backdrop); document.removeEventListener('keydown', onKey);
+        if (prev && prev.focus) prev.focus();
+        resolve(val);
+      };
+      const yes = () => done(true), no = () => done(false);
+      const backdrop = e => { if (e.target === modal) done(false); };
+      const onKey = e => { if (e.key === 'Escape') done(false); };
+      ok.addEventListener('click', yes); cancel.addEventListener('click', no);
+      modal.addEventListener('click', backdrop); document.addEventListener('keydown', onKey);
+      modal.hidden = false;
+      cancel.focus();
+    });
+  }
+
+  window.androidBack = () => {
+    for (const [box, btn] of [['modal', 'modalCancel'], ['cModal', 'cCancel'], ['promo', 'promoCancel']]) {
+      if (!$(box).hidden) { $(btn).click(); return true; }
+    }
+    return false;
+  };
+
+  /* ---------- Rozbalené panely si pamatujeme ---------- */
+  ['pMoves', 'pTags', 'pFile', 'pSend', 'pText', 'pSettings', 'pAbout', 'pChanges'].forEach(id => {
+    const el = $(id);
+    try { if (localStorage.getItem('pgn-panel-' + id) === '1') el.open = true; } catch (e) {}
+    el.addEventListener('toggle', () => {
+      try { localStorage.setItem('pgn-panel-' + id, el.open ? '1' : '0'); } catch (e) {}
+      if (id === 'pMoves' && el.open) { const c = $('moves').querySelector('.cur'); if (c) c.scrollIntoView({ block: 'nearest' }); }
+    });
+  });
+
+  /* ---------- Nastavení ---------- */
+  try { czech = localStorage.getItem('pgn-czech') === '1'; } catch (e) {}
+  $('czNotation').checked = czech;
+  $('czNotation').addEventListener('change', e => {
+    czech = e.target.checked;
+    try { localStorage.setItem('pgn-czech', czech ? '1' : '0'); } catch (err) {}
+    renderMoves();
+  });
+
+  /* ---------- Volitelné funkce ---------- */
+  function applyOpts() {
+    $('undo').hidden = !opts.undo;
+    $('commentBtn').hidden = !opts.comments;
+    $('optUndo').checked = opts.undo;
+    $('optComments').checked = opts.comments;
+  }
+  function saveOpts() { try { localStorage.setItem('pgn-opts', JSON.stringify(opts)); } catch (e) {} }
+  $('optUndo').addEventListener('change', e => { opts.undo = e.target.checked; saveOpts(); applyOpts(); });
+  $('optComments').addEventListener('change', e => { opts.comments = e.target.checked; saveOpts(); applyOpts(); renderMoves(); renderCounter(); });
+  applyOpts();
+
+  /* ---------- Komentář k tahu ---------- */
+  function openComment() {
+    const k = state.ply;
+    $('cTitle').textContent = k === 0 ? 'Komentář na začátek partie' : 'Komentář k tahu ' + moveNumber(k - 1) + (isWhiteMove(k - 1) ? '. ' : '... ') + show(state.moves[k - 1]);
+    $('cText').value = state.comments[k] || '';
+    $('cDelete').hidden = !state.comments[k];
+    $('cModal').hidden = false;
+    $('cText').focus();
+  }
+  function closeComment() { $('cModal').hidden = true; $('commentBtn').focus(); }
+  function setComment(text) {
+    const k = state.ply;
+    const old = state.comments[k] || '';
+    if (old === text) return;
+    snapshot();
+    if (text) state.comments[k] = text; else delete state.comments[k];
+    renderAll();
+  }
+  $('commentBtn').addEventListener('click', openComment);
+  $('cSave').addEventListener('click', () => { setComment($('cText').value.replace(/\s+/g, ' ').trim()); closeComment(); });
+  $('cDelete').addEventListener('click', () => { setComment(''); closeComment(); });
+  $('cCancel').addEventListener('click', closeComment);
+  $('cModal').addEventListener('click', e => { if (e.target === $('cModal')) closeComment(); });
+  $('cModal').addEventListener('keydown', e => { if (e.key === 'Escape') closeComment(); });
+
+  /* ---------- Barvy šachovnice ---------- */
+  const PRESETS = [
+    { name: 'Zelená', light: '#eeeed2', dark: '#769656' },
+    { name: 'Dřevo', light: '#f0d9b5', dark: '#b58863' },
+    { name: 'Modrá', light: '#dee3e6', dark: '#8ca2ad' },
+    { name: 'Šedá', light: '#e6e6e6', dark: '#9e9e9e' },
+    { name: 'Fialová', light: '#efe6f5', dark: '#9b7bb3' }
+  ];
+  let colors = { light: PRESETS[0].light, dark: PRESETS[0].dark };
+  try { const c = JSON.parse(localStorage.getItem('pgn-colors') || 'null'); if (c && c.light && c.dark) colors = c; } catch (e) {}
+  function applyColors(save) {
+    document.documentElement.style.setProperty('--sq-light', colors.light);
+    document.documentElement.style.setProperty('--sq-dark', colors.dark);
+    $('colLight').value = colors.light;
+    $('colDark').value = colors.dark;
+    $('presets').querySelectorAll('.preset').forEach(b => {
+      const pr = PRESETS[+b.dataset.i];
+      b.setAttribute('aria-pressed', String(pr.light === colors.light.toLowerCase() && pr.dark === colors.dark.toLowerCase()));
+    });
+    if (save) { try { localStorage.setItem('pgn-colors', JSON.stringify(colors)); } catch (e) {} }
+  }
+  PRESETS.forEach((pr, i) => {
+    const b = document.createElement('button');
+    b.type = 'button'; b.className = 'preset'; b.dataset.i = i;
+    const sw = document.createElement('span'); sw.className = 'swatch';
+    [pr.light, pr.dark, pr.dark, pr.light].forEach(c => { const q = document.createElement('span'); q.style.background = c; sw.appendChild(q); });
+    b.appendChild(sw); b.appendChild(document.createTextNode(pr.name));
+    b.addEventListener('click', () => { colors = { light: pr.light, dark: pr.dark }; applyColors(true); });
+    $('presets').appendChild(b);
+  });
+  $('colLight').addEventListener('input', e => { colors = { light: e.target.value, dark: colors.dark }; applyColors(true); });
+  $('colDark').addEventListener('input', e => { colors = { light: colors.light, dark: e.target.value }; applyColors(true); });
+  applyColors(false);
+
+  /* ---------- Odeslání e-mailem ---------- */
+  const DEFAULT_EMAIL = 'slivam24@gmail.com';
+  let email = DEFAULT_EMAIL;
+  try { email = localStorage.getItem('pgn-email') || DEFAULT_EMAIL; } catch (e) {}
+  $('setEmail').value = email;
+  $('setEmail').addEventListener('input', e => {
+    email = e.target.value.trim();
+    try { localStorage.setItem('pgn-email', email); } catch (err) {}
+    renderSend();
+  });
+  function validEmail(v) { return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(v); }
+  function playerShort(v) { const p = splitName(v); return p[0] || '?'; }
+  function mailSubject() {
+    const h = state.headers;
+    let sub = 'Partie ' + playerShort(h.White) + ' - ' + playerShort(h.Black);
+    if (h.Result !== '*') sub += ' ' + h.Result;
+    const extra = [];
+    if (h.Event !== '?') extra.push(h.Event);
+    if (h.Round !== '?') extra.push(h.Round + '. kolo');
+    if (extra.length) sub += ' (' + extra.join(', ') + ')';
+    return sub;
+  }
+  function mailBody(pgn) {
+    return 'Posílám partii ' + state.headers.White + ' - ' + state.headers.Black + '.\n' +
+      'PGN je v příloze a níže jako text.\n\n' + pgn;
+  }
+  function attachName() { return fileName().replace(/\.txt$/, ''); }
+  function toBase64(str) {
+    const bytes = new TextEncoder().encode(str);
+    let bin = '';
+    for (let i = 0; i < bytes.length; i += 0x8000) bin += String.fromCharCode.apply(null, bytes.subarray(i, i + 0x8000));
+    return btoa(bin);
+  }
+  function sendMsg(text, kind) { const m = $('sendMsg'); m.textContent = text; m.className = 'msg' + (kind ? ' ' + kind : ''); }
+  function renderSend() {
+    $('sendTo').textContent = email || '(není vyplněno)';
+    $('sendSubject').textContent = mailSubject();
+    const pgn = buildPgn();
+    $('mailtoLink').href = 'mailto:' + encodeURIComponent(email) + '?subject=' + encodeURIComponent(mailSubject()) + '&body=' + encodeURIComponent(mailBody(pgn));
+  }
+
+  let mcp = null;
+  (async () => {
+    if (ANDROID) {
+      $('sendNote').textContent = 'Otevře se poštovní aplikace s vyplněnou adresou, předmětem, partií v textu a přílohou .pgn. Stačí v ní e-mail odeslat. Adresu změníš v Nastavení.';
+      return;
+    }
+    try { if (window.claude && window.claude.use) mcp = await window.claude.use('mcp'); } catch (e) { mcp = null; }
+    if (!mcp) {
+      $('mailtoLink').hidden = false;
+      $('sendNote').textContent = 'Přímé odeslání tady teď není dostupné. Tlačítko Otevřít v poštovní aplikaci připraví e-mail s partií v textu, přílohu ale neumí. Adresu změníš v Nastavení.';
+    }
+  })();
+
+  let sending = false;
+  $('sendMail').addEventListener('click', async () => {
+    if (sending) return;
+    if (!validEmail(email)) { sendMsg('Adresa v Nastavení nevypadá jako platný e-mail.', 'err'); $('pSettings').open = true; return; }
+    if (ANDROID) {
+      const pgn = buildPgn();
+      const res = ANDROID.sendEmail(email, mailSubject(), mailBody(pgn), attachName(), pgn);
+      if (res === 'ok') sendMsg('E-mail je připravený v poštovní aplikaci, odešli ho tam.', 'ok');
+      else sendMsg('Poštovní aplikaci se nepodařilo otevřít' + (res ? ': ' + res : '.'), 'err');
+      return;
+    }
+    if (!mcp) { sendMsg('Přímé odeslání tady není dostupné. Použij Otevřít v poštovní aplikaci.', 'err'); return; }
+    const pgn = buildPgn();
+    const subject = mailSubject();
+    const ok = await askConfirm('Odeslat partii?', 'Komu: ' + email + '\nPředmět: ' + subject + '\nPříloha: ' + attachName(), 'Odeslat');
+    if (!ok) return;
+    sending = true;
+    $('sendMail').disabled = true;
+    sendMsg('Odesílám…', '');
+    try {
+      await mcp.callTool('Gmail', 'send_message', {
+        to: [email],
+        subject,
+        body: mailBody(pgn),
+        attachments: [{ content: toBase64(pgn), filename: attachName(), mimeType: 'application/x-chess-pgn' }]
+      });
+      sendMsg('Odesláno na ' + email + '.', 'ok');
+    } catch (err) {
+      const code = err && err.code;
+      if (code === 'server_not_connected' || code === 'server_not_found') sendMsg('Gmail není připojený. Připoj ho v claude.ai v Nastavení, sekce Konektory, a zkus to znovu.', 'err');
+      else if (code === 'needs_reauth') sendMsg('Přihlášení ke Gmailu vypršelo. Připoj Gmail znovu v claude.ai v Nastavení, sekce Konektory.', 'err');
+      else if (code === 'selection_required') sendMsg('Máš připojeno víc účtů Gmail. Vyber v claude.ai, který se má použít, a zkus to znovu.', 'err');
+      else if (code === 'not_in_manifest' || code === 'approval_required' || code === 'consent_required') sendMsg('Odeslání nebylo povoleno. Při dalším pokusu ho povol v okně, které se objeví.', 'err');
+      else if (code === 'blocked_by_policy') sendMsg('Odesílání přes Gmail je u tohoto účtu zakázané.', 'err');
+      else if (code === 'tool_error') sendMsg('Gmail e-mail odmítl: ' + (err.message || 'neznámý důvod') + '.', 'err');
+      else if (code === 'not_granted' || code === 'capability_disabled' || code === 'capability_removed') { sendMsg('Přímé odeslání tady není dostupné. Použij Otevřít v poštovní aplikaci.', 'err'); $('mailtoLink').hidden = false; }
+      else sendMsg('Nepodařilo se ověřit, jestli e-mail odešel. Než to zkusíš znovu, podívej se do Odeslané pošty v Gmailu.', 'err');
+    } finally {
+      sending = false;
+      $('sendMail').disabled = false;
+    }
+  });
+
+  /* ---------- Tahání figur prstem nebo myší ---------- */
+  let drag = null;
+  let suppressClick = false;
+  boardEl.addEventListener('pointerdown', e => {
+    const btn = e.target.closest('.sq');
+    if (!btn || e.button > 0) return;
+    const g = gameAt(state.ply);
+    const p = g.get(btn.dataset.sq);
+    if (!p || p.color !== g.turn()) return;
+    drag = { from: btn.dataset.sq, x: e.clientX, y: e.clientY, started: false, ghost: null, glyph: GLYPH[p.type] + VS, color: p.color };
+  });
+  window.addEventListener('pointermove', e => {
+    if (!drag) return;
+    if (!drag.started) {
+      if (Math.hypot(e.clientX - drag.x, e.clientY - drag.y) < 8) return;
+      drag.started = true;
+      selected = drag.from;
+      renderBoard();
+      const fromEl = boardEl.querySelector('[data-sq="' + drag.from + '"]');
+      if (fromEl) fromEl.classList.add('from');
+      const g = document.createElement('div');
+      g.className = 'ghost pc-' + drag.color;
+      g.textContent = drag.glyph;
+      g.style.fontSize = (boardEl.clientWidth / 8 * 0.95) + 'px';
+      document.body.appendChild(g);
+      drag.ghost = g;
+    }
+    drag.ghost.style.left = e.clientX + 'px';
+    drag.ghost.style.top = e.clientY + 'px';
+  });
+  function endDrag(e, cancelled) {
+    if (!drag) return;
+    const d = drag; drag = null;
+    if (!d.started) return;
+    if (d.ghost) d.ghost.remove();
+    suppressClick = true;
+    setTimeout(() => { suppressClick = false; }, 60);
+    const el = cancelled ? null : document.elementFromPoint(e.clientX, e.clientY);
+    const target = el && el.closest ? el.closest('.sq') : null;
+    if (target && target.dataset.sq !== d.from) {
+      const g = gameAt(state.ply);
+      const legal = g.moves({ square: d.from, verbose: true }).some(m => m.to === target.dataset.sq);
+      if (legal) { selected = d.from; onSquare(target.dataset.sq); return; }
+    }
+    selected = d.from;
+    renderBoard();
+  }
+  window.addEventListener('pointerup', e => endDrag(e, false));
+  window.addEventListener('pointercancel', e => endDrag(e, true));
+
+  /* ---------- Navigace ---------- */
+  function go(ply) { state.ply = Math.max(0, Math.min(state.moves.length, ply)); selected = null; renderAll(); }
+  $('navStart').addEventListener('click', () => go(0));
+  $('navPrev').addEventListener('click', () => go(state.ply - 1));
+  $('navNext').addEventListener('click', () => go(state.ply + 1));
+  $('navEnd').addEventListener('click', () => go(state.moves.length));
+  $('undo').addEventListener('click', undo);
+  $('flip').addEventListener('click', () => { state.flipped = !state.flipped; renderBoard(); persist(); });
+  document.addEventListener('keydown', e => {
+    if (/^(INPUT|TEXTAREA|SELECT)$/.test(e.target.tagName) || !$('modal').hidden || !$('cModal').hidden) return;
+    if (e.key === 'ArrowLeft') go(state.ply - 1);
+    else if (e.key === 'ArrowRight') go(state.ply + 1);
+    else if (e.key === 'Home') go(0);
+    else if (e.key === 'End') go(state.moves.length);
+  });
+
+  /* ---------- Rozpracovaná partie v prohlížeči ---------- */
+  function persist() { try { localStorage.setItem(STORE_KEY, JSON.stringify(state)); } catch (e) {} }
+  function restore() {
+    try {
+      const raw = localStorage.getItem(STORE_KEY);
+      if (!raw) return false;
+      const s = JSON.parse(raw);
+      if (!s || !Array.isArray(s.moves)) return false;
+      const test = new Chess(s.startFen || START);
+      for (const m of s.moves) if (!test.move(m)) return false;
+      state = Object.assign(freshState(), s);
+      return true;
+    } catch (e) { return false; }
+  }
+
+  function syncText() {
+    const ta = $('pgnText');
+    if (document.activeElement !== ta) ta.value = buildPgn();
+  }
+
+  function renderAll() {
+    renderBoard(); renderMoves(); renderCounter(); syncText(); renderSend(); persist();
+  }
+
+  if (!window.Chess) {
+    $('pFile').open = true;
+    showMsg('Nepodařilo se načíst šachovou knihovnu. Zkontroluj připojení k internetu a obnov stránku.', true);
+    return;
+  }
+
+  if (!restore()) {
+    loadPgnText('[Event "Ukázka"]\n[Site "Paříž"]\n[Date "1858.??.??"]\n[Round "?"]\n[White "Morphy, Paul"]\n[Black "Vévoda Brunšvický a hrabě Isouard"]\n[Result "1-0"]\n\n1. e4 e5 2. Nf3 d6 3. d4 Bg4 4. dxe5 Bxf3 5. Qxf3 dxe5 6. Bc4 Nf6 7. Qb3 Qe7 8. Nc3 c6 9. Bg5 b5 10. Nxb5 cxb5 11. Bxb5+ Nbd7 12. O-O-O Rd8 13. Rxd7 Rxd7 14. Rd1 Qe6 15. Bxd7+ Nxd7 16. Qb8+ Nxb8 17. Rd8# 1-0');
+  }
+  fillTags();
+  renderAll();
+})();
+</script>
+
+</body></html>
