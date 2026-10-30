@@ -38,12 +38,9 @@ jobs:
         continue-on-error: true
         run: |
           python3 -m http.server 8000 --directory app/src/main/assets/www >/dev/null 2>&1 &
-          sleep 2
-          for v in "nahled:" "nahled-menu:#menu" "nahled-vse:#vse" "nahled-editor:#editor" "nahled-varianty:#varianty" "nahled-motor:#motor"; do
-            budget=3000; [ "${v#*:}" = "#motor" ] && budget=20000
-            google-chrome --headless=new --no-sandbox --hide-scrollbars --force-device-scale-factor=2 \
-              --window-size=412,915 --virtual-time-budget=$budget --screenshot="${v%%:*}.png" "http://localhost:8000/index.html${v#*:}"
-          done
+          cd .github/nahled && npm init -y >/dev/null && npm install --silent puppeteer-core@23 && cd ../..
+          node .github/nahled/nahled.js
+          cat nahled-log.txt
 
       - name: Uložit náhled (vydání nahled)
         continue-on-error: true
@@ -51,7 +48,7 @@ jobs:
           GH_TOKEN: ${{ github.token }}
         run: |
           gh release view nahled >/dev/null 2>&1 || gh release create nahled --prerelease --title "Náhled obrazovky (jen pro kontrolu)" --notes "Automatické snímky obrazovky z posledního sestavení."
-          gh release upload nahled nahled*.png --clobber
+          gh release upload nahled nahled*.png nahled-log.txt --clobber
 
       - name: Zveřejnit ke stažení (Releases)
         uses: softprops/action-gh-release@v2
