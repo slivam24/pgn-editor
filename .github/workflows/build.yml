@@ -38,7 +38,7 @@ jobs:
         continue-on-error: true
         run: |
           P="$PWD/app/src/main/assets/www/index.html"
-          for v in "nahled:" "nahled-menu:#menu" "nahled-vse:#vse"; do
+          for v in "nahled:" "nahled-menu:#menu" "nahled-vse:#vse" "nahled-editor:#editor"; do
             google-chrome --headless=new --no-sandbox --hide-scrollbars --force-device-scale-factor=2 \
               --window-size=412,915 --virtual-time-budget=3000 --screenshot="${v%%:*}.png" "file://$P${v#*:}"
           done

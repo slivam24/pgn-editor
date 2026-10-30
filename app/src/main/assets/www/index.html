@@ -169,6 +169,31 @@ a.btn { display: inline-flex; align-items: center; text-decoration: none; font-w
 .toast { position: fixed; left: 50%; bottom: max(20px, env(safe-area-inset-bottom, 0px)); transform: translateX(-50%); z-index: 60; max-width: min(92vw, 420px); background: var(--fg); color: var(--bg); padding: 10px 14px; border-radius: 8px; font-size: 14px; box-shadow: 0 6px 20px rgba(0,0,0,.3); }
 .toast.err { background: var(--warn); color: #fff; }
 
+/* Rozestavení pozice */
+.ed-title { display: none; font-weight: 600; font-size: 17px; flex: 1; }
+body.editing .ed-title { display: block; }
+body.editing #menuBtn, body.editing #undo, body.editing #commentBtn, body.editing #sendIcon,
+body.editing .player, body.editing #counter, body.editing #curComment, body.editing .nav,
+body.editing .app > .col + .col { display: none !important; }
+.editor { display: grid; gap: 12px; max-width: 520px; }
+.editor[hidden] { display: none; }
+.palette { display: grid; grid-template-columns: repeat(7, minmax(0, 1fr)); gap: 6px; }
+.pal { position: relative; aspect-ratio: 1 / 1; border-radius: 6px; border: 1px solid var(--line); background: var(--sq-light); cursor: pointer; padding: 0; }
+.pal .piece { inset: 8%; }
+.pal[aria-pressed="true"] { border-color: var(--accent); box-shadow: 0 0 0 3px var(--accent); }
+.pal.erase { grid-row: span 2; aspect-ratio: auto; background: var(--surface); color: var(--fg); display: grid; place-items: center; font: inherit; font-size: 13px; }
+.ed-line { display: flex; align-items: center; gap: 12px; flex-wrap: wrap; }
+.ed-label { font-size: 13px; color: var(--muted); }
+.seg { display: inline-flex; }
+.seg .btn { border-radius: 0; min-width: 80px; }
+.seg .btn:first-child { border-radius: 6px 0 0 6px; }
+.seg .btn:last-child { border-radius: 0 6px 6px 0; margin-left: -1px; }
+.seg .btn[aria-pressed="true"] { background: var(--accent); color: var(--accent-fg); border-color: var(--accent); }
+.ed-castle { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 8px 12px; }
+.ed-castle .ed-label { grid-column: 1 / -1; }
+.ed-castle label.off { opacity: .45; }
+.ed-end { justify-content: flex-end; }
+
 /* Ovládání */
 .counter { color: var(--muted); font-size: 14px; font-variant-numeric: tabular-nums; text-align: center; }
 .nav { display: flex; gap: 6px; flex-wrap: wrap; }
@@ -226,6 +251,7 @@ textarea.fen { min-height: 0; font-size: 14px; word-break: break-all; }
 <div class="app">
   <div class="col">
     <div class="topbar">
+      <span class="ed-title">Rozestavení pozice</span>
       <button class="icon-btn" id="menuBtn" type="button" aria-label="Menu" aria-controls="drawer" aria-expanded="false"><svg viewBox="0 0 24 24" width="24" height="24" aria-hidden="true"><path d="M4 6h16M4 12h16M4 18h16" stroke="currentColor" stroke-width="2" stroke-linecap="round" fill="none"/></svg></button>
       <button class="icon-btn" id="flip" type="button" aria-label="Otočit šachovnici" title="Otočit šachovnici"><svg viewBox="0 0 24 24" width="24" height="24" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M7 20V5M3.5 8.5L7 5l3.5 3.5M17 4v15M13.5 15.5L17 19l3.5-3.5"/></svg></button>
       <button class="icon-btn" id="undo" type="button" aria-label="Vrátit poslední akci" title="Vrátit poslední akci" hidden><svg viewBox="0 0 24 24" width="24" height="24" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 14L4 9l5-5"/><path d="M4 9h10.5a5.5 5.5 0 0 1 0 11H11"/></svg></button>
@@ -244,6 +270,33 @@ textarea.fen { min-height: 0; font-size: 14px; word-break: break-all; }
       </div>
     </div>
     <div class="player bottom" id="playerBottom"></div>
+    <section class="editor" id="editor" hidden aria-label="Rozestavení pozice">
+      <p class="note">Vyber figuru a klepej na pole, kam ji chceš postavit. Klepnutí na stejnou figuru ji zase odebere.</p>
+      <div class="palette" id="palette"></div>
+      <div class="ed-line">
+        <span class="ed-label">Na tahu</span>
+        <div class="seg" role="group" aria-label="Na tahu">
+          <button class="btn" id="edTurnW" type="button" aria-pressed="true">Bílý</button>
+          <button class="btn" id="edTurnB" type="button" aria-pressed="false">Černý</button>
+        </div>
+      </div>
+      <div class="ed-castle">
+        <span class="ed-label">Rošády</span>
+        <label class="switch"><input type="checkbox" id="edCK"> Bílý krátká</label>
+        <label class="switch"><input type="checkbox" id="edCQ"> Bílý dlouhá</label>
+        <label class="switch"><input type="checkbox" id="edCk"> Černý krátká</label>
+        <label class="switch"><input type="checkbox" id="edCq"> Černý dlouhá</label>
+      </div>
+      <div class="actions">
+        <button class="btn" id="edClear" type="button">Prázdná šachovnice</button>
+        <button class="btn" id="edStart" type="button">Základní postavení</button>
+      </div>
+      <p class="msg" id="edMsg" role="status"></p>
+      <div class="actions ed-end">
+        <button class="btn" id="edCancel" type="button">Zrušit</button>
+        <button class="btn primary" id="edDone" type="button">Hotovo, začít partii</button>
+      </div>
+    </section>
     <div class="counter" id="counter"></div>
     <p class="cur-comment" id="curComment" hidden></p>
     <div class="nav">
@@ -339,13 +392,14 @@ textarea.fen { min-height: 0; font-size: 14px; word-break: break-all; }
     </details>
 
     <details class="panel" id="pFen">
-      <summary><h2>Pozice (FEN)</h2></summary>
+      <summary><h2>Pozice</h2></summary>
       <div class="panel-body">
-        <p class="note">FEN je zápis jedné pozice na šachovnici. Tady zjistíš FEN právě zobrazené pozice, nebo vložíš vlastní a začneš z něj novou partii.</p>
+        <p class="note">Novou partii z libovolné pozice začneš rozestavením figur přímo na šachovnici, nebo vložením FEN (zápisu pozice).</p>
+        <div class="actions"><button class="btn primary" id="edOpen" type="button">Rozestavit figury na šachovnici</button></div>
         <label class="field">FEN zobrazené pozice<textarea id="fenCur" class="fen" rows="2" readonly spellcheck="false"></textarea></label>
         <div class="actions"><button class="btn" id="fenCopy" type="button">Kopírovat FEN</button></div>
         <label class="field">Nová partie z pozice<textarea id="fenIn" class="fen" rows="3" spellcheck="false" autocapitalize="off" autocomplete="off" placeholder="např. 8/8/4k3/8/8/4K3/4P3/8 w - - 0 1"></textarea></label>
-        <div class="actions"><button class="btn primary" id="fenLoad" type="button">Začít z této pozice</button></div>
+        <div class="actions"><button class="btn" id="fenLoad" type="button">Začít z tohoto FEN</button></div>
         <p class="msg" id="fenMsg" role="status"></p>
       </div>
     </details>
@@ -377,7 +431,7 @@ textarea.fen { min-height: 0; font-size: 14px; word-break: break-all; }
     <details class="panel" id="pAbout">
       <summary><h2>O aplikaci</h2></summary>
       <div class="panel-body prose">
-        <p><strong>PGN editor</strong> <span class="ver-badge">verze 0.12</span></p>
+        <p><strong>PGN editor</strong> <span class="ver-badge">verze 0.13</span></p>
         <p>Jednoduchý editor pro zápis a úpravu šachových partií ve formátu PGN, určený hlavně pro telefon s Androidem. Aplikaci programuje Claude (umělá inteligence od společnosti Anthropic) ve spolupráci s Michalem Slivou, který určuje, co má aplikace umět a jak má vypadat.</p>
         <h3>Co aplikace umí</h3>
         <ul>
@@ -386,7 +440,7 @@ textarea.fen { min-height: 0; font-size: 14px; word-break: break-all; }
           <li>Pod šachovnicí je jen zápis a hlavička partie, vše ostatní je v menu ☰ vlevo nahoře. Tlačítka pro otočení šachovnice a volitelné funkce jsou v horní liště vedle menu.</li>
           <li>Hlavička partie: turnaj, místo, kolo, datum, hráči a výsledek. Výsledek se při matu nebo patu doplní sám.</li>
           <li>Otevření souboru PGN nebo vloženého textu, uložení do souboru .pgn, kopírování do schránky.</li>
-          <li>Pozice ve formátu FEN: zobrazení a kopírování FEN aktuální pozice, nová partie ze zadané pozice.</li>
+          <li>Nová partie z libovolné pozice: rozestavením figur na šachovnici, nebo vložením FEN. FEN zobrazené pozice jde zkopírovat.</li>
           <li>Odeslání partie přes sdílení Androidu, nebo rovnou e-mailem na adresu z Nastavení. PGN je v textu i jako příloha. V Nastavení lze zapnout ikonu pro rychlé odeslání v horní liště.</li>
           <li>Funguje bez připojení k internetu.</li>
           <li>Potvrzení před smazáním nebo přepsáním partie.</li>
@@ -414,6 +468,13 @@ textarea.fen { min-height: 0; font-size: 14px; word-break: break-all; }
     <details class="panel" id="pChanges">
       <summary><h2>Verze a změny</h2></summary>
       <div class="panel-body log">
+        <section>
+          <div class="head"><span class="ver-badge">0.13</span><span class="date">30. 10. 2026</span></div>
+          <ul>
+            <li>Rozestavení pozice přímo na šachovnici (menu, Pozice): výběr figury, klepání na pole, gumování, kdo je na tahu a rošády. Začíná se od právě zobrazené pozice.</li>
+            <li>Kontrola pozice nově hlídá i pěšce na první a poslední řadě. Rošádu jde zapnout jen tehdy, když král a věž stojí na výchozích polích.</li>
+          </ul>
+        </section>
         <section>
           <div class="head"><span class="ver-badge">0.12</span><span class="date">30. 10. 2026</span></div>
           <ul>
@@ -610,6 +671,7 @@ textarea.fen { min-height: 0; font-size: 14px; word-break: break-all; }
 
   /* ---------- Šachovnice ---------- */
   function renderBoard() {
+    if (editor) { renderEditorBoard(); return; }
     if ($('fenCur')) $('fenCur').value = gameAt(state.ply).fen();
     if (typeof renderPlayers === 'function') renderPlayers();
     const g = gameAt(state.ply);
@@ -660,6 +722,7 @@ textarea.fen { min-height: 0; font-size: 14px; word-break: break-all; }
   });
 
   function onSquare(sq) {
+    if (editor) { editSquare(sq); return; }
     const g = gameAt(state.ply);
     if (selected) {
       const cands = g.moves({ square: selected, verbose: true }).filter(m => m.to === sq);
@@ -1063,10 +1126,19 @@ textarea.fen { min-height: 0; font-size: 14px; word-break: break-all; }
     for (let i = parts.length; i < 6; i++) parts.push(def[i]);
     if (parts.length > 6) return { error: 'FEN má víc částí, než by měl.' };
     if (parts[1] !== 'w' && parts[1] !== 'b') return { error: 'Druhá část FEN musí být w (táhne bílý) nebo b (táhne černý).' };
-    const fen = parts.join(' ');
+    let fen = parts.join(' ');
     const place = parts[0];
     const wk = (place.match(/K/g) || []).length, bk = (place.match(/k/g) || []).length;
     if (wk !== 1 || bk !== 1) return { error: 'Na šachovnici musí být právě jeden bílý a jeden černý král.' };
+    const rows = place.split('/');
+    if (rows.length === 8 && /[pP]/.test(rows[0] + rows[7])) return { error: 'Pěšec nemůže stát na první ani na poslední řadě.' };
+    if (rows.length === 8) {
+      const at = sq => { const r = rows[8 - +sq[1]].replace(/\d/g, d => '.'.repeat(+d)); return r['abcdefgh'.indexOf(sq[0])] || '.'; };
+      const need = { K: ['e1', 'K', 'h1', 'R'], Q: ['e1', 'K', 'a1', 'R'], k: ['e8', 'k', 'h8', 'r'], q: ['e8', 'k', 'a8', 'r'] };
+      const c = parts[2] === '-' ? '' : parts[2].split('').filter(x => need[x] && at(need[x][0]) === need[x][1] && at(need[x][2]) === need[x][3]).join('');
+      parts[2] = c || '-';
+    }
+    fen = parts.join(' ');
     const v = new Chess().validate_fen(fen);
     if (!v.valid) return { error: 'FEN není platný. Zkontroluj rozestavení figur: 8 řad oddělených lomítkem, v každé 8 polí.' };
     const g = new Chess(fen);
@@ -1075,19 +1147,141 @@ textarea.fen { min-height: 0; font-size: 14px; word-break: break-all; }
     if (test.in_check()) return { error: 'V této pozici je v šachu hráč, který právě netáhne. Taková pozice nemůže nastat.' };
     return { fen };
   }
-  $('fenLoad').addEventListener('click', async () => {
-    const r = normalizeFen($('fenIn').value);
-    if (r.error) { fenMsg(r.error, true); return; }
-    if (state.moves.length && !(await askConfirm('Začít z této pozice?', 'Rozepsaná partie se nahradí. Pokud ji chceš mít, nejdřív ji ulož.' + (opts.undo ? ' Omyl jde vrátit tlačítkem ↶.' : ''), 'Začít'))) return;
+  async function startFromFen(fen) {
+    if (state.moves.length && !(await askConfirm('Začít z této pozice?', 'Rozepsaná partie se nahradí. Pokud ji chceš mít, nejdřív ji ulož.' + (opts.undo ? ' Omyl jde vrátit tlačítkem ↶.' : ''), 'Začít'))) return false;
     snapshot();
+    const r = { fen };
     const flipped = state.flipped;
     state = freshState(); state.flipped = flipped; selected = null;
     if (r.fen !== START) { state.startFen = r.fen; state.extra = { SetUp: '1', FEN: r.fen }; }
     fillTags(); renderAll();
-    $('fenIn').value = '';
-    fenMsg('', false);
     if (drawerOpen()) setDrawer(false);
     toast('Nová partie z pozice. Táhne ' + (r.fen.split(' ')[1] === 'w' ? 'bílý.' : 'černý.'));
+    return true;
+  }
+  $('fenLoad').addEventListener('click', async () => {
+    const r = normalizeFen($('fenIn').value);
+    if (r.error) { fenMsg(r.error, true); return; }
+    if (await startFromFen(r.fen)) { $('fenIn').value = ''; fenMsg('', false); }
+  });
+
+  /* ---------- Rozestavení pozice ---------- */
+  let editor = null; // { b: {e1: 'K', ...}, turn: 'w', tool: 'P' | 'x', castle: {K,Q,k,q} }
+  const PAL = ['K', 'Q', 'R', 'B', 'N', 'P'];
+  const CASTLE = { K: ['e1', 'K', 'h1', 'R'], Q: ['e1', 'K', 'a1', 'R'], k: ['e8', 'k', 'h8', 'r'], q: ['e8', 'k', 'a8', 'r'] };
+  const pieceCls = ch => 'p-' + (ch === ch.toUpperCase() ? 'w' : 'b') + ch.toLowerCase();
+  function boardFromFen(fen) {
+    const b = {};
+    fen.split(' ')[0].split('/').forEach((row, i) => {
+      let c = 0;
+      for (const ch of row) { if (/\d/.test(ch)) c += +ch; else { b['abcdefgh'[c] + (8 - i)] = ch; c++; } }
+    });
+    return b;
+  }
+  function editorFen() {
+    let place = '';
+    for (let r = 8; r >= 1; r--) {
+      let row = '', empty = 0;
+      for (const f of 'abcdefgh') { const p = editor.b[f + r]; if (p) { if (empty) row += empty; empty = 0; row += p; } else empty++; }
+      if (empty) row += empty;
+      place += (r < 8 ? '/' : '') + row;
+    }
+    const c = Object.keys(CASTLE).filter(k => editor.castle[k] && castlePossible(k)).join('') || '-';
+    return place + ' ' + editor.turn + ' ' + c + ' - 0 1';
+  }
+  function castlePossible(k) { const n = CASTLE[k]; return editor.b[n[0]] === n[1] && editor.b[n[2]] === n[3]; }
+  function renderPalette() {
+    const pal = $('palette');
+    pal.innerHTML = '';
+    const add = (tool, label, cls) => {
+      const b = document.createElement('button');
+      b.type = 'button'; b.className = 'pal' + (cls ? ' ' + cls : '');
+      b.setAttribute('aria-pressed', editor.tool === tool ? 'true' : 'false');
+      b.setAttribute('aria-label', label);
+      if (tool === 'x') b.textContent = 'Gumovat';
+      else { const i = document.createElement('span'); i.className = 'piece ' + pieceCls(tool); b.appendChild(i); }
+      b.addEventListener('click', () => { editor.tool = tool; renderPalette(); });
+      pal.appendChild(b);
+    };
+    PAL.forEach(t => add(t, 'bílý ' + NAMES[t.toLowerCase()]));
+    add('x', 'gumovat', 'erase');
+    PAL.forEach(t => add(t.toLowerCase(), 'černý ' + NAMES[t.toLowerCase()]));
+  }
+  function renderEditorControls() {
+    $('edTurnW').setAttribute('aria-pressed', editor.turn === 'w' ? 'true' : 'false');
+    $('edTurnB').setAttribute('aria-pressed', editor.turn === 'b' ? 'true' : 'false');
+    Object.keys(CASTLE).forEach(k => {
+      const el = $('edC' + k), ok = castlePossible(k);
+      el.disabled = !ok; el.checked = ok && editor.castle[k];
+      el.closest('label').classList.toggle('off', !ok);
+    });
+  }
+  function renderEditorBoard() {
+    const files = 'abcdefgh';
+    boardEl.innerHTML = '';
+    for (let vr = 0; vr < 8; vr++) {
+      for (let vc = 0; vc < 8; vc++) {
+        const r = state.flipped ? 7 - vr : vr, c = state.flipped ? 7 - vc : vc;
+        const sq = files[c] + (8 - r), p = editor.b[sq];
+        const btn = document.createElement('button');
+        btn.type = 'button';
+        btn.className = 'sq ' + ((r + c) % 2 === 0 ? 'light' : 'dark');
+        btn.dataset.sq = sq;
+        if (p) { const s = document.createElement('span'); s.className = 'piece ' + pieceCls(p); btn.appendChild(s); }
+        if (vr === 7) { const f = document.createElement('span'); f.className = 'coord file'; f.textContent = files[c]; btn.appendChild(f); }
+        if (vc === 0) { const k = document.createElement('span'); k.className = 'coord rank'; k.textContent = 8 - r; btn.appendChild(k); }
+        btn.setAttribute('aria-label', sq + (p ? ', ' + (p === p.toUpperCase() ? 'bílý ' : 'černý ') + NAMES[p.toLowerCase()] : ''));
+        boardEl.appendChild(btn);
+      }
+    }
+    renderEditorControls();
+  }
+  function editSquare(sq) {
+    const t = editor.tool;
+    if (t === 'x' || editor.b[sq] === t) delete editor.b[sq];
+    else {
+      if (t === 'K' || t === 'k') Object.keys(editor.b).forEach(k => { if (editor.b[k] === t) delete editor.b[k]; }); // jen jeden král každé barvy
+      editor.b[sq] = t;
+    }
+    $('edMsg').textContent = '';
+    renderEditorBoard();
+  }
+  function openEditor() {
+    const fen = gameAt(state.ply).fen();
+    const f = fen.split(' ');
+    editor = { b: boardFromFen(fen), turn: f[1], tool: 'P', castle: { K: f[2].includes('K'), Q: f[2].includes('Q'), k: f[2].includes('k'), q: f[2].includes('q') } };
+    selected = null;
+    document.body.classList.add('editing');
+    $('editor').hidden = false;
+    $('edMsg').textContent = '';
+    if (drawerOpen()) setDrawer(false);
+    renderPalette(); renderEditorBoard();
+    window.scrollTo(0, 0);
+  }
+  function closeEditor() {
+    editor = null;
+    document.body.classList.remove('editing');
+    $('editor').hidden = true;
+    renderBoard();
+  }
+  $('edOpen').addEventListener('click', openEditor);
+  $('edCancel').addEventListener('click', closeEditor);
+  $('edTurnW').addEventListener('click', () => { editor.turn = 'w'; renderEditorControls(); });
+  $('edTurnB').addEventListener('click', () => { editor.turn = 'b'; renderEditorControls(); });
+  Object.keys(CASTLE).forEach(k => $('edC' + k).addEventListener('change', e => { editor.castle[k] = e.target.checked; }));
+  $('edClear').addEventListener('click', () => { editor.b = {}; renderEditorBoard(); });
+  $('edStart').addEventListener('click', () => {
+    editor.b = boardFromFen(START); editor.turn = 'w'; editor.castle = { K: true, Q: true, k: true, q: true };
+    renderEditorBoard();
+  });
+  $('edDone').addEventListener('click', async () => {
+    const r = normalizeFen(editorFen());
+    if (r.error) { const m = $('edMsg'); m.textContent = r.error; m.className = 'msg err'; return; }
+    const fen = r.fen;
+    const ed = editor;
+    editor = null; // startFromFen vykresluje partii
+    if (await startFromFen(fen)) { document.body.classList.remove('editing'); $('editor').hidden = true; }
+    else { editor = ed; renderEditorBoard(); }
   });
 
   $('newGame').addEventListener('click', async () => {
@@ -1137,6 +1331,7 @@ textarea.fen { min-height: 0; font-size: 14px; word-break: break-all; }
   }
 
   window.androidBack = () => {
+    if (editor && $('modal').hidden) { closeEditor(); return true; }
     for (const [box, btn] of [['modal', 'modalCancel'], ['cModal', 'cCancel'], ['promo', 'promoCancel']]) {
       if (!$(box).hidden) { $(btn).click(); return true; }
     }
@@ -1371,6 +1566,7 @@ textarea.fen { min-height: 0; font-size: 14px; word-break: break-all; }
   $('menuBtn').addEventListener('click', () => setDrawer(true));
   // Náhledy pro kontrolu vzhledu při sestavení (#menu, #vse = všechna volitelná tlačítka)
   if (location.hash === '#menu') setTimeout(() => setDrawer(true), 0);
+  if (location.hash === '#editor') setTimeout(openEditor, 0);
   if (location.hash === '#vse') ['undo', 'commentBtn', 'sendIcon'].forEach(id => { $(id).hidden = false; });
   $('drawerClose').addEventListener('click', () => setDrawer(false));
   $('drawerBg').addEventListener('click', () => setDrawer(false));
@@ -1380,6 +1576,7 @@ textarea.fen { min-height: 0; font-size: 14px; word-break: break-all; }
   let drag = null;
   let suppressClick = false;
   boardEl.addEventListener('pointerdown', e => {
+    if (editor) return;
     const btn = e.target.closest('.sq');
     if (!btn || e.button > 0) return;
     const g = gameAt(state.ply);
