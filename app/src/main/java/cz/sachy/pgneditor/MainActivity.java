@@ -5,6 +5,7 @@ import android.content.ActivityNotFoundException;
 import android.content.ClipData;
 import android.content.ClipboardManager;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.database.Cursor;
 import android.net.Uri;
 import android.os.Bundle;
@@ -13,6 +14,7 @@ import android.webkit.JavascriptInterface;
 import android.webkit.ValueCallback;
 import android.webkit.WebChromeClient;
 import android.webkit.WebResourceRequest;
+import android.webkit.WebResourceResponse;
 import android.webkit.WebSettings;
 import android.webkit.WebView;
 import android.webkit.WebViewClient;
@@ -22,9 +24,11 @@ import androidx.core.content.FileProvider;
 
 import org.json.JSONObject;
 
+import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.FileOutputStream;
+import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.nio.ByteBuffer;
@@ -32,6 +36,8 @@ import java.nio.charset.CharacterCodingException;
 import java.nio.charset.Charset;
 import java.nio.charset.CodingErrorAction;
 import java.nio.charset.StandardCharsets;
+import java.util.HashMap;
+import java.util.Map;
 
 /**
  * Celá aplikace je webová stránka v assets/www/index.html zobrazená ve WebView.
@@ -40,6 +46,13 @@ import java.nio.charset.StandardCharsets;
  * Stránka s ní mluví přes objekt window.Android.
  */
 public class MainActivity extends Activity {
+
+    // Soubory aplikace se načítají z vnitřní zabezpečené adresy (https), aby mohl běžet šachový motor.
+    // Adresa nikam na internet nevede, požadavky na ni obslouží shouldInterceptRequest ze složky assets.
+    private static final String HOST = "appassets.androidplatform.net";
+    private static final String BASE = "https://" + HOST + "/";
+    private static final String START_URL = BASE + "www/index.html";
+    private static final String OLD_URL = "file:///android_asset/www/index.html";
 
     private static final int REQ_OPEN = 1;
     private static final int REQ_SAVE = 2;
@@ -68,14 +81,35 @@ public class MainActivity extends Activity {
         web.setWebViewClient(new WebViewClient() {
             @Override
             public void onPageFinished(WebView view, String url) {
+                if (url == null || !url.startsWith(BASE)) return;
                 pageLoaded = true;
                 deliverOpen();
             }
 
             @Override
+            public WebResourceResponse shouldInterceptRequest(WebView view, WebResourceRequest request) {
+                Uri u = request.getUrl();
+                if (!"https".equals(u.getScheme()) || !HOST.equals(u.getHost())) return null;
+                String path = u.getPath();
+                if (path == null || path.contains("..")) return notFound();
+                if (path.startsWith("/")) path = path.substring(1);
+                try {
+                    InputStream in = getAssets().open(path);
+                    String mime = mimeFor(path);
+                    WebResourceResponse r = new WebResourceResponse(mime, mime.startsWith("text/") ? "UTF-8" : null, in);
+                    Map<String, String> h = new HashMap<>();
+                    h.put("Cache-Control", "no-cache");
+                    r.setResponseHeaders(h);
+                    return r;
+                } catch (IOException e) {
+                    return notFound();
+                }
+            }
+
+            @Override
             public boolean shouldOverrideUrlLoading(WebView view, WebResourceRequest request) {
                 Uri u = request.getUrl();
-                if ("file".equals(u.getScheme())) return false;
+                if ("file".equals(u.getScheme()) || HOST.equals(u.getHost())) return false;
                 // Odkazy ven (mailto: apod.) otevře příslušná aplikace
                 try { startActivity(new Intent(Intent.ACTION_VIEW, u)); } catch (Exception ignored) { }
                 return true;
@@ -100,9 +134,42 @@ public class MainActivity extends Activity {
             }
         });
 
-        web.loadUrl("file:///android_asset/www/index.html");
+        // Starší verze ukládaly data pod adresou file://. Při prvním spuštění je stránka
+        // na staré adrese předá (migrateStorage) a pak se aplikace načte z nové adresy.
+        boolean migrated = getSharedPreferences("app", MODE_PRIVATE).getBoolean("migrated", false);
+        web.loadUrl(migrated ? START_URL : OLD_URL);
         // Po otočení obrazovky nebo změně motivu se stejný soubor znovu neotevírá
         if (savedInstanceState == null) handleIntent(getIntent());
+    }
+
+    @Override
+    protected void onPause() {
+        super.onPause();
+        web.onPause(); // stránka dostane zprávu, že je skrytá, a rozbor motorem se zastaví
+    }
+
+    @Override
+    protected void onResume() {
+        super.onResume();
+        web.onResume();
+    }
+
+    private static WebResourceResponse notFound() {
+        return new WebResourceResponse("text/plain", "UTF-8", 404, "Not Found", new HashMap<>(), new ByteArrayInputStream(new byte[0]));
+    }
+
+    private static String mimeFor(String path) {
+        String p = path.toLowerCase();
+        if (p.endsWith(".html")) return "text/html";
+        if (p.endsWith(".js")) return "text/javascript";
+        if (p.endsWith(".css")) return "text/css";
+        if (p.endsWith(".wasm")) return "application/wasm";
+        if (p.endsWith(".woff2")) return "font/woff2";
+        if (p.endsWith(".json")) return "application/json";
+        if (p.endsWith(".svg")) return "image/svg+xml";
+        if (p.endsWith(".png")) return "image/png";
+        if (p.endsWith(".txt")) return "text/plain";
+        return "application/octet-stream";
     }
 
     @Override
@@ -227,6 +294,25 @@ public class MainActivity extends Activity {
 
     /** Metody volané ze stránky (běží mimo hlavní vlákno). */
     private class Bridge {
+
+        /** Stránka na staré adrese předá uložená data, pak se načte nová adresa. */
+        @JavascriptInterface
+        public void migrateStorage(String json) {
+            getSharedPreferences("app", MODE_PRIVATE).edit()
+                    .putString("migrated_data", json)
+                    .putBoolean("migrated", true)
+                    .apply();
+            runOnUiThread(() -> web.loadUrl(START_URL));
+        }
+
+        /** Stránka na nové adrese si jednou vyzvedne přenesená data. */
+        @JavascriptInterface
+        public String takeMigratedStorage() {
+            SharedPreferences p = getSharedPreferences("app", MODE_PRIVATE);
+            String d = p.getString("migrated_data", null);
+            if (d != null) p.edit().remove("migrated_data").apply();
+            return d;
+        }
 
         @JavascriptInterface
         public void copy(String text) {

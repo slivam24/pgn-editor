@@ -220,6 +220,25 @@ body.editing .app > .col + .col { display: none !important; }
 .choices .btn { width: 100%; }
 .nav .btn svg { display: block; margin: 0 auto; }
 
+/* Rozbor motorem */
+.engine { display: grid; gap: 6px; max-width: 520px; background: var(--surface); border: 1px solid var(--line); border-radius: 8px; padding: 8px 10px; }
+.engine[hidden] { display: none; }
+body.editing .engine { display: none !important; }
+.ev-bar { height: 8px; border-radius: 4px; background: #2b2b2b; overflow: hidden; box-shadow: inset 0 0 0 1px var(--line); }
+.ev-fill { height: 100%; width: 50%; background: #f4f4f0; transition: width .3s ease; }
+.eng-head { display: flex; align-items: center; gap: 10px; min-width: 0; }
+.eng-head .ev { font-family: var(--font-mono); font-weight: 600; font-size: 17px; min-width: 64px; }
+.eng-head .eng-info { flex: 1; min-width: 0; font-size: 13px; color: var(--muted); overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+button.btn.small { min-height: 34px; padding: 4px 10px; font-size: 13px; flex: none; }
+.eng-lines { display: grid; gap: 4px; }
+.eng-line { display: flex; gap: 8px; align-items: baseline; width: 100%; text-align: left; border: 0; border-top: 1px solid var(--line); background: none; color: var(--fg); font: inherit; padding: 6px 0 2px; cursor: pointer; min-width: 0; }
+.eng-line .sc { font-family: var(--font-mono); font-weight: 600; font-size: 14px; min-width: 64px; flex: none; }
+.eng-line .pv { font-family: var(--font-mono); font-size: 14px; color: var(--muted); overflow: hidden; text-overflow: ellipsis; white-space: nowrap; min-width: 0; }
+.eng-line:active .pv { color: var(--fg); }
+.modal-box.wide { max-width: 560px; }
+pre.lic { margin: 0; max-height: 60vh; overflow: auto; white-space: pre-wrap; font-family: var(--font-mono); font-size: 12px; line-height: 1.45; background: var(--bg); border: 1px solid var(--line); border-radius: 6px; padding: 10px; }
+.prose a { color: var(--accent); overflow-wrap: anywhere; }
+
 /* Ovládání */
 .counter { color: var(--muted); font-size: 14px; font-variant-numeric: tabular-nums; text-align: center; }
 .nav { display: flex; gap: 6px; flex-wrap: wrap; }
@@ -283,6 +302,7 @@ textarea.fen { min-height: 0; font-size: 14px; word-break: break-all; }
       <button class="icon-btn" id="undo" type="button" aria-label="Vrátit poslední akci" title="Vrátit poslední akci" hidden><svg viewBox="0 0 24 24" width="24" height="24" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 14L4 9l5-5"/><path d="M4 9h10.5a5.5 5.5 0 0 1 0 11H11"/></svg></button>
       <button class="icon-btn" id="commentBtn" type="button" aria-label="Komentář k tahu" title="Komentář k tahu" hidden><svg viewBox="0 0 24 24" width="24" height="24" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 20h4L19 9a2.8 2.8 0 0 0-4-4L4 16v4z"/><path d="M13.5 6.5l4 4"/></svg></button>
       <button class="icon-btn txt" id="nagBtn" type="button" aria-label="Hodnocení tahu" title="Hodnocení tahu" hidden>!?</button>
+      <button class="icon-btn" id="engineBtn" type="button" aria-label="Rozbor motorem Stockfish" title="Rozbor motorem Stockfish" hidden><svg viewBox="0 0 24 24" width="24" height="24" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="6" y="6" width="12" height="12" rx="2"/><rect x="9.5" y="9.5" width="5" height="5" rx="1"/><path d="M9 2.5V6M15 2.5V6M9 18v3.5M15 18v3.5M2.5 9H6M2.5 15H6M18 9h3.5M18 15h3.5"/></svg></button>
       <button class="icon-btn" id="sendIcon" type="button" aria-label="Odeslat e-mailem" title="Odeslat e-mailem" hidden><svg viewBox="0 0 24 24" width="24" height="24" aria-hidden="true"><rect x="3" y="5.5" width="18" height="13" rx="2" stroke="currentColor" stroke-width="2" fill="none"/><path d="M3.5 7l8.5 6 8.5-6" stroke="currentColor" stroke-width="2" stroke-linejoin="round" fill="none"/></svg></button>
     </div>
     <div class="player" id="playerTop"></div>
@@ -297,6 +317,15 @@ textarea.fen { min-height: 0; font-size: 14px; word-break: break-all; }
       </div>
     </div>
     <div class="player bottom" id="playerBottom"></div>
+    <section class="engine" id="engineBox" hidden aria-label="Rozbor motorem Stockfish">
+      <div class="ev-bar" aria-hidden="true"><div class="ev-fill" id="evFill"></div></div>
+      <div class="eng-head">
+        <span class="ev" id="evText">…</span>
+        <span class="eng-info" id="engInfo" role="status"></span>
+        <button class="btn small" id="engCheck" type="button">Zkontrolovat partii</button>
+      </div>
+      <div class="eng-lines" id="engLines"></div>
+    </section>
     <section class="editor" id="editor" hidden aria-label="Rozestavení pozice">
       <p class="note">Vyber figuru a klepej na pole, kam ji chceš postavit. Klepnutí na stejnou figuru ji zase odebere.</p>
       <div class="palette" id="palette"></div>
@@ -465,9 +494,24 @@ textarea.fen { min-height: 0; font-size: 14px; word-break: break-all; }
             <label class="switch"><input type="checkbox" id="optSend"> Ikona pro rychlé odeslání v horní liště</label>
             <label class="switch"><input type="checkbox" id="optVariants"> Varianty: jiný tah se uloží jako varianta a nic se nepřepíše</label>
             <label class="switch"><input type="checkbox" id="optNags"> Hodnocení tahů (tlačítko !?)</label>
+            <label class="switch"><input type="checkbox" id="optEngine"> Šachový motor Stockfish (tlačítko s čipem)</label>
             <label class="switch"><input type="checkbox" id="czNotation"> Zobrazovat tahy v české notaci (J, S, V, D, K)</label>
           </div>
           <p class="note">Česká notace mění jen zobrazení v aplikaci. Do souboru se tahy vždy ukládají anglicky, jak vyžaduje standard PGN.</p>
+        </div>
+        <div class="field" id="engineOpts" hidden>Šachový motor
+          <label class="field">Počet nejlepších pokračování
+            <select id="optEngLines"><option value="1">1</option><option value="2">2</option><option value="3">3</option></select>
+          </label>
+          <label class="field">Délka rozboru
+            <select id="optEngDepth">
+              <option value="14">krátká (hloubka 14)</option>
+              <option value="20">střední (hloubka 20)</option>
+              <option value="26">dlouhá (hloubka 26)</option>
+              <option value="0">bez omezení, dokud je rozbor zapnutý</option>
+            </select>
+          </label>
+          <p class="note">Rozbor běží jen se zapnutým tlačítkem s čipem v horní liště. Delší rozbor víc vybíjí baterii.</p>
         </div>
         <div class="field">Nová partie v souboru
           <div class="toggles">
@@ -492,7 +536,7 @@ textarea.fen { min-height: 0; font-size: 14px; word-break: break-all; }
     <details class="panel" id="pAbout">
       <summary><h2>O aplikaci</h2></summary>
       <div class="panel-body prose">
-        <p><strong>PGN editor</strong> <span class="ver-badge">verze 0.14</span></p>
+        <p><strong>PGN editor</strong> <span class="ver-badge">verze 0.15</span></p>
         <p>Jednoduchý editor pro zápis a úpravu šachových partií ve formátu PGN, určený hlavně pro telefon s Androidem. Aplikaci programuje Claude (umělá inteligence od společnosti Anthropic) ve spolupráci s Michalem Slivou, který určuje, co má aplikace umět a jak má vypadat.</p>
         <h3>Co aplikace umí</h3>
         <ul>
@@ -504,6 +548,7 @@ textarea.fen { min-height: 0; font-size: 14px; word-break: break-all; }
           <li>Otevření souboru PGN nebo vloženého textu, uložení do souboru .pgn, kopírování do schránky. Soubor .pgn jde otevřít i přímo z Gmailu nebo Správce souborů.</li>
           <li>Volitelně varianty a hodnocení tahů (!, ?, !!, ??, !?, ?!). Varianty, komentáře i hodnocení se načítají ze souboru a ukládají standardně, takže je přečte ChessBase.</li>
           <li>Automatický výsledek při matu i remíze (pat, nedostatek materiálu, trojí opakování, pravidlo 50 tahů).</li>
+          <li>Volitelně šachový motor Stockfish: rozbor pozice s hodnocením, nejlepší pokračování s vložením do zápisu a kontrola celé partie. Funguje bez internetu.</li>
           <li>Nová partie z libovolné pozice: rozestavením figur na šachovnici, nebo vložením FEN. FEN zobrazené pozice jde zkopírovat.</li>
           <li>Odeslání partie přes sdílení Androidu, nebo rovnou e-mailem na adresu z Nastavení. PGN je v textu i jako příloha. V Nastavení lze zapnout ikonu pro rychlé odeslání v horní liště.</li>
           <li>Funguje bez připojení k internetu.</li>
@@ -532,6 +577,16 @@ textarea.fen { min-height: 0; font-size: 14px; word-break: break-all; }
     <details class="panel" id="pChanges">
       <summary><h2>Verze a změny</h2></summary>
       <div class="panel-body log">
+        <section>
+          <div class="head"><span class="ver-badge">0.15</span><span class="date">30. 10. 2026</span></div>
+          <ul>
+            <li>Šachový motor Stockfish 19 (odlehčená verze), zapíná se v Nastavení. Tlačítko s čipem v horní liště spustí rozbor zobrazené pozice: hodnocení, pruh výhody a 1 až 3 nejlepší pokračování. Klepnutím na pokračování se vloží do zápisu, nic se nepřepíše.</li>
+            <li>Kontrola celé partie: Stockfish projde hlavní linii, označí nepřesnosti ?!, chyby ? a hrubé chyby ?? a na přání přidá lepší tahy jako varianty.</li>
+            <li>V Nastavení počet zobrazených pokračování a délka rozboru. Na pozadí se rozbor zastaví, aby nevybíjel baterii.</li>
+            <li>Nová položka menu Licence: aplikace je pod licencí GNU GPL 3, seznam použitých součástí s autory a texty licencí.</li>
+            <li>Aplikace se nově načítá ze zabezpečené vnitřní adresy, aby mohl běžet motor. Uložené partie a nastavení se přenesou automaticky.</li>
+          </ul>
+        </section>
         <section>
           <div class="head"><span class="ver-badge">0.14</span><span class="date">30. 10. 2026</span></div>
           <ul>
@@ -660,6 +715,30 @@ textarea.fen { min-height: 0; font-size: 14px; word-break: break-all; }
         </section>
       </div>
     </details>
+
+    <details class="panel" id="pLicense">
+      <summary><h2>Licence</h2></summary>
+      <div class="panel-body prose">
+        <p>PGN editor je svobodný software pod licencí GNU GPL verze 3. Smíš ho používat, šířit i upravovat. Každá šířená verze musí zůstat pod stejnou licencí a se zdrojovým kódem.</p>
+        <p>Zdrojový kód: <a href="https://github.com/slivam24/pgn-editor">github.com/slivam24/pgn-editor</a></p>
+        <h3>Použité součásti</h3>
+        <ul>
+          <li><strong>Stockfish 19</strong>, šachový motor. Autoři T. Romstad, M. Costalba, J. Kiiski, G. Linscott a další, licence GPL 3. Zdrojový kód: <a href="https://github.com/official-stockfish/Stockfish">github.com/official-stockfish/Stockfish</a></li>
+          <li><strong>Stockfish.js 19</strong>, Stockfish pro WebAssembly (odlehčená jednovláknová verze). © 2026 Chess.com, LLC, Nathan Rugg, licence GPL 3. Neuronová síť nn-61e7af4bb97d, autor Chris Bao. Zdrojový kód: <a href="https://github.com/nmrugg/stockfish.js">github.com/nmrugg/stockfish.js</a></li>
+          <li><strong>chess.js 0.10.3</strong>, pravidla šachu. © Jeff Hlywa, licence BSD.</li>
+          <li><strong>Figury cburnett</strong>, autor Colin M. L. Burnett, převzaté z projektu chessground (Lichess), licence GPL 3.</li>
+          <li><strong>Písma IBM Plex Sans a IBM Plex Mono</strong>, © IBM Corp., licence SIL Open Font License 1.1.</li>
+          <li><strong>AndroidX Core</strong>, © The Android Open Source Project, licence Apache 2.0.</li>
+        </ul>
+        <h3>Texty licencí</h3>
+        <div class="actions">
+          <button class="btn" type="button" data-licence="gpl-3.0.txt">GNU GPL 3</button>
+          <button class="btn" type="button" data-licence="chess.js-LICENSE.txt">BSD (chess.js)</button>
+          <button class="btn" type="button" data-licence="ibm-plex-sans-LICENSE.txt">OFL 1.1 (IBM Plex)</button>
+          <button class="btn" type="button" data-licence="apache-2.0.txt">Apache 2.0</button>
+        </div>
+      </div>
+    </details>
 </aside>
 
 <div class="toast" id="toast" role="status" hidden></div>
@@ -674,6 +753,14 @@ textarea.fen { min-height: 0; font-size: 14px; word-break: break-all; }
       <button class="btn" id="cCancel" type="button">Zrušit</button>
       <button class="btn primary" id="cSave" type="button">Uložit</button>
     </div>
+  </div>
+</div>
+
+<div class="modal" id="lModal" hidden>
+  <div class="modal-box wide" role="dialog" aria-modal="true" aria-labelledby="lTitle">
+    <h3 id="lTitle">Licence</h3>
+    <pre class="lic" id="lText"></pre>
+    <div class="actions"><button class="btn primary" id="lClose" type="button">Zavřít</button></div>
   </div>
 </div>
 
@@ -712,6 +799,22 @@ textarea.fen { min-height: 0; font-size: 14px; word-break: break-all; }
 <script src="chess.js"></script>
 <script>
 (function () {
+  // Jednorázový přesun uložených dat ze staré adresy aplikace (file://) na novou (https),
+  // na které může běžet šachový motor. Android pak stránku načte znovu z nové adresy.
+  if (location.protocol === 'file:' && window.Android && window.Android.migrateStorage) {
+    document.documentElement.style.visibility = 'hidden';
+    const data = {};
+    try { for (let i = 0; i < localStorage.length; i++) { const k = localStorage.key(i); data[k] = localStorage.getItem(k); } } catch (e) {}
+    window.Android.migrateStorage(JSON.stringify(data));
+    return;
+  }
+  if (window.Android && window.Android.takeMigratedStorage) {
+    try {
+      const raw = window.Android.takeMigratedStorage();
+      if (raw) { const d = JSON.parse(raw); Object.keys(d).forEach(k => { if (localStorage.getItem(k) === null) localStorage.setItem(k, d[k]); }); }
+    } catch (e) {}
+  }
+
   const START = 'rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1';
   const TAGS = ['Event', 'Site', 'Date', 'Round', 'White', 'Black', 'Result'];
   const SIMPLE = ['Event', 'Site', 'Date', 'Round', 'Result'];
@@ -725,12 +828,17 @@ textarea.fen { min-height: 0; font-size: 14px; word-break: break-all; }
   let FILE = null;   // otevřený soubor: { games: [...], cur, name }
   let state = null;  // právě upravovaná partie = FILE.games[FILE.cur]
   let LINE = [];     // uzly aktuální linie: LINE[0] je začátek, LINE[k] pozice po k půltazích
+  // Šachový motor: stav běžícího rozboru
+  const eng = { worker: null, loading: null, ready: false, searching: false, stopping: false, job: null, next: null,
+    liveFen: null, liveDone: false, lines: [], depth: 0, checking: null, renderTimer: null, error: '' };
+  let engineOn = false;
   let selected = null;
   let pendingPromo = null;
   let history = [];
   let czech = false;
   let opts = { undo: false, comments: false, sendIcon: false, variants: false, nags: false,
-    prefill: false, preEvent: true, preSite: true, preRound: true, preDate: 'prev' };
+    prefill: false, preEvent: true, preSite: true, preRound: true, preDate: 'prev',
+    engine: false, engLines: 1, engDepth: 20 };
   try { const o = JSON.parse(localStorage.getItem('pgn-opts') || 'null'); if (o) opts = Object.assign(opts, o); } catch (e) {}
 
   function serializeFile() { return JSON.stringify(FILE, (k, v) => k === 'moves' ? undefined : v); }
@@ -846,6 +954,7 @@ textarea.fen { min-height: 0; font-size: 14px; word-break: break-all; }
         boardEl.appendChild(btn);
       }
     }
+    analyzeCurrent();
   }
 
   boardEl.addEventListener('click', e => {
@@ -856,6 +965,7 @@ textarea.fen { min-height: 0; font-size: 14px; word-break: break-all; }
 
   function onSquare(sq) {
     if (editor) { editSquare(sq); return; }
+    if (eng.checking) { toast('Počkej, až Stockfish dokončí kontrolu partie.'); return; }
     const g = gameAt(state.ply);
     if (selected) {
       const cands = g.moves({ square: selected, verbose: true }).filter(m => m.to === sq);
@@ -1761,7 +1871,7 @@ textarea.fen { min-height: 0; font-size: 14px; word-break: break-all; }
   window.androidBack = () => {
     if (editor && $('modal').hidden) { closeEditor(); return true; }
     if (!$('modal').hidden && $('modalCancel').hidden) { $('modalOk').click(); return true; }
-    for (const [box, btn] of [['modal', 'modalCancel'], ['cModal', 'cCancel'], ['nModal', 'nCancel'], ['chModal', 'chCancel'], ['promo', 'promoCancel']]) {
+    for (const [box, btn] of [['modal', 'modalCancel'], ['cModal', 'cCancel'], ['nModal', 'nCancel'], ['chModal', 'chCancel'], ['lModal', 'lClose'], ['promo', 'promoCancel']]) {
       if (!$(box).hidden) { $(btn).click(); return true; }
     }
     if (drawerOpen()) { setDrawer(false); return true; }
@@ -1824,8 +1934,323 @@ textarea.fen { min-height: 0; font-size: 14px; word-break: break-all; }
   $('nCancel').addEventListener('click', () => { $('nModal').hidden = true; });
   $('nModal').addEventListener('click', e => { if (e.target === $('nModal')) $('nModal').hidden = true; });
 
+  /* ---------- Šachový motor Stockfish ---------- */
+  // Odlehčený jednovláknový Stockfish 19 ve WebAssembly běží v samostatném vlákně (Web Worker)
+  // a komunikuje protokolem UCI. Soubory se načtou ze stránky a vlákno se spustí z paměti.
+  const ENGINE_JS = 'engine/stockfish-19-lite-single.js', ENGINE_WASM = 'engine/stockfish-19-lite-single.wasm';
+  function engineLoad() {
+    if (eng.loading) return eng.loading;
+    eng.loading = (async () => {
+      const get = (u, kind) => fetch(u).then(r => { if (!r.ok) throw new Error(u); return r[kind](); });
+      const [js, wasm] = await Promise.all([get(ENGINE_JS, 'text'), get(ENGINE_WASM, 'arrayBuffer')]);
+      const wasmUrl = URL.createObjectURL(new Blob([wasm], { type: 'application/wasm' }));
+      const jsUrl = URL.createObjectURL(new Blob([js], { type: 'text/javascript' }));
+      const w = new Worker(jsUrl + '#' + encodeURIComponent(wasmUrl));
+      eng.worker = w;
+      await new Promise((resolve, reject) => {
+        const t = setTimeout(() => reject(new Error('timeout')), 20000);
+        w.onmessage = e => { if (e.data === 'uciok') { clearTimeout(t); resolve(); } };
+        w.onerror = e => { clearTimeout(t); reject(e); };
+        w.postMessage('uci');
+      });
+      w.onmessage = e => { if (typeof e.data === 'string') onEngineLine(e.data); };
+      w.postMessage('setoption name Hash value 32');
+      w.postMessage('isready');
+      eng.ready = true;
+    })();
+    eng.loading.catch(() => { eng.loading = null; if (eng.worker) { eng.worker.terminate(); eng.worker = null; } });
+    return eng.loading;
+  }
+  function engineQuit() {
+    if (eng.worker) eng.worker.terminate();
+    Object.assign(eng, { worker: null, loading: null, ready: false, searching: false, stopping: false, job: null, next: null, liveFen: null, liveDone: false, lines: [], depth: 0 });
+  }
+  // Úloha: { fen, multipv, depth (0 = bez omezení), onInfo(info), onDone(nejlepší tah, přerušeno) }
+  function engineGo(job) {
+    if (eng.job) eng.job.aborted = true;
+    eng.next = job;
+    if (eng.searching) {
+      if (!eng.stopping) { eng.stopping = true; eng.worker.postMessage('stop'); }
+      return;
+    }
+    startNextJob();
+  }
+  function startNextJob() {
+    const job = eng.next;
+    eng.next = null;
+    if (!job || !eng.worker) return;
+    eng.job = job; eng.searching = true; eng.stopping = false;
+    eng.worker.postMessage('setoption name MultiPV value ' + (job.multipv || 1));
+    eng.worker.postMessage('position fen ' + job.fen);
+    eng.worker.postMessage(job.depth ? 'go depth ' + job.depth : 'go infinite');
+  }
+  function engineStop() {
+    eng.next = null;
+    if (eng.job) eng.job.aborted = true;
+    if (eng.searching && !eng.stopping) { eng.stopping = true; eng.worker.postMessage('stop'); }
+  }
+  function parseInfo(l) {
+    const t = l.split(' ');
+    const si = t.indexOf('score'), pi = t.indexOf('pv');
+    if (si === -1 || pi === -1) return null;
+    if (t[si + 3] === 'lowerbound' || t[si + 3] === 'upperbound') return null;
+    const at = k => { const i = t.indexOf(k); return i === -1 ? null : t[i + 1]; };
+    const kind = t[si + 1], val = parseInt(t[si + 2], 10);
+    return { depth: +at('depth') || 0, mpv: +(at('multipv') || 1), cp: kind === 'cp' ? val : null, mate: kind === 'mate' ? val : null, pv: t.slice(pi + 1) };
+  }
+  function onEngineLine(l) {
+    const job = eng.job;
+    if (l.startsWith('info ')) {
+      if (job && !job.aborted && job.onInfo) { const inf = parseInfo(l); if (inf) job.onInfo(inf); }
+    } else if (l.startsWith('bestmove')) {
+      eng.searching = false; eng.stopping = false; eng.job = null;
+      if (job && job.onDone) job.onDone(l.split(' ')[1], !!job.aborted);
+      startNextJob();
+    }
+  }
+
+  // Hodnocení: z pohledu bílého, šance na výhru podle vzorce, který používá Lichess
+  function whiteScore(line) {
+    const s = line.turn === 'w' ? 1 : -1;
+    return line.mate !== null ? { mate: line.mate * s } : { cp: line.cp * s };
+  }
+  function fmtScore(sc) {
+    if (sc.mate !== undefined) return (sc.mate < 0 ? '−' : '') + 'M' + Math.abs(sc.mate);
+    const v = sc.cp / 100;
+    return (v > 0 ? '+' : v < 0 ? '−' : '') + Math.abs(v).toFixed(2).replace('.', ',');
+  }
+  function winChance(cp) { return 2 / (1 + Math.exp(-0.00368208 * cp)) - 1; }
+  function whiteShare(sc) {
+    const cp = sc.mate !== undefined ? (sc.mate > 0 ? 1000 : -1000) : Math.max(-1000, Math.min(1000, sc.cp));
+    return 50 + 50 * winChance(cp);
+  }
+  function pvToSan(fen, pv, max) {
+    const g = new Chess(fen), out = [];
+    for (const u of pv.slice(0, max)) {
+      const m = g.move({ from: u.slice(0, 2), to: u.slice(2, 4), promotion: u[4] });
+      if (!m) break;
+      out.push(m.san);
+    }
+    return out;
+  }
+  function sanLineText(fen, sans) {
+    const f = fen.split(' ');
+    let n = parseInt(f[5], 10) || 1, white = f[1] === 'w';
+    const out = [];
+    sans.forEach((san, i) => {
+      if (white) out.push(n + '.');
+      else if (i === 0) out.push(n + '...');
+      out.push(show(san));
+      if (!white) n++;
+      white = !white;
+    });
+    return out.join(' ');
+  }
+
+  // Průběžný rozbor zobrazené pozice
+  function analyzeCurrent() {
+    if (!engineOn || eng.checking || editor || document.hidden) return;
+    const g = gameAt(state.ply), fen = g.fen();
+    if (fen === eng.liveFen) return;
+    eng.liveFen = fen; eng.liveDone = false; eng.lines = []; eng.depth = 0; eng.error = '';
+    if (g.game_over()) {
+      engineStop();
+      eng.liveDone = true;
+      renderEngine(g.in_checkmate() ? 'Mat, konec partie.' : 'Remíza, konec partie.');
+      return;
+    }
+    renderEngine();
+    const turn = g.turn();
+    engineLoad().then(() => {
+      if (eng.liveFen !== fen || !engineOn || eng.checking) return;
+      engineGo({ fen, multipv: opts.engLines, depth: opts.engDepth,
+        onInfo: inf => {
+          if (inf.mpv > opts.engLines) return;
+          eng.lines[inf.mpv - 1] = Object.assign(inf, { turn });
+          if (inf.mpv === 1) eng.depth = inf.depth;
+          scheduleEngineRender();
+        },
+        onDone: (best, aborted) => { if (!aborted) { eng.liveDone = true; scheduleEngineRender(); } } });
+    }).catch(() => { eng.error = 'Stockfish se nepodařilo spustit.'; renderEngine(); });
+  }
+  function scheduleEngineRender() {
+    if (eng.renderTimer) return;
+    eng.renderTimer = setTimeout(() => { eng.renderTimer = null; renderEngine(); }, 200);
+  }
+  function renderEngine(msg) {
+    const box = $('engineBox');
+    box.hidden = !engineOn;
+    $('engineBtn').classList.toggle('primary', engineOn);
+    if (!engineOn) return;
+    const linesEl = $('engLines');
+    $('engCheck').textContent = eng.checking ? 'Přerušit kontrolu' : 'Zkontrolovat partii';
+    if (eng.checking) {
+      $('evText').textContent = '…';
+      const d = eng.checking.deep;
+      $('engInfo').textContent = d ? 'Ověřuji podezřelé tahy: ' + (d.k + 1) + ' z ' + d.n + '.' : 'Kontroluji partii: pozice ' + (eng.checking.i + 1) + ' z ' + eng.checking.n + '.';
+      $('evFill').style.width = (d ? 100 * d.k / d.n : 100 * eng.checking.i / eng.checking.n) + '%';
+      linesEl.innerHTML = '';
+      return;
+    }
+    const best = eng.lines[0];
+    if (msg || eng.error || !best) {
+      $('evText').textContent = '…';
+      $('engInfo').textContent = msg || eng.error || (eng.ready ? 'Počítám…' : 'Spouštím Stockfish…');
+      $('evFill').style.width = '50%';
+      linesEl.innerHTML = '';
+      return;
+    }
+    const sc = whiteScore(best);
+    $('evText').textContent = fmtScore(sc);
+    $('evFill').style.width = whiteShare(sc) + '%';
+    $('engInfo').textContent = 'Stockfish, hloubka ' + eng.depth + (eng.liveDone ? '' : '…');
+    linesEl.innerHTML = '';
+    eng.lines.slice(0, opts.engLines).forEach(line => {
+      if (!line) return;
+      const sans = pvToSan(eng.liveFen, line.pv, 10);
+      if (!sans.length) return;
+      const b = document.createElement('button');
+      b.type = 'button';
+      b.className = 'eng-line';
+      b.title = 'Vložit do zápisu';
+      const s1 = document.createElement('span'); s1.className = 'sc'; s1.textContent = fmtScore(whiteScore(line));
+      const s2 = document.createElement('span'); s2.className = 'pv'; s2.textContent = sanLineText(eng.liveFen, sans);
+      b.append(s1, s2);
+      b.addEventListener('click', () => insertLine(eng.liveFen, line.pv));
+      linesEl.appendChild(b);
+    });
+  }
+  // Vloží pokračování motoru do zápisu; nic nepřepíše, jinak než stávající tahy jde jako varianta
+  function insertLine(fen, pv) {
+    if (gameAt(state.ply).fen() !== fen) return;
+    const sans = pvToSan(fen, pv, 10);
+    if (!sans.length) return;
+    snapshot();
+    let node = LINE[state.ply];
+    const asVariant = node.ch.length > 0 && node.ch[0].s !== sans[0];
+    for (const san of sans) {
+      let c = node.ch.find(x => x.s === san);
+      if (!c) { c = newNode(san); node.ch.push(c); }
+      node = c;
+    }
+    renderAll();
+    toast(asVariant ? 'Pokračování vloženo do zápisu jako varianta.' : 'Pokračování vloženo do zápisu.');
+  }
+  function setEngineOn(on) {
+    engineOn = on;
+    if (!on) { engineStop(); eng.liveFen = null; }
+    renderEngine();
+    if (on) analyzeCurrent();
+  }
+  $('engineBtn').addEventListener('click', () => setEngineOn(!engineOn));
+  document.addEventListener('visibilitychange', () => {
+    if (document.hidden) { if (!eng.checking) { engineStop(); eng.liveFen = null; } }
+    else analyzeCurrent();
+  });
+
+  // Kontrola celé partie: rozbor každé pozice hlavní linie a označení chyb
+  function analyzeOnce(fen, depth) {
+    return new Promise(resolve => {
+      let last = null;
+      engineGo({ fen, multipv: 1, depth,
+        onInfo: inf => { if (inf.mpv === 1) last = inf; },
+        onDone: best => resolve({ cp: last ? last.cp : 0, mate: last ? last.mate : null, pv: last ? last.pv : [best], best, turn: fen.split(' ')[1] }) });
+    });
+  }
+  function moverChance(ev, mover) {
+    const s = ev.turn === mover ? 1 : -1;
+    if (ev.mate !== null && ev.mate !== undefined) return (ev.mate > 0 ? 1 : -1) * s;
+    return winChance(ev.cp) * s;
+  }
+  async function checkGame() {
+    const main = [], fens = [];
+    const g = new Chess(state.startFen);
+    fens.push(g.fen());
+    let node = state.root;
+    while (node.ch.length) { node = node.ch[0]; main.push(node); g.move(node.s); fens.push(g.fen()); }
+    if (!main.length) { toast('Partie zatím nemá žádné tahy.'); return; }
+    const mins = Math.round(fens.length * 1.2 / 60);
+    const i0 = await askChoice('Zkontrolovat partii?',
+      'Stockfish projde hlavní linii (' + main.length + ' ' + plural(main.length, 'půltah', 'půltahy', 'půltahů') + ') a označí nepřesnosti ?!, chyby ? a hrubé chyby ??. Potrvá to ' + (mins < 1 ? 'méně než minutu' : 'asi ' + mins + ' ' + plural(mins, 'minutu', 'minuty', 'minut')) + '.',
+      ['Označit a přidat lepší tahy', 'Jen označit']);
+    if (i0 < 0) return;
+    const addLines = i0 === 0;
+    try { await engineLoad(); } catch (e) { showInfo('Stockfish', 'Stockfish se nepodařilo spustit.'); return; }
+    engineStop();
+    eng.checking = { i: 0, n: fens.length, abort: false };
+    renderEngine();
+    // 1. rychlý průchod celou partií, 2. podezřelé tahy se ověří hlubším propočtem
+    // (při malé hloubce motor občas přehlédne kombinaci a dobrý tah by označil za chybu)
+    const evalAt = async (i, depth) => {
+      const p = new Chess(fens[i]);
+      if (p.game_over()) return { cp: 0, mate: p.in_checkmate() ? 0 : null, pv: [], best: '', turn: p.turn() };
+      return analyzeOnce(fens[i], depth);
+    };
+    const evals = [];
+    for (let i = 0; i < fens.length && !eng.checking.abort; i++) {
+      eng.checking.i = i; renderEngine();
+      evals.push(await evalAt(i, 12));
+    }
+    const judge = i => {
+      const before = evals[i], after = evals[i + 1], mover = before.turn;
+      const bestSan = before.pv.length ? pvToSan(fens[i], before.pv, 1)[0] : '';
+      if (!bestSan || bestSan === main[i].s) return -1;
+      const delta = moverChance(before, mover) - moverChance(after, mover);
+      return delta >= 0.3 ? 2 : delta >= 0.2 ? 1 : delta >= 0.1 ? 0 : -1;
+    };
+    const suspects = [];
+    if (!eng.checking.abort) for (let i = 0; i < main.length; i++) if (judge(i) >= 0) suspects.push(i);
+    const deep = new Set();
+    for (let k = 0; k < suspects.length && !eng.checking.abort; k++) {
+      const i = suspects[k];
+      eng.checking.deep = { k, n: suspects.length }; renderEngine();
+      for (const j of [i, i + 1]) if (!deep.has(j)) { evals[j] = await evalAt(j, 18); deep.add(j); }
+    }
+    const aborted = eng.checking.abort;
+    eng.checking = null; eng.liveFen = null;
+    if (aborted) { renderEngine(); analyzeCurrent(); toast('Kontrola přerušena, partie zůstala beze změny.'); return; }
+    snapshot();
+    const stats = { w: [0, 0, 0], b: [0, 0, 0] };
+    for (const i of suspects) {
+      const before = evals[i], mover = before.turn;
+      const kind = judge(i);
+      if (kind < 0) continue;
+      stats[mover][kind]++;
+      const nd = main[i];
+      if (!nd.n.some(x => x >= 1 && x <= 6)) nd.n.unshift([6, 2, 4][kind]);
+      if (addLines) {
+        const parent = i === 0 ? state.root : main[i - 1];
+        const sans = pvToSan(fens[i], before.pv, 6);
+        if (sans.length && !parent.ch.some(c => c.s === sans[0])) {
+          let x = newNode(sans[0]);
+          parent.ch.push(x);
+          for (const san of sans.slice(1)) { const y = newNode(san); x.ch.push(y); x = y; }
+        }
+      }
+    }
+    renderAll();
+    const txt = c => c[0] + ' ' + plural(c[0], 'nepřesnost', 'nepřesnosti', 'nepřesností') + ', ' + c[1] + ' ' + plural(c[1], 'chyba', 'chyby', 'chyb') + ', ' + c[2] + ' ' + plural(c[2], 'hrubá chyba', 'hrubé chyby', 'hrubých chyb');
+    showInfo('Kontrola dokončena', 'Bílý: ' + txt(stats.w) + '.\nČerný: ' + txt(stats.b) + '.' + (addLines ? '\nLepší tahy jsou v zápisu jako varianty.' : ''));
+  }
+  $('engCheck').addEventListener('click', () => {
+    if (eng.checking) { eng.checking.abort = true; engineStop(); }
+    else checkGame();
+  });
+
+  /* ---------- Licence ---------- */
+  document.querySelectorAll('[data-licence]').forEach(b => b.addEventListener('click', async () => {
+    $('lTitle').textContent = b.textContent;
+    $('lText').textContent = 'Načítám…';
+    $('lModal').hidden = false;
+    try { const r = await fetch('licence/' + b.dataset.licence); if (!r.ok) throw 0; $('lText').textContent = await r.text(); }
+    catch (e) { $('lText').textContent = 'Text licence se nepodařilo načíst. Najdeš ho ve zdrojovém kódu aplikace ve složce licence.'; }
+    $('lText').scrollTop = 0;
+  }));
+  $('lClose').addEventListener('click', () => { $('lModal').hidden = true; });
+  $('lModal').addEventListener('click', e => { if (e.target === $('lModal')) $('lModal').hidden = true; });
+
   /* ---------- Rozbalené panely si pamatujeme ---------- */
-  ['pMoves', 'pTags', 'pFile', 'pGames', 'pSend', 'pText', 'pFen', 'pSettings', 'pAbout', 'pChanges'].forEach(id => {
+  ['pMoves', 'pTags', 'pFile', 'pGames', 'pSend', 'pText', 'pFen', 'pSettings', 'pAbout', 'pChanges', 'pLicense'].forEach(id => {
     const el = $(id);
     try { if (localStorage.getItem('pgn-panel-' + id) === '1') el.open = true; } catch (e) {}
     el.addEventListener('toggle', () => {
@@ -1861,6 +2286,13 @@ textarea.fen { min-height: 0; font-size: 14px; word-break: break-all; }
     $('prePSite').checked = opts.preSite;
     $('prePRound').checked = opts.preRound;
     $('prePDate').value = opts.preDate;
+    $('optEngine').checked = opts.engine;
+    $('engineOpts').hidden = !opts.engine;
+    $('engineBtn').hidden = !opts.engine;
+    $('optEngLines').value = String(opts.engLines);
+    $('optEngDepth').value = String(opts.engDepth);
+    if (!opts.engine && engineOn) setEngineOn(false);
+    if (!opts.engine && eng.worker && !eng.checking) engineQuit();
   }
   function saveOpts() { try { localStorage.setItem('pgn-opts', JSON.stringify(opts)); } catch (e) {} }
   $('optUndo').addEventListener('change', e => { opts.undo = e.target.checked; saveOpts(); applyOpts(); });
@@ -1872,6 +2304,9 @@ textarea.fen { min-height: 0; font-size: 14px; word-break: break-all; }
   [['prePEvent', 'preEvent'], ['prePSite', 'preSite'], ['prePRound', 'preRound']].forEach(([id, key]) =>
     $(id).addEventListener('change', e => { opts[key] = e.target.checked; saveOpts(); }));
   $('prePDate').addEventListener('change', e => { opts.preDate = e.target.value; saveOpts(); });
+  $('optEngine').addEventListener('change', e => { opts.engine = e.target.checked; saveOpts(); applyOpts(); });
+  $('optEngLines').addEventListener('change', e => { opts.engLines = +e.target.value; saveOpts(); eng.liveFen = null; analyzeCurrent(); });
+  $('optEngDepth').addEventListener('change', e => { opts.engDepth = +e.target.value; saveOpts(); eng.liveFen = null; analyzeCurrent(); });
   applyOpts();
 
   /* ---------- Komentář k tahu ---------- */
@@ -2077,6 +2512,7 @@ textarea.fen { min-height: 0; font-size: 14px; word-break: break-all; }
   // Náhledy pro kontrolu vzhledu při sestavení (#menu, #vse = všechna volitelná tlačítka)
   if (location.hash === '#menu') setTimeout(() => setDrawer(true), 0);
   if (location.hash === '#editor') setTimeout(openEditor, 0);
+  if (location.hash === '#motor') setTimeout(() => { opts.engine = true; opts.engLines = 3; applyOpts(); goPath([0, 0, 0, 0, 0, 0, 0, 0]); setEngineOn(true); }, 0);
   if (location.hash === '#varianty') setTimeout(() => {
     loadFile('[Event "Ukazka"]\n[White "Novak, Jan"]\n[Black "Dvorak, Petr"]\n[Result "*"]\n\n1. e4 e5 (1... c5 2. Nf3 (2. c3 d5) 2... d6) 2. Nf3 $1 Nc6 {Hlavni pokracovani} 3. Bb5 a6 $6 (3... Nf6 4. O-O) 4. Ba4 *\n\n[Event "Ukazka"]\n[White "Svoboda"]\n[Black "Cerny"]\n[Result "1/2-1/2"]\n\n1. d4 d5 1/2-1/2', 'ukazka.pgn');
     opts.comments = true; opts.variants = true; opts.nags = true; applyOpts(); goPath([0, 0, 0, 0]); $('pMoves').open = true; renderAll();
@@ -2090,7 +2526,7 @@ textarea.fen { min-height: 0; font-size: 14px; word-break: break-all; }
   let drag = null;
   let suppressClick = false;
   boardEl.addEventListener('pointerdown', e => {
-    if (editor) return;
+    if (editor || eng.checking) return;
     const btn = e.target.closest('.sq');
     if (!btn || e.button > 0) return;
     const g = gameAt(state.ply);

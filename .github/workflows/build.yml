@@ -37,10 +37,12 @@ jobs:
       - name: Náhled obrazovky
         continue-on-error: true
         run: |
-          P="$PWD/app/src/main/assets/www/index.html"
-          for v in "nahled:" "nahled-menu:#menu" "nahled-vse:#vse" "nahled-editor:#editor" "nahled-varianty:#varianty"; do
+          python3 -m http.server 8000 --directory app/src/main/assets/www >/dev/null 2>&1 &
+          sleep 2
+          for v in "nahled:" "nahled-menu:#menu" "nahled-vse:#vse" "nahled-editor:#editor" "nahled-varianty:#varianty" "nahled-motor:#motor"; do
+            budget=3000; [ "${v#*:}" = "#motor" ] && budget=20000
             google-chrome --headless=new --no-sandbox --hide-scrollbars --force-device-scale-factor=2 \
-              --window-size=412,915 --virtual-time-budget=3000 --screenshot="${v%%:*}.png" "file://$P${v#*:}"
+              --window-size=412,915 --virtual-time-budget=$budget --screenshot="${v%%:*}.png" "http://localhost:8000/index.html${v#*:}"
           done
 
       - name: Uložit náhled (vydání nahled)

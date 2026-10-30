@@ -34,6 +34,21 @@ Soubor `app/pgn-editor.keystore` podepisuje aplikaci. Díky němu jde každá da
 | `app/build.gradle` | číslo verze, podpis |
 | `.github/workflows/build.yml` | návod pro GitHub, jak APK sestavit |
 
-Licence použitých knihoven a písem jsou ve složce `app/src/main/assets/www/licence/`.
+## Licence
+
+PGN editor je svobodný software pod licencí **GNU GPL verze 3** (soubor `LICENSE`). Kdo aplikaci šíří, například na Google Play, musí k ní přiložit licenci a zpřístupnit zdrojový kód.
+
+| Součást | Autor | Licence |
+|---|---|---|
+| Stockfish 19 | T. Romstad, M. Costalba, J. Kiiski, G. Linscott a další | GPL 3 |
+| Stockfish.js 19, odlehčená jednovláknová verze (`assets/www/engine/`) | Chess.com, LLC, Nathan Rugg; síť nn-61e7af4bb97d od Chrise Baa | GPL 3 |
+| chess.js 0.10.3 | Jeff Hlywa | BSD |
+| Figury cburnett (z projektu chessground) | Colin M. L. Burnett | GPL 3 |
+| Písma IBM Plex Sans a Mono | IBM Corp. | SIL OFL 1.1 |
+| AndroidX Core | The Android Open Source Project | Apache 2.0 |
+
+Texty licencí jsou ve složce `app/src/main/assets/www/licence/` a v aplikaci v menu Licence. Zdrojový kód Stockfishe: https://github.com/official-stockfish/Stockfish, Stockfish.js: https://github.com/nmrugg/stockfish.js.
+
+**Před zveřejněním repozitáře** je potřeba přesunout podpisový klíč `app/pgn-editor.keystore` a jeho heslo z repozitáře do tajného úložiště GitHubu (Secrets) a odstranit je i z historie.
 
 Alternativa ke GitHubu: projekt jde otevřít v Android Studiu a sestavit přes **Build > Generate App Bundles or APKs > Build APK(s)**.
