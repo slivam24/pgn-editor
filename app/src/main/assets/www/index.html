@@ -1018,7 +1018,7 @@ textarea.fen { min-height: 0; font-size: 14px; word-break: break-all; }
           const vp = path.concat(v);
           const nn = emitMove(w, node.ch[v], vp, true);
           emitLine(w, node.ch[v], vp, nn, level + 1);
-          if (level > 0) w.append(')');
+          if (level > 0) w.append(') ');
           parent.appendChild(w);
           needNum = true;
         }
