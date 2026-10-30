@@ -1,7 +1,7 @@
 // Snímky obrazovky aplikace ve skutečném prohlížeči (Chrome) pro kontrolu vzhledu při sestavení
 const fs = require('fs');
 const puppeteer = require('puppeteer-core');
-const SHOTS = [['nahled', ''], ['nahled-menu', '#menu'], ['nahled-vse', '#vse'], ['nahled-editor', '#editor'], ['nahled-varianty', '#varianty'], ['nahled-motor', '#motor']];
+const SHOTS = [['nahled', ''], ['nahled-menu', '#menu'], ['nahled-vse', '#vse'], ['nahled-editor', '#editor'], ['nahled-varianty', '#varianty'], ['nahled-motor', '#motor'], ['nahled-nastaveni', '#nastaveni'], ['nahled-partie', '#partie']];
 (async () => {
   const browser = await puppeteer.launch({ executablePath: '/usr/bin/google-chrome', args: ['--no-sandbox'] });
   const log = [];

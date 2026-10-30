@@ -11,8 +11,8 @@ android {
         minSdk 26          // Android 8.0 a novější
         targetSdk 34
         // S každou novou verzí zvýšit obě čísla (stejně jako v O aplikaci)
-        versionCode 15
-        versionName '0.15'
+        versionCode 16
+        versionName '0.16'
     }
 
     // Stálý podpisový klíč, aby šlo novou verzi nainstalovat přes starou bez ztráty dat

@@ -239,6 +239,65 @@ button.btn.small { min-height: 34px; padding: 4px 10px; font-size: 13px; flex: n
 pre.lic { margin: 0; max-height: 60vh; overflow: auto; white-space: pre-wrap; font-family: var(--font-mono); font-size: 12px; line-height: 1.45; background: var(--bg); border: 1px solid var(--line); border-radius: 6px; padding: 10px; }
 .prose a { color: var(--accent); overflow-wrap: anywhere; }
 
+/* Menu: hlavní seznam a stránky */
+.drawer { display: block; padding: 0; overflow: hidden; }
+.dpage { position: absolute; inset: 0; display: flex; flex-direction: column; background: var(--bg); }
+.dpage[hidden] { display: none; }
+.dhead, .phead { display: flex; align-items: center; gap: 8px; padding: max(12px, env(safe-area-inset-top, 0px)) 12px 8px 16px; flex: none; }
+.phead { padding-left: 6px; border-bottom: 1px solid var(--line); padding-bottom: 10px; }
+.phead h2 { margin: 0; font-size: 18px; font-weight: 600; flex: 1; min-width: 0; }
+.dtitle { flex: 1; min-width: 0; display: grid; }
+.dtitle b { font-size: 18px; }
+.dtitle small { color: var(--muted); font-size: 13px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.icon-btn.plain { border-color: transparent; background: transparent; }
+.mlist { display: grid; padding: 4px 8px 24px; overflow-y: auto; }
+.mlist.inset { padding: 8px 0 0; border-top: 1px solid var(--line); margin-top: 6px; }
+.mi { display: flex; align-items: center; gap: 14px; width: 100%; min-height: 48px; padding: 0 10px; border: 0; border-radius: 8px; background: none; color: var(--fg); font: inherit; font-size: 15.5px; text-align: left; cursor: pointer; }
+.mi:hover, .mi:focus-visible { background: var(--accent-soft); }
+.mi:focus-visible { outline: 2px solid var(--accent); outline-offset: -2px; }
+.mi .mi-ic { flex: none; color: var(--muted); }
+.mi .mi-l { flex: 1; min-width: 0; }
+.mi .mi-chev { flex: none; color: var(--muted); }
+.mi.danger, .mi.danger .mi-ic { color: var(--warn); }
+.mi-badge { min-width: 24px; padding: 1px 7px; border-radius: 11px; background: var(--accent-soft); font-size: 13px; text-align: center; }
+.mi-ver { color: var(--muted); font-size: 13px; font-family: var(--font-mono); }
+.msep { height: 1px; background: var(--line); margin: 6px 10px; }
+.pbody { flex: 1; overflow-y: auto; overscroll-behavior: contain; padding: 14px 16px 28px; display: grid; gap: 12px; align-content: start; }
+.pfoot { flex: none; display: flex; gap: 8px; padding: 10px 16px max(12px, env(safe-area-inset-bottom, 0px)); border-top: 1px solid var(--line); background: var(--bg); }
+.pfoot .btn { flex: 1; }
+.phead .count { min-width: 24px; padding: 1px 7px; border-radius: 11px; background: var(--accent-soft); font-size: 13px; text-align: center; }
+
+/* Seznam partií */
+.gsearch { font-size: 15px; }
+.games { max-height: none; gap: 4px; }
+.games .game { grid-template-columns: auto minmax(0, 1fr) auto; align-items: center; column-gap: 10px; row-gap: 0; padding: 7px 10px; }
+.games .game .no { grid-row: span 2; color: var(--muted); font-family: var(--font-mono); font-size: 13px; min-width: 22px; text-align: right; }
+.games .game .r { grid-row: span 2; font-family: var(--font-mono); font-size: 13px; color: var(--muted); }
+.games .game.cur .r, .games .game.cur .no { color: var(--accent); }
+
+/* Nastavení */
+.sgroup { background: var(--surface); border: 1px solid var(--line); border-radius: 10px; padding: 4px 14px; }
+.sgroup h3 { margin: 10px 0 2px; font-size: 12px; font-weight: 600; text-transform: uppercase; letter-spacing: .06em; color: var(--accent); }
+.srow { display: flex; align-items: center; gap: 12px; padding: 10px 0; border-top: 1px solid var(--line); cursor: pointer; }
+.sgroup h3 + .srow { border-top: 0; }
+.srow.col { flex-direction: column; align-items: stretch; gap: 8px; cursor: default; }
+.srow .st { flex: 1; min-width: 0; display: grid; gap: 2px; }
+.srow .st b { font-weight: 500; font-size: 15px; }
+.srow .st small { color: var(--muted); font-size: 13px; line-height: 1.35; }
+.srow select { width: auto; max-width: 55%; flex: none; }
+.srow.sub { padding-left: 14px; }
+.ssub { border-top: 1px solid var(--line); }
+.ssub[hidden] { display: none; }
+.ssub .srow:first-child { border-top: 0; }
+.tgl { appearance: none; -webkit-appearance: none; flex: none; width: 44px; height: 26px; border-radius: 13px; background: var(--line); position: relative; cursor: pointer; transition: background .15s; margin: 0; padding: 0; border: 0; }
+.tgl::after { content: ""; position: absolute; top: 3px; left: 3px; width: 20px; height: 20px; border-radius: 50%; background: #fff; box-shadow: 0 1px 2px rgba(0,0,0,.3); transition: transform .15s; }
+.tgl:checked { background: var(--accent); }
+.tgl:checked::after { transform: translateX(18px); }
+.tgl.small { width: 38px; height: 22px; }
+.tgl.small::after { width: 16px; height: 16px; }
+.tgl.small:checked::after { transform: translateX(16px); }
+.tgl:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
+
 /* Ovládání */
 .counter { color: var(--muted); font-size: 14px; font-variant-numeric: tabular-nums; text-align: center; }
 .nav { display: flex; gap: 6px; flex-wrap: wrap; }
@@ -409,62 +468,67 @@ textarea.fen { min-height: 0; font-size: 14px; word-break: break-all; }
 
 <div class="drawer-bg" id="drawerBg" hidden></div>
 <aside class="drawer" id="drawer" aria-label="Menu">
-  <div class="drawer-head">
-    <h2>Menu</h2>
-    <button class="icon-btn" id="drawerClose" type="button" aria-label="Zavřít menu"><svg viewBox="0 0 24 24" width="22" height="22" aria-hidden="true"><path d="M6 6l12 12M18 6L6 18" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg></button>
-  </div>
-    <details class="panel" id="pFile">
-      <summary><h2>Soubor</h2></summary>
-      <div class="panel-body">
-        <div class="actions">
-          <button class="btn primary" id="openFile" type="button">Otevřít PGN</button>
-          <button class="btn" id="saveFile" type="button">Uložit</button>
-          <button class="btn" id="copyPgn" type="button">Kopírovat PGN</button>
-          <button class="btn danger" id="newGame" type="button">Nový soubor</button>
-        </div>
-        <input type="file" id="fileInput" accept=".pgn,.txt,text/plain,application/x-chess-pgn" hidden>
-        <p class="msg" id="msg" role="status"></p>
-      </div>
-    </details>
-
-    <details class="panel" id="pGames">
-      <summary><h2>Partie v souboru <span class="count" id="gamesCount"></span></h2></summary>
-      <div class="panel-body">
+  <section class="dpage main" id="pgMain">
+    <div class="dhead">
+      <div class="dtitle"><b>PGN editor</b><small id="fileInfo"></small></div>
+      <button class="icon-btn plain" id="drawerClose" type="button" aria-label="Zavřít menu"><svg viewBox="0 0 24 24" width="22" height="22" aria-hidden="true"><path d="M6 6l12 12M18 6L6 18" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg></button>
+    </div>
+    <nav class="mlist">
+      <button class="mi" type="button" data-page="pgGames"><svg class="mi-ic" viewBox="0 0 24 24" width="22" height="22" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M8 6h12M8 12h12M8 18h12"/><circle cx="4" cy="6" r="1"/><circle cx="4" cy="12" r="1"/><circle cx="4" cy="18" r="1"/></svg><span class="mi-l">Partie v souboru</span><span class="mi-badge" id="gamesCount"></span><svg class="mi-chev" viewBox="0 0 24 24" width="18" height="18" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 6l6 6-6 6"/></svg></button>
+      <div class="msep"></div>
+      <button class="mi" type="button" id="openFile"><svg class="mi-ic" viewBox="0 0 24 24" width="22" height="22" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M3 7a2 2 0 0 1 2-2h4l2 2h8a2 2 0 0 1 2 2v1"/><path d="M3 7v11a2 2 0 0 0 2 2h12.5a2 2 0 0 0 1.9-1.4L22 11H7.5a2 2 0 0 0-1.9 1.4L3 18"/></svg><span class="mi-l">Otevřít soubor</span></button>
+      <button class="mi" type="button" id="saveFile"><svg class="mi-ic" viewBox="0 0 24 24" width="22" height="22" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M12 4v11M7.5 10.5L12 15l4.5-4.5"/><path d="M5 19h14"/></svg><span class="mi-l">Uložit</span></button>
+      <button class="mi" type="button" id="sendMail"><svg class="mi-ic" viewBox="0 0 24 24" width="22" height="22" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M21 3L10 14"/><path d="M21 3l-6.5 18-3.5-7-7-3.5z"/></svg><span class="mi-l">Odeslat</span></button>
+      <button class="mi" type="button" id="copyPgn"><svg class="mi-ic" viewBox="0 0 24 24" width="22" height="22" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="8" y="8" width="12" height="12" rx="2"/><path d="M16 8V6a2 2 0 0 0-2-2H6a2 2 0 0 0-2 2v8a2 2 0 0 0 2 2h2"/></svg><span class="mi-l">Kopírovat PGN</span></button>
+      <button class="mi" type="button" data-page="pgText"><svg class="mi-ic" viewBox="0 0 24 24" width="22" height="22" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M14 3H7a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2V8z"/><path d="M14 3v5h5M9 13h6M9 17h6"/></svg><span class="mi-l">PGN text</span><svg class="mi-chev" viewBox="0 0 24 24" width="18" height="18" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 6l6 6-6 6"/></svg></button>
+      <div class="msep"></div>
+      <button class="mi" type="button" data-page="pgFen"><svg class="mi-ic" viewBox="0 0 24 24" width="22" height="22" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="4" y="4" width="16" height="16" rx="1.5"/><path d="M4 12h16M12 4v16"/><path d="M4 8h4v4H4zM12 12h4v4h-4zM8 4v4M16 8h4v4M8 16h4v4"/></svg><span class="mi-l">Nová partie z pozice</span><svg class="mi-chev" viewBox="0 0 24 24" width="18" height="18" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 6l6 6-6 6"/></svg></button>
+      <button class="mi danger" type="button" id="newGame"><svg class="mi-ic" viewBox="0 0 24 24" width="22" height="22" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M14 3H7a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2V8z"/><path d="M14 3v5h5M12 11v6M9 14h6"/></svg><span class="mi-l">Nový soubor</span></button>
+      <div class="msep"></div>
+      <button class="mi" type="button" data-page="pgSettings"><svg class="mi-ic" viewBox="0 0 24 24" width="22" height="22" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.7 1.7 0 0 0 .3 1.8l.1.1a2 2 0 1 1-2.8 2.8l-.1-.1a1.7 1.7 0 0 0-1.8-.3 1.7 1.7 0 0 0-1 1.5V21a2 2 0 1 1-4 0v-.1a1.7 1.7 0 0 0-1.1-1.5 1.7 1.7 0 0 0-1.8.3l-.1.1a2 2 0 1 1-2.8-2.8l.1-.1a1.7 1.7 0 0 0 .3-1.8 1.7 1.7 0 0 0-1.5-1H3a2 2 0 1 1 0-4h.1a1.7 1.7 0 0 0 1.5-1.1 1.7 1.7 0 0 0-.3-1.8l-.1-.1a2 2 0 1 1 2.8-2.8l.1.1a1.7 1.7 0 0 0 1.8.3H9a1.7 1.7 0 0 0 1-1.5V3a2 2 0 1 1 4 0v.1a1.7 1.7 0 0 0 1 1.5 1.7 1.7 0 0 0 1.8-.3l.1-.1a2 2 0 1 1 2.8 2.8l-.1.1a1.7 1.7 0 0 0-.3 1.8V9a1.7 1.7 0 0 0 1.5 1H21a2 2 0 1 1 0 4h-.1a1.7 1.7 0 0 0-1.5 1z"/></svg><span class="mi-l">Nastavení</span><svg class="mi-chev" viewBox="0 0 24 24" width="18" height="18" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 6l6 6-6 6"/></svg></button>
+      <button class="mi" type="button" data-page="pgAbout"><svg class="mi-ic" viewBox="0 0 24 24" width="22" height="22" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><path d="M12 11v6M12 7.5v.5"/></svg><span class="mi-l">O aplikaci</span><span class="mi-ver" id="verLabel"></span><svg class="mi-chev" viewBox="0 0 24 24" width="18" height="18" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 6l6 6-6 6"/></svg></button>
+    </nav>
+    <input type="file" id="fileInput" accept=".pgn,.txt,text/plain,application/x-chess-pgn" hidden>
+    <div hidden>
+      <span id="sendTo"></span><span id="sendSubject"></span><a id="mailtoLink" href="#" hidden></a><span id="sendNote"></span>
+      <p id="msg"></p><p id="sendMsg"></p>
+    </div>
+  </section>
+  <section class="dpage" id="pgGames" hidden>
+    <div class="phead">
+      <button class="icon-btn plain" type="button" data-back aria-label="Zpět"><svg viewBox="0 0 24 24" width="22" height="22" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M15 6l-6 6 6 6"/></svg></button>
+      <h2>Partie v souboru</h2><span class="count" id="gamesCount2"></span>
+    </div>
+    <div class="pbody">
+        <input type="search" id="gameSearch" class="gsearch" placeholder="Hledat hráče, turnaj nebo kolo" autocomplete="off" hidden>
         <ol class="games" id="gamesList"></ol>
-        <div class="actions">
-          <button class="btn primary" id="addGame" type="button">Přidat partii</button>
-          <button class="btn danger" id="delGame" type="button">Smazat tuto partii</button>
-        </div>
-      </div>
-    </details>
+        <p class="note" id="gamesEmpty" hidden>Žádná partie neodpovídá hledání.</p>
 
-    <details class="panel" id="pSend">
-      <summary><h2>Odeslat</h2></summary>
-      <div class="panel-body">
-        <div class="send-info">
-          <div><span class="note">Komu:</span> <span id="sendTo" class="mono"></span></div>
-          <div><span class="note">Předmět:</span> <span id="sendSubject"></span></div>
-        </div>
-        <div class="actions">
-          <button class="btn primary" id="sendMail" type="button">Odeslat e-mailem</button>
-          <a class="btn" id="mailtoLink" href="#" target="_blank" rel="noopener" hidden>Otevřít v poštovní aplikaci</a>
-        </div>
-        <p class="note" id="sendNote">E-mail odejde z tvého Gmailu. PGN bude v textu zprávy i jako příloha. Adresu změníš v Nastavení.</p>
-        <p class="msg" id="sendMsg" role="status"></p>
-      </div>
-    </details>
+    </div>
+    <div class="pfoot">
+      <button class="btn primary" id="addGame" type="button">Přidat partii</button>
+      <button class="btn danger" id="delGame" type="button">Smazat aktuální</button>
+    </div>
+  </section>
+  <section class="dpage" id="pgText" hidden>
+    <div class="phead">
+      <button class="icon-btn plain" type="button" data-back aria-label="Zpět"><svg viewBox="0 0 24 24" width="22" height="22" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M15 6l-6 6 6 6"/></svg></button>
+      <h2>PGN text</h2>
+    </div>
+    <div class="pbody">
 
-    <details class="panel" id="pText">
-      <summary><h2>PGN text</h2></summary>
-      <div class="panel-body">
         <textarea id="pgnText" spellcheck="false" aria-label="PGN text"></textarea>
         <div class="actions"><button class="btn" id="loadText" type="button">Načíst vložený text</button></div>
-      </div>
-    </details>
+      
+    </div>
+  </section>
+  <section class="dpage" id="pgFen" hidden>
+    <div class="phead">
+      <button class="icon-btn plain" type="button" data-back aria-label="Zpět"><svg viewBox="0 0 24 24" width="22" height="22" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M15 6l-6 6 6 6"/></svg></button>
+      <h2>Nová partie z pozice</h2>
+    </div>
+    <div class="pbody">
 
-    <details class="panel" id="pFen">
-      <summary><h2>Pozice</h2></summary>
-      <div class="panel-body">
         <p class="note">Novou partii z libovolné pozice začneš rozestavením figur přímo na šachovnici, nebo vložením FEN (zápisu pozice).</p>
         <div class="actions"><button class="btn primary" id="edOpen" type="button">Rozestavit figury na šachovnici</button></div>
         <label class="field">FEN zobrazené pozice<textarea id="fenCur" class="fen" rows="2" readonly spellcheck="false"></textarea></label>
@@ -472,71 +536,76 @@ textarea.fen { min-height: 0; font-size: 14px; word-break: break-all; }
         <label class="field">Nová partie z pozice<textarea id="fenIn" class="fen" rows="3" spellcheck="false" autocapitalize="off" autocomplete="off" placeholder="např. 8/8/4k3/8/8/4K3/4P3/8 w - - 0 1"></textarea></label>
         <div class="actions"><button class="btn" id="fenLoad" type="button">Začít z tohoto FEN</button></div>
         <p class="msg" id="fenMsg" role="status"></p>
-      </div>
-    </details>
+      
+    </div>
+  </section>
+  <section class="dpage" id="pgSettings" hidden>
+    <div class="phead">
+      <button class="icon-btn plain" type="button" data-back aria-label="Zpět"><svg viewBox="0 0 24 24" width="22" height="22" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M15 6l-6 6 6 6"/></svg></button>
+      <h2>Nastavení</h2>
+    </div>
+    <div class="pbody">
+        <div class="sgroup">
+          <h3>Zápis partie</h3>
+          <label class="srow"><span class="st"><b>Varianty</b><small>Jiný tah se uloží jako varianta, nic se nepřepíše.</small></span><input type="checkbox" class="tgl" id="optVariants"></label>
+          <label class="srow"><span class="st"><b>Komentáře k tahům</b><small>Tlačítko ✎ v horní liště.</small></span><input type="checkbox" class="tgl" id="optComments"></label>
+          <label class="srow"><span class="st"><b>Hodnocení tahů</b><small>Tlačítko !? v horní liště.</small></span><input type="checkbox" class="tgl" id="optNags"></label>
+          <label class="srow"><span class="st"><b>Vracení akcí</b><small>Tlačítko ↶ v horní liště.</small></span><input type="checkbox" class="tgl" id="optUndo"></label>
+          <label class="srow"><span class="st"><b>Česká notace</b><small>Jen zobrazení (J, S, V, D, K). Do souboru se tahy ukládají anglicky.</small></span><input type="checkbox" class="tgl" id="czNotation"></label>
+        </div>
+        <div class="sgroup">
+          <h3>Šachový motor</h3>
+          <label class="srow"><span class="st"><b>Stockfish</b><small>Tlačítko s čipem v horní liště spustí rozbor pozice.</small></span><input type="checkbox" class="tgl" id="optEngine"></label>
+          <div class="ssub" id="engineOpts" hidden>
+            <label class="srow sub"><span class="st"><b>Počet pokračování</b></span>
+              <select id="optEngLines"><option value="1">1</option><option value="2">2</option><option value="3">3</option></select></label>
+            <label class="srow sub"><span class="st"><b>Délka rozboru</b><small>Delší rozbor víc vybíjí baterii.</small></span>
+              <select id="optEngDepth">
+                <option value="14">krátká</option>
+                <option value="20">střední</option>
+                <option value="26">dlouhá</option>
+                <option value="0">bez omezení</option>
+              </select></label>
+          </div>
+        </div>
+        <div class="sgroup">
+          <h3>Nová partie v souboru</h3>
+          <label class="srow"><span class="st"><b>Předvyplnit hlavičku</b><small>Podle předchozí partie v souboru.</small></span><input type="checkbox" class="tgl" id="optPrefill"></label>
+          <div class="ssub" id="prefillOpts" hidden>
+            <label class="srow sub"><span class="st"><b>Turnaj</b></span><input type="checkbox" class="tgl small" id="prePEvent"></label>
+            <label class="srow sub"><span class="st"><b>Místo</b></span><input type="checkbox" class="tgl small" id="prePSite"></label>
+            <label class="srow sub"><span class="st"><b>Kolo o jedno vyšší</b></span><input type="checkbox" class="tgl small" id="prePRound"></label>
+            <label class="srow sub"><span class="st"><b>Datum</b></span>
+              <select id="prePDate"><option value="prev">z předchozí</option><option value="today">dnešní</option><option value="none">nevyplňovat</option></select></label>
+          </div>
+        </div>
+        <div class="sgroup">
+          <h3>Odesílání</h3>
+          <label class="srow col"><span class="st"><b>Adresa pro odesílání</b><small>Nepovinné. Bez adresy se otevře sdílení Androidu.</small></span>
+            <input id="setEmail" type="email" autocomplete="email" inputmode="email" placeholder="např. jmeno@email.cz"></label>
+          <label class="srow"><span class="st"><b>Ikona rychlého odeslání</b><small>Obálka v horní liště.</small></span><input type="checkbox" class="tgl" id="optSend"></label>
+        </div>
+        <div class="sgroup">
+          <h3>Vzhled šachovnice</h3>
+          <div class="srow col"><span class="st"><b>Barvy</b></span>
+            <div class="presets" id="presets"></div>
+            <div class="colors">
+              <label class="color-pick"><input type="color" id="colLight"> Světlá pole</label>
+              <label class="color-pick"><input type="color" id="colDark"> Tmavá pole</label>
+            </div>
+          </div>
+        </div>
 
-    <details class="panel" id="pSettings">
-      <summary><h2>Nastavení</h2></summary>
-      <div class="panel-body">
-        <div class="field">Barvy šachovnice
-          <div class="presets" id="presets"></div>
-          <div class="colors">
-            <label class="color-pick"><input type="color" id="colLight"> Světlá pole</label>
-            <label class="color-pick"><input type="color" id="colDark"> Tmavá pole</label>
-          </div>
-        </div>
-        <label class="field">Adresa pro odesílání partií (nepovinné)<input id="setEmail" type="email" autocomplete="email" inputmode="email" placeholder="nevyplněno: zeptá se při odeslání"></label>
-        <div class="field">Další funkce
-          <p class="note">Ve výchozím stavu je aplikace co nejjednodušší. Tady si zapneš, co navíc potřebuješ.</p>
-          <div class="toggles">
-            <label class="switch"><input type="checkbox" id="optUndo"> Tlačítko ↶ pro vrácení posledních akcí</label>
-            <label class="switch"><input type="checkbox" id="optComments"> Komentáře k tahům (tlačítko ✎)</label>
-            <label class="switch"><input type="checkbox" id="optSend"> Ikona pro rychlé odeslání v horní liště</label>
-            <label class="switch"><input type="checkbox" id="optVariants"> Varianty: jiný tah se uloží jako varianta a nic se nepřepíše</label>
-            <label class="switch"><input type="checkbox" id="optNags"> Hodnocení tahů (tlačítko !?)</label>
-            <label class="switch"><input type="checkbox" id="optEngine"> Šachový motor Stockfish (tlačítko s čipem)</label>
-            <label class="switch"><input type="checkbox" id="czNotation"> Zobrazovat tahy v české notaci (J, S, V, D, K)</label>
-          </div>
-          <p class="note">Česká notace mění jen zobrazení v aplikaci. Do souboru se tahy vždy ukládají anglicky, jak vyžaduje standard PGN.</p>
-        </div>
-        <div class="field" id="engineOpts" hidden>Šachový motor
-          <label class="field">Počet nejlepších pokračování
-            <select id="optEngLines"><option value="1">1</option><option value="2">2</option><option value="3">3</option></select>
-          </label>
-          <label class="field">Délka rozboru
-            <select id="optEngDepth">
-              <option value="14">krátká (hloubka 14)</option>
-              <option value="20">střední (hloubka 20)</option>
-              <option value="26">dlouhá (hloubka 26)</option>
-              <option value="0">bez omezení, dokud je rozbor zapnutý</option>
-            </select>
-          </label>
-          <p class="note">Rozbor běží jen se zapnutým tlačítkem s čipem v horní liště. Delší rozbor víc vybíjí baterii.</p>
-        </div>
-        <div class="field">Nová partie v souboru
-          <div class="toggles">
-            <label class="switch"><input type="checkbox" id="optPrefill"> Předvyplnit hlavičku podle předchozí partie</label>
-          </div>
-          <div class="toggles sub" id="prefillOpts" hidden>
-            <label class="switch"><input type="checkbox" id="prePEvent"> Turnaj</label>
-            <label class="switch"><input type="checkbox" id="prePSite"> Místo</label>
-            <label class="switch"><input type="checkbox" id="prePRound"> Kolo, o jedno vyšší</label>
-            <label class="field">Datum
-              <select id="prePDate">
-                <option value="prev">z předchozí partie</option>
-                <option value="today">dnešní</option>
-                <option value="none">nevyplňovat</option>
-              </select>
-            </label>
-          </div>
-        </div>
-      </div>
-    </details>
+    </div>
+  </section>
+  <section class="dpage" id="pgAbout" hidden>
+    <div class="phead">
+      <button class="icon-btn plain" type="button" data-back aria-label="Zpět"><svg viewBox="0 0 24 24" width="22" height="22" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M15 6l-6 6 6 6"/></svg></button>
+      <h2>O aplikaci</h2>
+    </div>
+    <div class="pbody prose">
 
-    <details class="panel" id="pAbout">
-      <summary><h2>O aplikaci</h2></summary>
-      <div class="panel-body prose">
-        <p><strong>PGN editor</strong> <span class="ver-badge">verze 0.15</span></p>
+        <p><strong>PGN editor</strong> <span class="ver-badge">verze 0.16</span></p>
         <p>Jednoduchý editor pro zápis a úpravu šachových partií ve formátu PGN, určený hlavně pro telefon s Androidem. Aplikaci programuje Claude (umělá inteligence od společnosti Anthropic) ve spolupráci s Michalem Slivou, který určuje, co má aplikace umět a jak má vypadat.</p>
         <h3>Co aplikace umí</h3>
         <ul>
@@ -571,12 +640,29 @@ textarea.fen { min-height: 0; font-size: 14px; word-break: break-all; }
         <ul>
           <li>Aplikace se instaluje ze souboru APK mimo Obchod Play, takže se sama neaktualizuje. Novou verzi stačí nainstalovat přes starou, partie i nastavení zůstanou.</li>
         </ul>
-      </div>
-    </details>
+      
+        <nav class="mlist inset">
+      <button class="mi" type="button" data-page="pgChanges"><svg class="mi-ic" viewBox="0 0 24 24" width="22" height="22" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M12 8v4l3 2"/><circle cx="12" cy="12" r="9"/></svg><span class="mi-l">Verze a změny</span><svg class="mi-chev" viewBox="0 0 24 24" width="18" height="18" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 6l6 6-6 6"/></svg></button>
+      <button class="mi" type="button" data-page="pgLicense"><svg class="mi-ic" viewBox="0 0 24 24" width="22" height="22" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M7 3h7l5 5v13H7z"/><path d="M14 3v5h5M10 13l1.5 1.5L15 11"/></svg><span class="mi-l">Licence</span><svg class="mi-chev" viewBox="0 0 24 24" width="18" height="18" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 6l6 6-6 6"/></svg></button>
+        </nav>
 
-    <details class="panel" id="pChanges">
-      <summary><h2>Verze a změny</h2></summary>
-      <div class="panel-body log">
+    </div>
+  </section>
+  <section class="dpage" id="pgChanges" hidden>
+    <div class="phead">
+      <button class="icon-btn plain" type="button" data-back aria-label="Zpět"><svg viewBox="0 0 24 24" width="22" height="22" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M15 6l-6 6 6 6"/></svg></button>
+      <h2>Verze a změny</h2>
+    </div>
+    <div class="pbody log">
+        <section>
+          <div class="head"><span class="ver-badge">0.16</span><span class="date">30. 10. 2026</span></div>
+          <ul>
+            <li>Nové menu: krátký seznam s ikonami. Otevřít, Uložit, Odeslat a Kopírovat se spustí hned, ostatní položky se otevřou jako samostatná stránka s tlačítkem zpět.</li>
+            <li>Partie v souboru mají vlastní stránku s kompaktním seznamem a hledáním podle hráče, turnaje nebo kola. Seznam se vykresluje jen při otevření, takže ani velký soubor nezpomalí zadávání tahů.</li>
+            <li>Nastavení je rozdělené do skupin s přepínači a krátkými popisy. Doplňující volby se ukážou jen u zapnuté funkce.</li>
+            <li>Verze a změny a Licence jsou nově v O aplikaci.</li>
+          </ul>
+        </section>
         <section>
           <div class="head"><span class="ver-badge">0.15</span><span class="date">30. 10. 2026</span></div>
           <ul>
@@ -713,12 +799,16 @@ textarea.fen { min-height: 0; font-size: 14px; word-break: break-all; }
             <li>Pamatování rozpracované partie v prohlížeči.</li>
           </ul>
         </section>
-      </div>
-    </details>
+      
+    </div>
+  </section>
+  <section class="dpage" id="pgLicense" hidden>
+    <div class="phead">
+      <button class="icon-btn plain" type="button" data-back aria-label="Zpět"><svg viewBox="0 0 24 24" width="22" height="22" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M15 6l-6 6 6 6"/></svg></button>
+      <h2>Licence</h2>
+    </div>
+    <div class="pbody prose">
 
-    <details class="panel" id="pLicense">
-      <summary><h2>Licence</h2></summary>
-      <div class="panel-body prose">
         <p>PGN editor je svobodný software pod licencí GNU GPL verze 3. Smíš ho používat, šířit i upravovat. Každá šířená verze musí zůstat pod stejnou licencí a se zdrojovým kódem.</p>
         <p>Zdrojový kód: <a href="https://github.com/slivam24/pgn-editor">github.com/slivam24/pgn-editor</a></p>
         <h3>Použité součásti</h3>
@@ -737,8 +827,9 @@ textarea.fen { min-height: 0; font-size: 14px; word-break: break-all; }
           <button class="btn" type="button" data-licence="ibm-plex-sans-LICENSE.txt">OFL 1.1 (IBM Plex)</button>
           <button class="btn" type="button" data-licence="apache-2.0.txt">Apache 2.0</button>
         </div>
-      </div>
-    </details>
+      
+    </div>
+  </section>
 </aside>
 
 <div class="toast" id="toast" role="status" hidden></div>
@@ -1429,8 +1520,8 @@ textarea.fen { min-height: 0; font-size: 14px; word-break: break-all; }
 
   /* ---------- Soubor ---------- */
   function showMsg(text, isErr) {
-    const m = $('msg'); m.textContent = text; m.className = 'msg' + (isErr ? ' err' : '');
-    if (!drawerOpen() && text) toast(text, isErr ? 'err' : '');
+    const m = $('msg'); m.textContent = text;
+    if (text) toast(text, isErr ? 'err' : '');
   }
 
   async function confirmCloseFile(title, okLabel) {
@@ -1479,10 +1570,10 @@ textarea.fen { min-height: 0; font-size: 14px; word-break: break-all; }
 
   $('loadText').addEventListener('click', async () => {
     const text = $('pgnText').value;
-    if (text.trim() === buildPgn().trim()) { showMsg('V textu není nic nového k načtení.', false); $('pFile').open = true; return; }
+    if (text.trim() === buildPgn().trim()) { showMsg('V textu není nic nového k načtení.', false); return; }
     if (!(await confirmCloseFile('Načíst text jako nový soubor?', 'Načíst'))) return;
     const r = loadFile(text, '');
-    if (r.error) { showMsg(r.error, true); $('pFile').open = true; return; }
+    if (r.error) { showMsg(r.error, true); return; }
     afterLoad(r, 'Načteno z textu');
   });
 
@@ -1538,7 +1629,7 @@ textarea.fen { min-height: 0; font-size: 14px; word-break: break-all; }
     if (!scope) return;
     const pgn = scope === 'all' ? buildFilePgn() : buildPgn();
     const fallback = () => {
-      $('pText').open = true;
+      setDrawer(true); openPage('pgText');
       const ta = $('pgnText'); ta.value = pgn; ta.focus(); ta.select();
       showMsg('Text je označený v panelu PGN text, zkopíruj ho ručně.', false);
     };
@@ -1574,22 +1665,40 @@ textarea.fen { min-height: 0; font-size: 14px; word-break: break-all; }
     const nm = t => splitName(g.headers[t])[0] || (t === 'White' ? 'Bílý' : 'Černý');
     return (i + 1) + '. ' + nm('White') + ' - ' + nm('Black') + (g.headers.Result !== '*' ? '  ' + g.headers.Result : '');
   }
-  function renderGames() {
+  function gameNames(g) {
+    const nm = t => splitName(g.headers[t])[0] || (t === 'White' ? 'Bílý' : 'Černý');
+    return nm('White') + ' - ' + nm('Black');
+  }
+  // Seznam partií se vykresluje jen na své stránce v menu, aby velké soubory nezdržovaly zadávání tahů
+  function renderGames(scrollToCur) {
+    if (curPage !== 'pgGames' || !drawerOpen() && !scrollToCur) { renderMenuInfo(); return; }
+    renderMenuInfo();
     const ol = $('gamesList');
+    const search = $('gameSearch');
+    search.hidden = FILE.games.length < 8;
+    const q = search.hidden ? '' : toAscii(search.value).toLowerCase().trim();
     ol.innerHTML = '';
+    let shown = 0;
     FILE.games.forEach((g, i) => {
-      const li = document.createElement('li');
-      const b = document.createElement('button');
-      b.type = 'button';
-      b.className = 'game' + (i === FILE.cur ? ' cur' : '');
-      const t = document.createElement('span'); t.className = 't'; t.textContent = gameTitle(g, i);
       const sub = [];
       if (g.headers.Event !== '?') sub.push(g.headers.Event);
       if (g.headers.Round !== '?') sub.push(g.headers.Round + '. kolo');
       const n = mainLength(g);
       sub.push(n ? Math.ceil(n / 2) + ' ' + plural(Math.ceil(n / 2), 'tah', 'tahy', 'tahů') : 'bez tahů');
+      if (q) {
+        const hay = toAscii([g.headers.White, g.headers.Black, g.headers.Event, g.headers.Round, g.headers.Site, g.headers.Date].join(' ')).toLowerCase();
+        if (!q.split(/\s+/).every(w => hay.includes(w))) return;
+      }
+      shown++;
+      const li = document.createElement('li');
+      const b = document.createElement('button');
+      b.type = 'button';
+      b.className = 'game' + (i === FILE.cur ? ' cur' : '');
+      const no = document.createElement('span'); no.className = 'no'; no.textContent = i + 1;
+      const t = document.createElement('span'); t.className = 't'; t.textContent = gameNames(g);
+      const r = document.createElement('span'); r.className = 'r'; r.textContent = g.headers.Result === '1/2-1/2' ? '½-½' : g.headers.Result;
       const d = document.createElement('span'); d.className = 's'; d.textContent = sub.join(', ');
-      b.append(t, d);
+      b.append(no, t, r, d);
       b.addEventListener('click', () => {
         if (i !== FILE.cur) { useGame(i, state.flipped); fillTags(); renderAll(); }
         setDrawer(false);
@@ -1597,16 +1706,18 @@ textarea.fen { min-height: 0; font-size: 14px; word-break: break-all; }
       li.appendChild(b);
       ol.appendChild(li);
     });
-    $('gamesCount').textContent = FILE.games.length;
+    $('gamesEmpty').hidden = shown > 0;
     $('delGame').disabled = FILE.games.length === 1 && isEmptyGame(state);
+    if (scrollToCur) { const c = ol.querySelector('.game.cur'); if (c && c.scrollIntoView) c.scrollIntoView({ block: 'center' }); }
   }
+  $('gameSearch').addEventListener('input', () => renderGames(false));
   $('addGame').addEventListener('click', () => {
     addGame();
     setDrawer(false);
     toast('Nová partie č. ' + FILE.games.length + '.');
   });
   $('delGame').addEventListener('click', async () => {
-    const ok = await askConfirm('Smazat partii?', 'Partie ' + gameTitle(state, FILE.cur) + ' se ze souboru smaže.' + (opts.undo ? ' Omyl jde vrátit tlačítkem ↶.' : ''), 'Smazat');
+    const ok = await askConfirm('Smazat partii?', 'Partie č. ' + (FILE.cur + 1) + ' ' + gameNames(state) + ' se ze souboru smaže.' + (opts.undo ? ' Omyl jde vrátit tlačítkem ↶.' : ''), 'Smazat');
     if (!ok) return;
     snapshot();
     const flipped = state.flipped;
@@ -1615,6 +1726,7 @@ textarea.fen { min-height: 0; font-size: 14px; word-break: break-all; }
     useGame(Math.min(FILE.cur, FILE.games.length - 1), flipped);
     fillTags(); renderAll();
     toast('Partie smazána.');
+    renderGames(false);
   });
 
   /* ---------- FEN ---------- */
@@ -1874,7 +1986,7 @@ textarea.fen { min-height: 0; font-size: 14px; word-break: break-all; }
     for (const [box, btn] of [['modal', 'modalCancel'], ['cModal', 'cCancel'], ['nModal', 'nCancel'], ['chModal', 'chCancel'], ['lModal', 'lClose'], ['promo', 'promoCancel']]) {
       if (!$(box).hidden) { $(btn).click(); return true; }
     }
-    if (drawerOpen()) { setDrawer(false); return true; }
+    if (drawerOpen()) { if (curPage !== 'pgMain') pageBack(); else setDrawer(false); return true; }
     return false;
   };
 
@@ -2250,7 +2362,7 @@ textarea.fen { min-height: 0; font-size: 14px; word-break: break-all; }
   $('lModal').addEventListener('click', e => { if (e.target === $('lModal')) $('lModal').hidden = true; });
 
   /* ---------- Rozbalené panely si pamatujeme ---------- */
-  ['pMoves', 'pTags', 'pFile', 'pGames', 'pSend', 'pText', 'pFen', 'pSettings', 'pAbout', 'pChanges', 'pLicense'].forEach(id => {
+  ['pMoves', 'pTags'].forEach(id => {
     const el = $(id);
     try { if (localStorage.getItem('pgn-panel-' + id) === '1') el.open = true; } catch (e) {}
     el.addEventListener('toggle', () => {
@@ -2415,7 +2527,7 @@ textarea.fen { min-height: 0; font-size: 14px; word-break: break-all; }
   }
   function sendMsg(text, kind) {
     const m = $('sendMsg'); m.textContent = text; m.className = 'msg' + (kind ? ' ' + kind : '');
-    if (!drawerOpen() && text && text !== 'Odesílám…') toast(text, kind);
+    if (text && text !== 'Odesílám…') toast(text, kind);
   }
   function renderPlayers() {
     const side = (el, color) => {
@@ -2456,7 +2568,7 @@ textarea.fen { min-height: 0; font-size: 14px; word-break: break-all; }
   let sending = false;
   $('sendMail').addEventListener('click', async () => {
     if (sending) return;
-    if ((email || !ANDROID) && !validEmail(email)) { sendMsg('Adresa v Nastavení nevypadá jako platný e-mail.', 'err'); $('pSettings').open = true; return; }
+    if ((email || !ANDROID) && !validEmail(email)) { sendMsg('Adresa v Nastavení nevypadá jako platný e-mail.', 'err'); setDrawer(true); openPage('pgSettings'); return; }
     const scope = await askScope('Co odeslat?');
     if (!scope) return;
     if (ANDROID) {
@@ -2501,16 +2613,36 @@ textarea.fen { min-height: 0; font-size: 14px; word-break: break-all; }
   $('sendIcon').addEventListener('click', () => $('sendMail').click());
 
   /* ---------- Menu ---------- */
+  let curPage = 'pgMain';
+  const PARENT = { pgChanges: 'pgAbout', pgLicense: 'pgAbout' };
+  function openPage(id) {
+    document.querySelectorAll('#drawer .dpage').forEach(p => { p.hidden = p.id !== id; });
+    curPage = id;
+    if (id === 'pgGames') { renderGames(true); }
+    const pb = $(id).querySelector('.pbody, .mlist');
+    if (pb && id !== 'pgGames') pb.scrollTop = 0;
+  }
+  function pageBack() { openPage(PARENT[curPage] || 'pgMain'); }
+  document.querySelectorAll('#drawer [data-page]').forEach(b => b.addEventListener('click', () => openPage(b.dataset.page)));
+  document.querySelectorAll('#drawer [data-back]').forEach(b => b.addEventListener('click', pageBack));
   function drawerOpen() { return $('drawer').classList.contains('open'); }
   function setDrawer(open) {
+    if (open && !drawerOpen()) openPage('pgMain');
     $('drawer').classList.toggle('open', open);
     $('drawerBg').hidden = !open;
+    if (open) renderMenuInfo();
     $('menuBtn').setAttribute('aria-expanded', open ? 'true' : 'false');
     if (open) $('drawerClose').focus(); else $('menuBtn').focus();
   }
   $('menuBtn').addEventListener('click', () => setDrawer(true));
   // Náhledy pro kontrolu vzhledu při sestavení (#menu, #vse = všechna volitelná tlačítka)
   if (location.hash === '#menu') setTimeout(() => setDrawer(true), 0);
+  if (location.hash === '#nastaveni') setTimeout(() => { setDrawer(true); openPage('pgSettings'); }, 0);
+  if (location.hash === '#partie') setTimeout(() => {
+    const games = [];
+    for (let i = 1; i <= 40; i++) games.push('[Event "Krajsky prebor"]\n[Round "' + Math.ceil(i / 5) + '"]\n[White "Hrac' + i + ', A"]\n[Black "Soupeř' + i + ', B"]\n[Result "' + ['1-0', '0-1', '1/2-1/2'][i % 3] + '"]\n\n1. e4 e5 ' + ['1-0', '0-1', '1/2-1/2'][i % 3]);
+    loadFile(games.join('\n\n'), 'prebor.pgn'); fillTags(); renderAll(); setDrawer(true); openPage('pgGames');
+  }, 0);
   if (location.hash === '#editor') setTimeout(openEditor, 0);
   if (location.hash === '#motor') setTimeout(() => { opts.engine = true; opts.engLines = 3; applyOpts(); goPath([0, 0, 0, 0, 0, 0, 0, 0]); setEngineOn(true); }, 0);
   if (location.hash === '#varianty') setTimeout(() => {
@@ -2520,7 +2652,14 @@ textarea.fen { min-height: 0; font-size: 14px; word-break: break-all; }
   if (location.hash === '#vse') ['undo', 'commentBtn', 'sendIcon'].forEach(id => { $(id).hidden = false; });
   $('drawerClose').addEventListener('click', () => setDrawer(false));
   $('drawerBg').addEventListener('click', () => setDrawer(false));
-  $('drawer').addEventListener('keydown', e => { if (e.key === 'Escape' && $('modal').hidden) setDrawer(false); });
+  $('drawer').addEventListener('keydown', e => { if (e.key === 'Escape' && $('modal').hidden) { if (curPage !== 'pgMain') pageBack(); else setDrawer(false); } });
+  function renderMenuInfo() {
+    const n = FILE.games.length;
+    $('gamesCount').textContent = n;
+    $('gamesCount2').textContent = n;
+    $('fileInfo').textContent = (FILE.name ? FILE.name + '.pgn, ' : '') + n + ' ' + plural(n, 'partie', 'partie', 'partií') + ', aktuální č. ' + (FILE.cur + 1);
+    $('verLabel').textContent = (document.querySelector('.ver-badge') || {}).textContent.replace('verze ', '') || '';
+  }
 
   /* ---------- Tahání figur prstem nebo myší ---------- */
   let drag = null;
@@ -2637,7 +2776,6 @@ textarea.fen { min-height: 0; font-size: 14px; word-break: break-all; }
   }
 
   if (!window.Chess) {
-    $('pFile').open = true;
     showMsg('Nepodařilo se načíst šachovou knihovnu. Zkontroluj připojení k internetu a obnov stránku.', true);
     return;
   }
