@@ -181,20 +181,25 @@ public class MainActivity extends Activity {
 
                 Intent send = new Intent(Intent.ACTION_SEND);
                 send.setType("application/octet-stream");
-                send.putExtra(Intent.EXTRA_EMAIL, new String[]{to});
+                boolean hasTo = to != null && !to.trim().isEmpty();
+                if (hasTo) send.putExtra(Intent.EXTRA_EMAIL, new String[]{to.trim()});
                 send.putExtra(Intent.EXTRA_SUBJECT, subject);
                 send.putExtra(Intent.EXTRA_TEXT, body);
                 send.putExtra(Intent.EXTRA_STREAM, uri);
                 send.setClipData(ClipData.newRawUri("", uri));
                 send.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION);
-                // Nabídnout jen poštovní aplikace
-                send.setSelector(new Intent(Intent.ACTION_SENDTO, Uri.parse("mailto:")));
-                try {
-                    startActivity(send);
-                } catch (ActivityNotFoundException e) {
-                    send.setSelector(null);
-                    startActivity(Intent.createChooser(send, "Odeslat partii"));
+                if (hasTo) {
+                    // S adresou nabídnout jen poštovní aplikace
+                    send.setSelector(new Intent(Intent.ACTION_SENDTO, Uri.parse("mailto:")));
+                    try {
+                        startActivity(send);
+                        return "ok";
+                    } catch (ActivityNotFoundException e) {
+                        send.setSelector(null);
+                    }
                 }
+                // Bez adresy (nebo bez poštovní aplikace) obecné sdílení Androidu
+                startActivity(Intent.createChooser(send, "Poslat partii"));
                 return "ok";
             } catch (Exception e) {
                 return e.getMessage() != null ? e.getMessage() : "neznámá chyba";

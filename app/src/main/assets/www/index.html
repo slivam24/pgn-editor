@@ -195,7 +195,7 @@ button.btn.danger { color: var(--warn); }
 .modal-box .actions { justify-content: flex-end; }
 
 /* Zápis */
-.moves { font-family: var(--font-mono); font-size: 15px; line-height: 1.9; max-height: 260px; overflow-y: auto; overflow-wrap: anywhere; }
+.moves { position: relative; font-family: var(--font-mono); font-size: 15px; line-height: 1.9; max-height: 260px; overflow-y: auto; overflow-wrap: anywhere; }
 @media (min-width: 860px) { .moves { max-height: 340px; } }
 .moves .no { color: var(--muted); margin-right: 2px; }
 .moves .mv { border: 0; background: none; font: inherit; color: inherit; padding: 1px 5px; margin-right: 3px; border-radius: 4px; cursor: pointer; }
@@ -219,6 +219,7 @@ input, select, textarea { font: inherit; color: var(--fg); background: var(--bg)
 .msg.err { color: var(--warn); }
 details > summary { cursor: pointer; font-weight: 500; }
 textarea { font-family: var(--font-mono); font-size: 13px; min-height: 160px; resize: vertical; }
+textarea.fen { min-height: 0; font-size: 14px; word-break: break-all; }
 @media (prefers-reduced-motion: no-preference) { button.btn, .moves .mv { transition: background-color .12s, border-color .12s; } }
 </style>
 
@@ -337,6 +338,18 @@ textarea { font-family: var(--font-mono); font-size: 13px; min-height: 160px; re
       </div>
     </details>
 
+    <details class="panel" id="pFen">
+      <summary><h2>Pozice (FEN)</h2></summary>
+      <div class="panel-body">
+        <p class="note">FEN je zápis jedné pozice na šachovnici. Tady zjistíš FEN právě zobrazené pozice, nebo vložíš vlastní a začneš z něj novou partii.</p>
+        <label class="field">FEN zobrazené pozice<textarea id="fenCur" class="fen" rows="2" readonly spellcheck="false"></textarea></label>
+        <div class="actions"><button class="btn" id="fenCopy" type="button">Kopírovat FEN</button></div>
+        <label class="field">Nová partie z pozice<textarea id="fenIn" class="fen" rows="3" spellcheck="false" autocapitalize="off" autocomplete="off" placeholder="např. 8/8/4k3/8/8/4K3/4P3/8 w - - 0 1"></textarea></label>
+        <div class="actions"><button class="btn primary" id="fenLoad" type="button">Začít z této pozice</button></div>
+        <p class="msg" id="fenMsg" role="status"></p>
+      </div>
+    </details>
+
     <details class="panel" id="pSettings">
       <summary><h2>Nastavení</h2></summary>
       <div class="panel-body">
@@ -347,7 +360,7 @@ textarea { font-family: var(--font-mono); font-size: 13px; min-height: 160px; re
             <label class="color-pick"><input type="color" id="colDark"> Tmavá pole</label>
           </div>
         </div>
-        <label class="field">Adresa pro odesílání partií<input id="setEmail" type="email" autocomplete="email" inputmode="email"></label>
+        <label class="field">Adresa pro odesílání partií (nepovinné)<input id="setEmail" type="email" autocomplete="email" inputmode="email" placeholder="nevyplněno: zeptá se při odeslání"></label>
         <div class="field">Další funkce
           <p class="note">Ve výchozím stavu je aplikace co nejjednodušší. Tady si zapneš, co navíc potřebuješ.</p>
           <div class="toggles">
@@ -364,7 +377,7 @@ textarea { font-family: var(--font-mono); font-size: 13px; min-height: 160px; re
     <details class="panel" id="pAbout">
       <summary><h2>O aplikaci</h2></summary>
       <div class="panel-body prose">
-        <p><strong>PGN editor</strong> <span class="ver-badge">verze 0.11</span></p>
+        <p><strong>PGN editor</strong> <span class="ver-badge">verze 0.12</span></p>
         <p>Jednoduchý editor pro zápis a úpravu šachových partií ve formátu PGN, určený hlavně pro telefon s Androidem. Aplikaci programuje Claude (umělá inteligence od společnosti Anthropic) ve spolupráci s Michalem Slivou, který určuje, co má aplikace umět a jak má vypadat.</p>
         <h3>Co aplikace umí</h3>
         <ul>
@@ -373,7 +386,8 @@ textarea { font-family: var(--font-mono); font-size: 13px; min-height: 160px; re
           <li>Pod šachovnicí je jen zápis a hlavička partie, vše ostatní je v menu ☰ vlevo nahoře. Tlačítka pro otočení šachovnice a volitelné funkce jsou v horní liště vedle menu.</li>
           <li>Hlavička partie: turnaj, místo, kolo, datum, hráči a výsledek. Výsledek se při matu nebo patu doplní sám.</li>
           <li>Otevření souboru PGN nebo vloženého textu, uložení do souboru .pgn, kopírování do schránky.</li>
-          <li>Odeslání partie e-mailem: otevře se poštovní aplikace s připraveným e-mailem, PGN je v textu i jako příloha. V Nastavení lze zapnout ikonu pro rychlé odeslání vpravo nahoře.</li>
+          <li>Pozice ve formátu FEN: zobrazení a kopírování FEN aktuální pozice, nová partie ze zadané pozice.</li>
+          <li>Odeslání partie přes sdílení Androidu, nebo rovnou e-mailem na adresu z Nastavení. PGN je v textu i jako příloha. V Nastavení lze zapnout ikonu pro rychlé odeslání v horní liště.</li>
           <li>Funguje bez připojení k internetu.</li>
           <li>Potvrzení před smazáním nebo přepsáním partie.</li>
           <li>Volitelně (zapíná se v Nastavení): tlačítko ↶ pro vrácení posledních akcí a komentáře k tahům tlačítkem ✎.</li>
@@ -400,6 +414,14 @@ textarea { font-family: var(--font-mono); font-size: 13px; min-height: 160px; re
     <details class="panel" id="pChanges">
       <summary><h2>Verze a změny</h2></summary>
       <div class="panel-body log">
+        <section>
+          <div class="head"><span class="ver-badge">0.12</span><span class="date">30. 10. 2026</span></div>
+          <ul>
+            <li>Nová položka menu Pozice (FEN): FEN zobrazené pozice s tlačítkem pro kopírování a možnost začít novou partii z vloženého FEN. Stačí zadat jen rozestavení figur, zbytek se doplní.</li>
+            <li>Adresa pro odesílání už není přednastavená. Bez ní se při odeslání otevře sdílení Androidu, s ní poštovní aplikace s vyplněným příjemcem.</li>
+            <li>Opraveno: při zadávání tahů s otevřeným zápisem partie už obrazovka neposkakuje, posouvá se jen samotný seznam tahů.</li>
+          </ul>
+        </section>
         <section>
           <div class="head"><span class="ver-badge">0.11</span><span class="date">30. 10. 2026</span></div>
           <ul>
@@ -588,6 +610,7 @@ textarea { font-family: var(--font-mono); font-size: 13px; min-height: 160px; re
 
   /* ---------- Šachovnice ---------- */
   function renderBoard() {
+    if ($('fenCur')) $('fenCur').value = gameAt(state.ply).fen();
     if (typeof renderPlayers === 'function') renderPlayers();
     const g = gameAt(state.ply);
     const last = lastMoveAt(state.ply);
@@ -753,8 +776,16 @@ textarea { font-family: var(--font-mono); font-size: 13px; min-height: 160px; re
     r.className = 'res';
     r.textContent = state.headers.Result;
     box.appendChild(r);
-    const cur = box.querySelector('.cur');
-    if (cur && $('pMoves').open) cur.scrollIntoView({ block: 'nearest' });
+    if ($('pMoves').open) scrollMovesToCur();
+  }
+
+  // Posune jen seznam tahů, aby byl aktuální tah vidět. Stránka sama zůstane na místě.
+  function scrollMovesToCur() {
+    const box = $('moves'), cur = box.querySelector('.cur');
+    if (!cur) { box.scrollTop = 0; return; }
+    const top = cur.offsetTop, bottom = top + cur.offsetHeight;
+    if (top < box.scrollTop) box.scrollTop = Math.max(0, top - 6);
+    else if (bottom > box.scrollTop + box.clientHeight) box.scrollTop = bottom - box.clientHeight + 6;
   }
 
   function renderCounter() {
@@ -1013,6 +1044,52 @@ textarea { font-family: var(--font-mono); font-size: 13px; min-height: 160px; re
     catch (e) { fallback(); }
   });
 
+  /* ---------- FEN ---------- */
+  function copyText(text, okMsg, msgFn, fallback) {
+    if (ANDROID) { try { ANDROID.copy(text); msgFn(okMsg, false); } catch (e) { fallback(); } return; }
+    try { navigator.clipboard.writeText(text).then(() => msgFn(okMsg, false), fallback); } catch (e) { fallback(); }
+  }
+  function fenMsg(text, isErr) {
+    const m = $('fenMsg'); m.textContent = text; m.className = 'msg' + (isErr ? ' err' : '');
+    if (!drawerOpen() && text) toast(text, isErr ? 'err' : '');
+  }
+  $('fenCopy').addEventListener('click', () => copyText($('fenCur').value, 'FEN zkopírován do schránky.', fenMsg,
+    () => { const t = $('fenCur'); t.focus(); t.select(); fenMsg('FEN je označený, zkopíruj ho ručně.', false); }));
+  // Doplní chybějící části FEN (stačí rozestavení figur) a ověří pozici
+  function normalizeFen(raw) {
+    const parts = raw.trim().replace(/\s+/g, ' ').split(' ').filter(Boolean);
+    if (!parts.length) return { error: 'Vlož FEN.' };
+    const def = ['', 'w', '-', '-', '0', '1'];
+    for (let i = parts.length; i < 6; i++) parts.push(def[i]);
+    if (parts.length > 6) return { error: 'FEN má víc částí, než by měl.' };
+    if (parts[1] !== 'w' && parts[1] !== 'b') return { error: 'Druhá část FEN musí být w (táhne bílý) nebo b (táhne černý).' };
+    const fen = parts.join(' ');
+    const place = parts[0];
+    const wk = (place.match(/K/g) || []).length, bk = (place.match(/k/g) || []).length;
+    if (wk !== 1 || bk !== 1) return { error: 'Na šachovnici musí být právě jeden bílý a jeden černý král.' };
+    const v = new Chess().validate_fen(fen);
+    if (!v.valid) return { error: 'FEN není platný. Zkontroluj rozestavení figur: 8 řad oddělených lomítkem, v každé 8 polí.' };
+    const g = new Chess(fen);
+    const opp = g.turn() === 'w' ? 'b' : 'w';
+    const test = new Chess(fen.replace(/ [wb] /, ' ' + opp + ' ').replace(/ \S+ (\d+) (\d+)$/, ' - $1 $2'));
+    if (test.in_check()) return { error: 'V této pozici je v šachu hráč, který právě netáhne. Taková pozice nemůže nastat.' };
+    return { fen };
+  }
+  $('fenLoad').addEventListener('click', async () => {
+    const r = normalizeFen($('fenIn').value);
+    if (r.error) { fenMsg(r.error, true); return; }
+    if (state.moves.length && !(await askConfirm('Začít z této pozice?', 'Rozepsaná partie se nahradí. Pokud ji chceš mít, nejdřív ji ulož.' + (opts.undo ? ' Omyl jde vrátit tlačítkem ↶.' : ''), 'Začít'))) return;
+    snapshot();
+    const flipped = state.flipped;
+    state = freshState(); state.flipped = flipped; selected = null;
+    if (r.fen !== START) { state.startFen = r.fen; state.extra = { SetUp: '1', FEN: r.fen }; }
+    fillTags(); renderAll();
+    $('fenIn').value = '';
+    fenMsg('', false);
+    if (drawerOpen()) setDrawer(false);
+    toast('Nová partie z pozice. Táhne ' + (r.fen.split(' ')[1] === 'w' ? 'bílý.' : 'černý.'));
+  });
+
   $('newGame').addEventListener('click', async () => {
     if (state.moves.length) {
       const ok = await askConfirm('Začít novou partii?', 'Rozepsaná partie se smaže. Pokud ji chceš mít, nejdřív ji ulož.', 'Smazat a začít');
@@ -1068,12 +1145,12 @@ textarea { font-family: var(--font-mono); font-size: 13px; min-height: 160px; re
   };
 
   /* ---------- Rozbalené panely si pamatujeme ---------- */
-  ['pMoves', 'pTags', 'pFile', 'pSend', 'pText', 'pSettings', 'pAbout', 'pChanges'].forEach(id => {
+  ['pMoves', 'pTags', 'pFile', 'pSend', 'pText', 'pFen', 'pSettings', 'pAbout', 'pChanges'].forEach(id => {
     const el = $(id);
     try { if (localStorage.getItem('pgn-panel-' + id) === '1') el.open = true; } catch (e) {}
     el.addEventListener('toggle', () => {
       try { localStorage.setItem('pgn-panel-' + id, el.open ? '1' : '0'); } catch (e) {}
-      if (id === 'pMoves' && el.open) { const c = $('moves').querySelector('.cur'); if (c) c.scrollIntoView({ block: 'nearest' }); }
+      if (id === 'pMoves' && el.open) scrollMovesToCur();
     });
   });
 
@@ -1161,7 +1238,7 @@ textarea { font-family: var(--font-mono); font-size: 13px; min-height: 160px; re
   applyColors(false);
 
   /* ---------- Odeslání e-mailem ---------- */
-  const DEFAULT_EMAIL = 'slivam24@gmail.com';
+  const DEFAULT_EMAIL = '';
   let email = DEFAULT_EMAIL;
   try { email = localStorage.getItem('pgn-email') || DEFAULT_EMAIL; } catch (e) {}
   $('setEmail').value = email;
@@ -1219,7 +1296,7 @@ textarea { font-family: var(--font-mono); font-size: 13px; min-height: 160px; re
   }
   function renderSend() {
     renderPlayers();
-    $('sendTo').textContent = email || '(není vyplněno)';
+    $('sendTo').textContent = email || (ANDROID ? '(vybereš při sdílení)' : '(není vyplněno)');
     $('sendSubject').textContent = mailSubject();
     const pgn = buildPgn();
     $('mailtoLink').href = 'mailto:' + encodeURIComponent(email) + '?subject=' + encodeURIComponent(mailSubject()) + '&body=' + encodeURIComponent(mailBody(pgn));
@@ -1228,7 +1305,7 @@ textarea { font-family: var(--font-mono); font-size: 13px; min-height: 160px; re
   let mcp = null;
   (async () => {
     if (ANDROID) {
-      $('sendNote').textContent = 'Otevře se poštovní aplikace s vyplněnou adresou, předmětem, partií v textu a přílohou .pgn. Stačí v ní e-mail odeslat. Adresu změníš v Nastavení.';
+      $('sendNote').textContent = 'Bez vyplněné adresy se otevře sdílení Androidu a partii pošleš kamkoli (e-mail, WhatsApp, Disk…). S adresou v Nastavení se rovnou otevře poštovní aplikace s vyplněným příjemcem. PGN je vždy v textu i jako příloha .pgn.';
       return;
     }
     try { if (window.claude && window.claude.use) mcp = await window.claude.use('mcp'); } catch (e) { mcp = null; }
@@ -1241,11 +1318,11 @@ textarea { font-family: var(--font-mono); font-size: 13px; min-height: 160px; re
   let sending = false;
   $('sendMail').addEventListener('click', async () => {
     if (sending) return;
-    if (!validEmail(email)) { sendMsg('Adresa v Nastavení nevypadá jako platný e-mail.', 'err'); $('pSettings').open = true; return; }
+    if ((email || !ANDROID) && !validEmail(email)) { sendMsg('Adresa v Nastavení nevypadá jako platný e-mail.', 'err'); $('pSettings').open = true; return; }
     if (ANDROID) {
       const pgn = buildPgn();
       const res = ANDROID.sendEmail(email, mailSubject(), mailBody(pgn), attachName(), pgn);
-      if (res === 'ok') sendMsg('E-mail je připravený v poštovní aplikaci, odešli ho tam.', 'ok');
+      if (res === 'ok') sendMsg(email ? 'E-mail je připravený v poštovní aplikaci, odešli ho tam.' : 'Vyber, kam partii poslat.', 'ok');
       else sendMsg('Poštovní aplikaci se nepodařilo otevřít' + (res ? ': ' + res : '.'), 'err');
       return;
     }
