@@ -1198,7 +1198,7 @@ textarea.fen { min-height: 0; font-size: 14px; word-break: break-all; }
       b.type = 'button'; b.className = 'pal' + (cls ? ' ' + cls : '');
       b.setAttribute('aria-pressed', editor.tool === tool ? 'true' : 'false');
       b.setAttribute('aria-label', label);
-      if (tool === 'x') b.textContent = 'Gumovat';
+      if (tool === 'x') b.innerHTML = '<svg viewBox="0 0 24 24" width="26" height="26" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M7 21h10M5.5 15.5l9-9a2 2 0 0 1 2.8 0l1.2 1.2a2 2 0 0 1 0 2.8L11 18H8z"/><path d="M10 11l4.5 4.5"/></svg>';
       else { const i = document.createElement('span'); i.className = 'piece ' + pieceCls(tool); b.appendChild(i); }
       b.addEventListener('click', () => { editor.tool = tool; renderPalette(); });
       pal.appendChild(b);
