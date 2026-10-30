@@ -61,7 +61,8 @@ body {
   padding-right: max(16px, env(safe-area-inset-right, 0px));
   padding-block: 12px 32px;
 }
-.app { max-width: 1040px; margin: 0 auto; display: grid; gap: 16px; }
+.app { max-width: 1040px; margin: 0 auto; display: grid; grid-template-columns: minmax(0, 1fr); gap: 16px; }
+html, body { overflow-x: hidden; }
 @media (min-width: 860px) { .app { grid-template-columns: minmax(0, 520px) minmax(0, 1fr); align-items: start; } }
 
 .col { display: grid; gap: 12px; min-width: 0; }
@@ -141,13 +142,16 @@ a.btn { display: inline-flex; align-items: center; text-decoration: none; font-w
 .promo-row button .piece { inset: 6%; }
 
 /* Horní lišta a jména hráčů */
-.topbar { display: flex; align-items: center; gap: 8px; max-width: 520px; }
+.topbar { display: flex; align-items: center; gap: 8px; max-width: 520px; flex-wrap: wrap; }
 .icon-btn { flex: none; width: 44px; height: 44px; display: grid; place-items: center; padding: 0; border-radius: 8px; border: 1px solid var(--line); background: var(--surface); color: var(--fg); cursor: pointer; }
+.icon-btn.primary { background: var(--accent); color: var(--accent-fg); border-color: var(--accent); }
+.icon-btn:disabled { opacity: .45; cursor: default; }
 .icon-btn:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
 .player { flex: 1; min-width: 0; display: flex; align-items: center; gap: 8px; font-weight: 500; }
 .player .nm { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
 .player.empty .nm { color: var(--muted); font-weight: 400; }
-.player.bottom { max-width: 520px; margin-top: -4px; }
+.player { max-width: 520px; }
+.player.bottom { margin-top: -4px; }
 .stone { flex: none; width: 13px; height: 13px; border-radius: 50%; border: 1.5px solid var(--muted); }
 .stone.w { background: #fbfbf8; }
 .stone.b { background: #1c1c1c; }
@@ -175,7 +179,6 @@ button.btn:disabled { opacity: .45; cursor: default; }
 button.btn.primary { background: var(--accent); color: var(--accent-fg); border-color: var(--accent); }
 button.btn.danger { color: var(--warn); }
 .nav button.btn { flex: 1 1 0; min-width: 48px; font-size: 17px; padding-inline: 6px; }
-.nav button.btn.flip { font-size: 15px; flex: 1.4 1 0; }
 
 .panel { background: var(--surface); border: 1px solid var(--line); border-radius: 8px; min-width: 0; }
 .panel > summary { list-style: none; display: flex; align-items: center; justify-content: space-between; gap: 8px; padding: 14px; cursor: pointer; min-height: 48px; }
@@ -223,9 +226,12 @@ textarea { font-family: var(--font-mono); font-size: 13px; min-height: 160px; re
   <div class="col">
     <div class="topbar">
       <button class="icon-btn" id="menuBtn" type="button" aria-label="Menu" aria-controls="drawer" aria-expanded="false"><svg viewBox="0 0 24 24" width="24" height="24" aria-hidden="true"><path d="M4 6h16M4 12h16M4 18h16" stroke="currentColor" stroke-width="2" stroke-linecap="round" fill="none"/></svg></button>
-      <div class="player" id="playerTop"></div>
+      <button class="icon-btn" id="flip" type="button" aria-label="Otočit šachovnici" title="Otočit šachovnici"><svg viewBox="0 0 24 24" width="24" height="24" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M7 20V5M3.5 8.5L7 5l3.5 3.5M17 4v15M13.5 15.5L17 19l3.5-3.5"/></svg></button>
+      <button class="icon-btn" id="undo" type="button" aria-label="Vrátit poslední akci" title="Vrátit poslední akci" hidden><svg viewBox="0 0 24 24" width="24" height="24" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 14L4 9l5-5"/><path d="M4 9h10.5a5.5 5.5 0 0 1 0 11H11"/></svg></button>
+      <button class="icon-btn" id="commentBtn" type="button" aria-label="Komentář k tahu" title="Komentář k tahu" hidden><svg viewBox="0 0 24 24" width="24" height="24" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 20h4L19 9a2.8 2.8 0 0 0-4-4L4 16v4z"/><path d="M13.5 6.5l4 4"/></svg></button>
       <button class="icon-btn" id="sendIcon" type="button" aria-label="Odeslat e-mailem" title="Odeslat e-mailem" hidden><svg viewBox="0 0 24 24" width="24" height="24" aria-hidden="true"><rect x="3" y="5.5" width="18" height="13" rx="2" stroke="currentColor" stroke-width="2" fill="none"/><path d="M3.5 7l8.5 6 8.5-6" stroke="currentColor" stroke-width="2" stroke-linejoin="round" fill="none"/></svg></button>
     </div>
+    <div class="player" id="playerTop"></div>
     <div class="board-wrap">
       <div class="board" id="board" role="grid" aria-label="Šachovnice"></div>
       <div class="promo" id="promo" hidden>
@@ -244,9 +250,6 @@ textarea { font-family: var(--font-mono); font-size: 13px; min-height: 160px; re
       <button class="btn" id="navPrev" type="button" aria-label="O tah zpět">◀</button>
       <button class="btn" id="navNext" type="button" aria-label="O tah vpřed">▶</button>
       <button class="btn" id="navEnd" type="button" aria-label="Na konec">⏭</button>
-      <button class="btn" id="undo" type="button" aria-label="Vrátit poslední akci" title="Vrátit poslední akci" hidden>↶</button>
-      <button class="btn" id="commentBtn" type="button" aria-label="Komentář k tahu" title="Komentář k tahu" hidden>✎</button>
-      <button class="btn flip" id="flip" type="button">Otočit</button>
     </div>
   </div>
 
@@ -265,17 +268,17 @@ textarea { font-family: var(--font-mono); font-size: 13px; min-height: 160px; re
       <summary><h2>Hlavička partie</h2></summary>
       <div class="panel-body">
         <div class="tags">
-          <label class="wide">Turnaj <code>Event</code><input id="tEvent" autocomplete="off"></label>
-          <label>Místo <code>Site</code><input id="tSite" autocomplete="off"></label>
-          <label>Kolo <code>Round</code><input id="tRound" autocomplete="off"></label>
-          <label class="wide">Datum <code>Date</code>
+          <label class="wide">Turnaj<input id="tEvent" autocomplete="off"></label>
+          <label>Místo<input id="tSite" autocomplete="off"></label>
+          <label>Kolo<input id="tRound" autocomplete="off"></label>
+          <label class="wide">Datum
             <span class="date-row"><input id="tDate" placeholder="RRRR.MM.DD" autocomplete="off"><button class="btn" id="today" type="button">Dnes</button></span>
           </label>
           <label>Bílý, příjmení<input id="tWhiteLast" autocomplete="off"></label>
           <label>Bílý, jméno<input id="tWhiteFirst" autocomplete="off"></label>
           <label>Černý, příjmení<input id="tBlackLast" autocomplete="off"></label>
           <label>Černý, jméno<input id="tBlackFirst" autocomplete="off"></label>
-          <label class="wide">Výsledek <code>Result</code>
+          <label class="wide">Výsledek
             <select id="tResult">
               <option value="*">* (nedohráno)</option>
               <option value="1-0">1-0 (vyhrál bílý)</option>
@@ -361,13 +364,13 @@ textarea { font-family: var(--font-mono); font-size: 13px; min-height: 160px; re
     <details class="panel" id="pAbout">
       <summary><h2>O aplikaci</h2></summary>
       <div class="panel-body prose">
-        <p><strong>PGN editor</strong> <span class="ver-badge">verze 0.10</span></p>
+        <p><strong>PGN editor</strong> <span class="ver-badge">verze 0.11</span></p>
         <p>Jednoduchý editor pro zápis a úpravu šachových partií ve formátu PGN, určený hlavně pro telefon s Androidem. Aplikaci programuje Claude (umělá inteligence od společnosti Anthropic) ve spolupráci s Michalem Slivou, který určuje, co má aplikace umět a jak má vypadat.</p>
         <h3>Co aplikace umí</h3>
         <ul>
           <li>Zadávání tahů klepnutím nebo tažením figury, aplikace hlídá pravidla včetně rošády, braní mimochodem a proměny pěšce.</li>
           <li>Listování partií, skok na libovolný tah v zápisu, otočení šachovnice. Jména hráčů z hlavičky jsou u šachovnice na straně svých figur.</li>
-          <li>Pod šachovnicí je jen zápis a hlavička partie, vše ostatní je v menu ☰ vlevo nahoře.</li>
+          <li>Pod šachovnicí je jen zápis a hlavička partie, vše ostatní je v menu ☰ vlevo nahoře. Tlačítka pro otočení šachovnice a volitelné funkce jsou v horní liště vedle menu.</li>
           <li>Hlavička partie: turnaj, místo, kolo, datum, hráči a výsledek. Výsledek se při matu nebo patu doplní sám.</li>
           <li>Otevření souboru PGN nebo vloženého textu, uložení do souboru .pgn, kopírování do schránky.</li>
           <li>Odeslání partie e-mailem: otevře se poštovní aplikace s připraveným e-mailem, PGN je v textu i jako příloha. V Nastavení lze zapnout ikonu pro rychlé odeslání vpravo nahoře.</li>
@@ -397,6 +400,14 @@ textarea { font-family: var(--font-mono); font-size: 13px; min-height: 160px; re
     <details class="panel" id="pChanges">
       <summary><h2>Verze a změny</h2></summary>
       <div class="panel-body log">
+        <section>
+          <div class="head"><span class="ver-badge">0.11</span><span class="date">30. 10. 2026</span></div>
+          <ul>
+            <li>Opraveno: dlouhé jméno hráče nebo zapnutá volitelná tlačítka už nezvětší šachovnici přes okraj obrazovky. Příliš dlouhé jméno se zkrátí třemi tečkami.</li>
+            <li>Tlačítka Otočit, ↶, ✎ a ikona odeslání jsou nově v horní liště za tlačítkem menu. Jméno hráče s černými je pod ní, těsně nad šachovnicí.</li>
+            <li>Hlavička partie je jen česky, bez anglických názvů polí.</li>
+          </ul>
+        </section>
         <section>
           <div class="head"><span class="ver-badge">0.10</span><span class="date">30. 10. 2026</span></div>
           <ul>
@@ -1281,7 +1292,9 @@ textarea { font-family: var(--font-mono); font-size: 13px; min-height: 160px; re
     if (open) $('drawerClose').focus(); else $('menuBtn').focus();
   }
   $('menuBtn').addEventListener('click', () => setDrawer(true));
-  if (location.hash === '#menu') setTimeout(() => setDrawer(true), 0); // náhled menu pro kontrolu vzhledu
+  // Náhledy pro kontrolu vzhledu při sestavení (#menu, #vse = všechna volitelná tlačítka)
+  if (location.hash === '#menu') setTimeout(() => setDrawer(true), 0);
+  if (location.hash === '#vse') ['undo', 'commentBtn', 'sendIcon'].forEach(id => { $(id).hidden = false; });
   $('drawerClose').addEventListener('click', () => setDrawer(false));
   $('drawerBg').addEventListener('click', () => setDrawer(false));
   $('drawer').addEventListener('keydown', e => { if (e.key === 'Escape' && $('modal').hidden) setDrawer(false); });
