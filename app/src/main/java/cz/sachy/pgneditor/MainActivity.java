@@ -16,14 +16,21 @@ import android.webkit.WebResourceRequest;
 import android.webkit.WebSettings;
 import android.webkit.WebView;
 import android.webkit.WebViewClient;
+import android.widget.Toast;
 
 import androidx.core.content.FileProvider;
 
 import org.json.JSONObject;
 
+import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.FileOutputStream;
+import java.io.InputStream;
 import java.io.OutputStream;
+import java.nio.ByteBuffer;
+import java.nio.charset.CharacterCodingException;
+import java.nio.charset.Charset;
+import java.nio.charset.CodingErrorAction;
 import java.nio.charset.StandardCharsets;
 
 /**
@@ -40,6 +47,8 @@ public class MainActivity extends Activity {
     private WebView web;
     private ValueCallback<Uri[]> fileCallback;
     private String pendingSaveText;
+    private boolean pageLoaded;
+    private String pendingOpenText, pendingOpenName;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -57,6 +66,12 @@ public class MainActivity extends Activity {
         web.addJavascriptInterface(new Bridge(), "Android");
 
         web.setWebViewClient(new WebViewClient() {
+            @Override
+            public void onPageFinished(WebView view, String url) {
+                pageLoaded = true;
+                deliverOpen();
+            }
+
             @Override
             public boolean shouldOverrideUrlLoading(WebView view, WebResourceRequest request) {
                 Uri u = request.getUrl();
@@ -86,6 +101,77 @@ public class MainActivity extends Activity {
         });
 
         web.loadUrl("file:///android_asset/www/index.html");
+        // Po otočení obrazovky nebo změně motivu se stejný soubor znovu neotevírá
+        if (savedInstanceState == null) handleIntent(getIntent());
+    }
+
+    @Override
+    protected void onNewIntent(Intent intent) {
+        super.onNewIntent(intent);
+        setIntent(intent);
+        handleIntent(intent);
+    }
+
+    /** Soubor nebo text poslaný z jiné aplikace předá stránce k otevření. */
+    @SuppressWarnings("deprecation")
+    private void handleIntent(Intent intent) {
+        if (intent == null) return;
+        String action = intent.getAction();
+        Uri uri = null;
+        String text = null;
+        if (Intent.ACTION_VIEW.equals(action)) uri = intent.getData();
+        else if (Intent.ACTION_SEND.equals(action)) {
+            uri = intent.getParcelableExtra(Intent.EXTRA_STREAM);
+            if (uri == null) text = intent.getStringExtra(Intent.EXTRA_TEXT);
+        } else return;
+        String name = "";
+        try {
+            if (uri != null) {
+                text = readText(uri);
+                name = displayName(uri);
+                if ("soubor PGN".equals(name) && uri.getLastPathSegment() != null) name = uri.getLastPathSegment();
+            }
+        } catch (Exception e) {
+            text = null;
+        }
+        if (text == null || text.trim().isEmpty()) {
+            pendingOpenText = null;
+            Toast.makeText(this, "Soubor se nepodařilo přečíst.", Toast.LENGTH_LONG).show();
+            return;
+        }
+        pendingOpenText = text;
+        pendingOpenName = name;
+        deliverOpen();
+    }
+
+    private void deliverOpen() {
+        if (!pageLoaded || pendingOpenText == null) return;
+        String js = "window.androidOpenText && window.androidOpenText(" + JSONObject.quote(pendingOpenText) + "," + JSONObject.quote(pendingOpenName == null ? "" : pendingOpenName) + ")";
+        pendingOpenText = null;
+        web.evaluateJavascript(js, null);
+    }
+
+    /** Přečte soubor jako UTF-8, a když to nejde, jako windows-1250 (starší soubory s češtinou). */
+    private String readText(Uri uri) throws Exception {
+        try (InputStream in = getContentResolver().openInputStream(uri)) {
+            if (in == null) return null;
+            ByteArrayOutputStream buf = new ByteArrayOutputStream();
+            byte[] chunk = new byte[16384];
+            int n;
+            while ((n = in.read(chunk)) != -1) {
+                buf.write(chunk, 0, n);
+                if (buf.size() > 20 * 1024 * 1024) throw new Exception("soubor je příliš velký");
+            }
+            byte[] bytes = buf.toByteArray();
+            try {
+                return StandardCharsets.UTF_8.newDecoder()
+                        .onMalformedInput(CodingErrorAction.REPORT)
+                        .onUnmappableCharacter(CodingErrorAction.REPORT)
+                        .decode(ByteBuffer.wrap(bytes)).toString();
+            } catch (CharacterCodingException e) {
+                return new String(bytes, Charset.forName("windows-1250"));
+            }
+        }
     }
 
     /** Zpět nejdřív zavře otevřené okno ve stránce, teprve potom aplikaci. */
