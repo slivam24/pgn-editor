@@ -43,12 +43,13 @@ jobs:
               --window-size=412,915 --virtual-time-budget=3000 --screenshot="${v%%:*}.png" "file://$P${v#*:}"
           done
 
-      - name: Uložit náhled
+      - name: Uložit náhled (vydání nahled)
         continue-on-error: true
-        uses: actions/upload-artifact@v4
-        with:
-          name: nahled-${{ env.VER }}
-          path: nahled*.png
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          gh release view nahled >/dev/null 2>&1 || gh release create nahled --prerelease --title "Náhled obrazovky (jen pro kontrolu)" --notes "Automatické snímky obrazovky z posledního sestavení."
+          gh release upload nahled nahled*.png --clobber
 
       - name: Zveřejnit ke stažení (Releases)
         uses: softprops/action-gh-release@v2
