@@ -1,14 +1,22 @@
 package cz.sachy.pgneditor;
 
+import android.Manifest;
 import android.app.Activity;
 import android.content.ActivityNotFoundException;
 import android.content.ClipData;
 import android.content.ClipboardManager;
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.content.pm.PackageManager;
 import android.database.Cursor;
 import android.net.Uri;
 import android.os.Bundle;
+import android.os.VibrationEffect;
+import android.os.Vibrator;
+import android.speech.RecognitionListener;
+import android.speech.RecognizerIntent;
+import android.speech.SpeechRecognizer;
+import android.util.Base64;
 import android.provider.OpenableColumns;
 import android.webkit.JavascriptInterface;
 import android.webkit.ValueCallback;
@@ -22,6 +30,7 @@ import android.widget.Toast;
 
 import androidx.core.content.FileProvider;
 
+import org.json.JSONArray;
 import org.json.JSONObject;
 
 import java.io.ByteArrayInputStream;
@@ -36,6 +45,7 @@ import java.nio.charset.CharacterCodingException;
 import java.nio.charset.Charset;
 import java.nio.charset.CodingErrorAction;
 import java.nio.charset.StandardCharsets;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -56,10 +66,12 @@ public class MainActivity extends Activity {
 
     private static final int REQ_OPEN = 1;
     private static final int REQ_SAVE = 2;
+    private static final int REQ_MIC = 3;
 
     private WebView web;
     private ValueCallback<Uri[]> fileCallback;
-    private String pendingSaveText;
+    private byte[] pendingSaveBytes;
+    private SpeechRecognizer recognizer;
     private boolean pageLoaded;
     private String pendingOpenText, pendingOpenName;
 
@@ -145,7 +157,74 @@ public class MainActivity extends Activity {
     @Override
     protected void onPause() {
         super.onPause();
+        stopListening();
         web.onPause(); // stránka dostane zprávu, že je skrytá, a rozbor motorem se zastaví
+    }
+
+    @Override
+    protected void onDestroy() {
+        if (recognizer != null) { recognizer.destroy(); recognizer = null; }
+        super.onDestroy();
+    }
+
+    /* ---------- Hlasové zadávání ---------- */
+
+    private void js(String code) {
+        web.evaluateJavascript(code, null);
+    }
+
+    private void startListening() {
+        if (checkSelfPermission(Manifest.permission.RECORD_AUDIO) != PackageManager.PERMISSION_GRANTED) {
+            requestPermissions(new String[]{Manifest.permission.RECORD_AUDIO}, REQ_MIC);
+            return;
+        }
+        if (!SpeechRecognizer.isRecognitionAvailable(this)) {
+            js("window.onVoiceError && window.onVoiceError(100)");
+            return;
+        }
+        if (recognizer == null) {
+            recognizer = SpeechRecognizer.createSpeechRecognizer(this);
+            recognizer.setRecognitionListener(new RecognitionListener() {
+                @Override public void onReadyForSpeech(Bundle params) { js("window.onVoiceState && window.onVoiceState('listening')"); }
+                @Override public void onBeginningOfSpeech() { }
+                @Override public void onRmsChanged(float rmsdB) { }
+                @Override public void onBufferReceived(byte[] buffer) { }
+                @Override public void onEndOfSpeech() { js("window.onVoiceState && window.onVoiceState('processing')"); }
+                @Override public void onError(int error) { js("window.onVoiceError && window.onVoiceError(" + error + ")"); }
+                @Override public void onPartialResults(Bundle partialResults) { }
+                @Override public void onEvent(int eventType, Bundle params) { }
+                @Override public void onResults(Bundle results) {
+                    ArrayList<String> list = results.getStringArrayList(SpeechRecognizer.RESULTS_RECOGNITION);
+                    JSONArray arr = new JSONArray();
+                    if (list != null) for (String s : list) arr.put(s);
+                    js("window.onVoiceResult && window.onVoiceResult(" + JSONObject.quote(arr.toString()) + ")");
+                }
+            });
+        }
+        Intent i = new Intent(RecognizerIntent.ACTION_RECOGNIZE_SPEECH);
+        i.putExtra(RecognizerIntent.EXTRA_LANGUAGE_MODEL, RecognizerIntent.LANGUAGE_MODEL_FREE_FORM);
+        i.putExtra(RecognizerIntent.EXTRA_LANGUAGE, "cs-CZ");
+        i.putExtra(RecognizerIntent.EXTRA_MAX_RESULTS, 5);
+        i.putExtra(RecognizerIntent.EXTRA_CALLING_PACKAGE, getPackageName());
+        try {
+            recognizer.startListening(i);
+        } catch (Exception e) {
+            js("window.onVoiceError && window.onVoiceError(5)");
+        }
+    }
+
+    private void stopListening() {
+        if (recognizer != null) {
+            try { recognizer.cancel(); } catch (Exception ignored) { }
+        }
+    }
+
+    @Override
+    public void onRequestPermissionsResult(int requestCode, String[] permissions, int[] grantResults) {
+        super.onRequestPermissionsResult(requestCode, permissions, grantResults);
+        if (requestCode != REQ_MIC) return;
+        if (grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED) startListening();
+        else js("window.onVoiceError && window.onVoiceError(9)");
     }
 
     @Override
@@ -260,15 +339,15 @@ public class MainActivity extends Activity {
             fileCallback = null;
 
         } else if (requestCode == REQ_SAVE) {
-            String text = pendingSaveText;
-            pendingSaveText = null;
-            if (uri == null || text == null) { saved(false, ""); return; }
+            byte[] bytes = pendingSaveBytes;
+            pendingSaveBytes = null;
+            if (uri == null || bytes == null) { saved(false, ""); return; }
             try {
                 OutputStream out;
                 try { out = getContentResolver().openOutputStream(uri, "wt"); }
                 catch (Exception e) { out = getContentResolver().openOutputStream(uri, "w"); }
                 if (out == null) throw new Exception("soubor nelze otevřít");
-                try (OutputStream o = out) { o.write(text.getBytes(StandardCharsets.UTF_8)); }
+                try (OutputStream o = out) { o.write(bytes); }
                 saved(true, displayName(uri));
             } catch (Exception e) {
                 saved(false, e.getMessage() != null ? e.getMessage() : "neznámá chyba");
@@ -324,20 +403,69 @@ public class MainActivity extends Activity {
 
         @JavascriptInterface
         public void saveFile(String fileName, String text) {
+            // Obecný typ, aby Android k názvu nic nepřidával a koncovka zůstala .pgn
+            saveBytes(fileName, text.getBytes(StandardCharsets.UTF_8), "application/octet-stream");
+        }
+
+        @JavascriptInterface
+        public void saveBase64(String fileName, String base64, String mime) {
+            saveBytes(fileName, Base64.decode(base64, Base64.DEFAULT), mime);
+        }
+
+        private void saveBytes(String fileName, byte[] data, String mime) {
             runOnUiThread(() -> {
-                pendingSaveText = text;
+                pendingSaveBytes = data;
                 Intent i = new Intent(Intent.ACTION_CREATE_DOCUMENT);
                 i.addCategory(Intent.CATEGORY_OPENABLE);
-                // Obecný typ, aby Android k názvu nic nepřidával a koncovka zůstala .pgn
-                i.setType("application/octet-stream");
+                i.setType(mime);
                 i.putExtra(Intent.EXTRA_TITLE, safeName(fileName));
                 try {
                     startActivityForResult(i, REQ_SAVE);
                 } catch (ActivityNotFoundException e) {
-                    pendingSaveText = null;
+                    pendingSaveBytes = null;
                     saved(false, "v telefonu chybí výběr umístění souboru");
                 }
             });
+        }
+
+        /** Sdílení obrázku pozice (PNG) do jiné aplikace. */
+        @JavascriptInterface
+        public String shareImage(String fileName, String base64) {
+            try {
+                File dir = new File(getCacheDir(), "odeslat");
+                if (!dir.isDirectory() && !dir.mkdirs()) throw new Exception("nelze připravit obrázek");
+                File file = new File(dir, safeName(fileName));
+                try (FileOutputStream o = new FileOutputStream(file)) { o.write(Base64.decode(base64, Base64.DEFAULT)); }
+                Uri uri = FileProvider.getUriForFile(MainActivity.this, getPackageName() + ".files", file);
+                Intent send = new Intent(Intent.ACTION_SEND);
+                send.setType("image/png");
+                send.putExtra(Intent.EXTRA_STREAM, uri);
+                send.setClipData(ClipData.newRawUri("", uri));
+                send.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION);
+                startActivity(Intent.createChooser(send, "Sdílet obrázek pozice"));
+                return "ok";
+            } catch (Exception e) {
+                return e.getMessage() != null ? e.getMessage() : "neznámá chyba";
+            }
+        }
+
+        /** Krátká vibrace po tahu. */
+        @JavascriptInterface
+        public void vibrate(int ms) {
+            Vibrator v = getSystemService(Vibrator.class);
+            if (v == null || !v.hasVibrator()) return;
+            v.vibrate(VibrationEffect.createOneShot(Math.max(5, Math.min(ms, 200)), VibrationEffect.DEFAULT_AMPLITUDE));
+        }
+
+        /** Hlasové zadávání: jedno poslechnutí, výsledek přijde do window.onVoiceResult. */
+        @JavascriptInterface
+        public void voiceStart() {
+            runOnUiThread(MainActivity.this::startListening);
+        }
+
+        @JavascriptInterface
+        public void voiceStop() {
+            runOnUiThread(MainActivity.this::stopListening);
         }
 
         @JavascriptInterface

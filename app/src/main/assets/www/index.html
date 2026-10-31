@@ -96,7 +96,7 @@ html, body { overflow-x: hidden; }
 .pc-b { color: #1c1c1c; text-shadow: 0 0 1px rgba(255,255,255,.35); }
 .dot { position: absolute; left: 35%; top: 35%; width: 30%; height: 30%; border-radius: 50%; background: rgba(0,0,0,.22); pointer-events: none; }
 .ring { position: absolute; inset: 4%; border-radius: 50%; border: 5px solid rgba(0,0,0,.22); pointer-events: none; }
-.coord { position: absolute; font-size: 2.4cqw; line-height: 1; font-weight: 600; pointer-events: none; font-family: var(--font-ui); }
+.coord { position: absolute; font-size: var(--coord, 2.4cqw); line-height: 1; font-weight: 600; pointer-events: none; font-family: var(--font-ui); }
 .coord.file { right: 6%; bottom: 5%; }
 .coord.rank { left: 6%; top: 5%; }
 .sq.from .piece { opacity: .25; }
@@ -298,6 +298,57 @@ pre.lic { margin: 0; max-height: 60vh; overflow: auto; white-space: pre-wrap; fo
 .tgl.small:checked::after { transform: translateX(16px); }
 .tgl:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
 
+/* Kompaktní ovládání pod šachovnicí */
+.nav { flex-wrap: nowrap; align-items: center; max-width: 520px; }
+.nav .counter { flex: 1.6 1 0; min-width: 0; white-space: nowrap; font-size: 14px; }
+.strip { display: flex; gap: 2px; overflow-x: auto; overscroll-behavior-x: contain; scrollbar-width: none; max-width: 520px; padding: 2px 0; font-family: var(--font-mono); font-size: 15px; white-space: nowrap; -webkit-mask-image: linear-gradient(90deg, transparent 0, #000 12px, #000 calc(100% - 12px), transparent 100%); mask-image: linear-gradient(90deg, transparent 0, #000 12px, #000 calc(100% - 12px), transparent 100%); }
+.strip::-webkit-scrollbar { display: none; }
+.strip[hidden] { display: none; }
+.strip .no { color: var(--muted); padding: 4px 0 4px 8px; }
+.strip .mv { border: 0; background: none; font: inherit; color: inherit; padding: 4px 6px; border-radius: 4px; cursor: pointer; flex: none; }
+.strip .mv.cur { background: var(--accent); color: var(--accent-fg); }
+.strip .end { flex: none; width: 12px; }
+body.editing .strip { display: none !important; }
+.panel > summary .sh { display: grid; gap: 2px; min-width: 0; flex: 1; }
+.panel > summary .sum { font-size: 13px; color: var(--muted); overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.panel[open] > summary .sum { display: none; }
+.sum:empty { display: none; }
+body.coords-l { --coord: 3.3cqw; }
+body.coords-n .coord { display: none; }
+
+/* Šipka motoru */
+.arrows { position: absolute; inset: 0; width: 100%; height: 100%; pointer-events: none; overflow: visible; }
+body.editing .arrows { display: none; }
+
+/* Přepnutí partie přetažením */
+@keyframes slideL { from { transform: translateX(28px); opacity: .4; } to { transform: none; opacity: 1; } }
+@keyframes slideR { from { transform: translateX(-28px); opacity: .4; } to { transform: none; opacity: 1; } }
+.board-wrap.sl { animation: slideL .18s ease-out; }
+.board-wrap.sr { animation: slideR .18s ease-out; }
+@media (prefers-reduced-motion: reduce) { .board-wrap.sl, .board-wrap.sr { animation: none; } }
+.app { touch-action: pan-y; }
+
+/* Našeptávání jmen */
+.tags label.ac { position: relative; }
+.sugg { position: absolute; z-index: 30; left: 0; right: 0; top: 100%; margin: 2px 0 0; padding: 4px; list-style: none; background: var(--surface); border: 1px solid var(--line); border-radius: 8px; box-shadow: 0 6px 20px rgba(0,0,0,.18); max-height: 240px; overflow-y: auto; }
+.sugg[hidden] { display: none; }
+.sugg li button { display: block; width: 100%; text-align: left; border: 0; background: none; color: var(--fg); font: inherit; font-size: 15px; padding: 9px 8px; border-radius: 6px; cursor: pointer; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.sugg li button:hover, .sugg li button:focus-visible { background: var(--accent-soft); }
+.sugg li b { font-weight: 600; }
+
+/* Hlasové zadávání */
+.voice { display: flex; align-items: center; gap: 10px; max-width: 520px; background: var(--surface); border: 1px solid var(--accent); border-radius: 8px; padding: 6px 8px 6px 12px; }
+.voice[hidden] { display: none; }
+.voice .vtext { flex: 1; min-width: 0; font-size: 14px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.voice .vdot { flex: none; width: 10px; height: 10px; border-radius: 50%; background: var(--muted); }
+.voice.listening .vdot { background: #d43c2c; animation: vpulse 1s ease-in-out infinite; }
+@keyframes vpulse { 50% { opacity: .35; } }
+#micBtn.on { background: #d43c2c; border-color: #d43c2c; color: #fff; }
+body.editing .voice, body.editing #micBtn { display: none !important; }
+
+/* Obrázek pozice */
+img.diag { width: 100%; height: auto; border: 1px solid var(--line); border-radius: 6px; background: #fff; }
+
 /* Ovládání */
 .counter { color: var(--muted); font-size: 14px; font-variant-numeric: tabular-nums; text-align: center; }
 .nav { display: flex; gap: 6px; flex-wrap: wrap; }
@@ -361,12 +412,22 @@ textarea.fen { min-height: 0; font-size: 14px; word-break: break-all; }
       <button class="icon-btn" id="undo" type="button" aria-label="Vrátit poslední akci" title="Vrátit poslední akci" hidden><svg viewBox="0 0 24 24" width="24" height="24" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 14L4 9l5-5"/><path d="M4 9h10.5a5.5 5.5 0 0 1 0 11H11"/></svg></button>
       <button class="icon-btn" id="commentBtn" type="button" aria-label="Komentář k tahu" title="Komentář k tahu" hidden><svg viewBox="0 0 24 24" width="24" height="24" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 20h4L19 9a2.8 2.8 0 0 0-4-4L4 16v4z"/><path d="M13.5 6.5l4 4"/></svg></button>
       <button class="icon-btn txt" id="nagBtn" type="button" aria-label="Hodnocení tahu" title="Hodnocení tahu" hidden>!?</button>
+      <button class="icon-btn" id="micBtn" type="button" aria-label="Hlasové zadávání tahů" title="Hlasové zadávání tahů" hidden><svg viewBox="0 0 24 24" width="24" height="24" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="3" width="6" height="11" rx="3"/><path d="M5.5 11a6.5 6.5 0 0 0 13 0M12 17.5V21"/></svg></button>
       <button class="icon-btn" id="engineBtn" type="button" aria-label="Rozbor motorem Stockfish" title="Rozbor motorem Stockfish" hidden><svg viewBox="0 0 24 24" width="24" height="24" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="6" y="6" width="12" height="12" rx="2"/><rect x="9.5" y="9.5" width="5" height="5" rx="1"/><path d="M9 2.5V6M15 2.5V6M9 18v3.5M15 18v3.5M2.5 9H6M2.5 15H6M18 9h3.5M18 15h3.5"/></svg></button>
       <button class="icon-btn" id="sendIcon" type="button" aria-label="Odeslat e-mailem" title="Odeslat e-mailem" hidden><svg viewBox="0 0 24 24" width="24" height="24" aria-hidden="true"><rect x="3" y="5.5" width="18" height="13" rx="2" stroke="currentColor" stroke-width="2" fill="none"/><path d="M3.5 7l8.5 6 8.5-6" stroke="currentColor" stroke-width="2" stroke-linejoin="round" fill="none"/></svg></button>
+    </div>
+    <div class="voice" id="voiceBar" hidden role="status">
+      <span class="vdot" aria-hidden="true"></span>
+      <span class="vtext" id="voiceText">Poslouchám…</span>
+      <button class="btn small" id="voiceStop" type="button">Ukončit</button>
     </div>
     <div class="player" id="playerTop"></div>
     <div class="board-wrap">
       <div class="board" id="board" role="grid" aria-label="Šachovnice"></div>
+      <svg class="arrows" id="arrows" viewBox="0 0 8 8" aria-hidden="true">
+        <defs><marker id="ah" viewBox="0 0 10 10" refX="5" refY="5" markerWidth="2.2" markerHeight="2.2" orient="auto"><path d="M0 0L10 5L0 10z" fill="rgba(21,120,27,.85)"/></marker></defs>
+        <line id="bestArrow" x1="0" y1="0" x2="0" y2="0" stroke="rgba(21,120,27,.75)" stroke-width=".16" stroke-linecap="round" marker-end="url(#ah)" visibility="hidden"/>
+      </svg>
       <div class="promo" id="promo" hidden>
         <div class="promo-box">
           <p>Proměna pěšce</p>
@@ -412,19 +473,20 @@ textarea.fen { min-height: 0; font-size: 14px; word-break: break-all; }
         <button class="btn primary" id="edDone" type="button">Hotovo, začít partii</button>
       </div>
     </section>
-    <div class="counter" id="counter"></div>
     <p class="cur-comment" id="curComment" hidden></p>
     <div class="nav">
       <button class="btn" id="navStart" type="button" aria-label="Na začátek"><svg viewBox="0 0 24 24" width="24" height="24" aria-hidden="true" fill="currentColor"><rect x="5" y="5" width="2.5" height="14" rx="1"/><path d="M19 5.8v12.4a1 1 0 0 1-1.6.8L9.3 12.8a1 1 0 0 1 0-1.6l8.1-6.2a1 1 0 0 1 1.6.8z"/></svg></button>
       <button class="btn" id="navPrev" type="button" aria-label="O tah zpět"><svg viewBox="0 0 24 24" width="24" height="24" aria-hidden="true" fill="currentColor"><path d="M16 5.8v12.4a1 1 0 0 1-1.6.8L6.3 12.8a1 1 0 0 1 0-1.6l8.1-6.2a1 1 0 0 1 1.6.8z"/></svg></button>
+      <div class="counter" id="counter" aria-live="polite"></div>
       <button class="btn" id="navNext" type="button" aria-label="O tah vpřed"><svg viewBox="0 0 24 24" width="24" height="24" aria-hidden="true" fill="currentColor"><path d="M8 5.8v12.4a1 1 0 0 0 1.6.8l8.1-6.2a1 1 0 0 0 0-1.6L9.6 5a1 1 0 0 0-1.6.8z"/></svg></button>
       <button class="btn" id="navEnd" type="button" aria-label="Na konec"><svg viewBox="0 0 24 24" width="24" height="24" aria-hidden="true" fill="currentColor"><rect x="16.5" y="5" width="2.5" height="14" rx="1"/><path d="M5 5.8v12.4a1 1 0 0 0 1.6.8l8.1-6.2a1 1 0 0 0 0-1.6L6.6 5A1 1 0 0 0 5 5.8z"/></svg></button>
     </div>
+    <div class="strip" id="strip" hidden></div>
   </div>
 
   <div class="col">
     <details class="panel" id="pMoves">
-      <summary><h2>Zápis partie</h2></summary>
+      <summary><div class="sh"><h2>Zápis partie</h2><span class="sum" id="movesSum"></span></div></summary>
       <div class="panel-body">
         <div class="moves" id="moves"></div>
         <div class="actions">
@@ -438,7 +500,7 @@ textarea.fen { min-height: 0; font-size: 14px; word-break: break-all; }
     </details>
 
     <details class="panel" id="pTags">
-      <summary><h2>Hlavička partie</h2></summary>
+      <summary><div class="sh"><h2>Hlavička partie</h2><span class="sum" id="tagsSum"></span></div></summary>
       <div class="panel-body">
         <div class="tags">
           <label class="wide">Turnaj<input id="tEvent" autocomplete="off"></label>
@@ -447,10 +509,10 @@ textarea.fen { min-height: 0; font-size: 14px; word-break: break-all; }
           <label class="wide">Datum
             <span class="date-row"><input id="tDate" placeholder="RRRR.MM.DD" autocomplete="off"><button class="btn" id="today" type="button">Dnes</button></span>
           </label>
-          <label>Bílý, příjmení<input id="tWhiteLast" autocomplete="off"></label>
-          <label>Bílý, jméno<input id="tWhiteFirst" autocomplete="off"></label>
-          <label>Černý, příjmení<input id="tBlackLast" autocomplete="off"></label>
-          <label>Černý, jméno<input id="tBlackFirst" autocomplete="off"></label>
+          <label class="ac">Bílý, příjmení<input id="tWhiteLast" autocomplete="off" autocapitalize="words" data-color="White" data-part="Last"><ul class="sugg" hidden></ul></label>
+          <label class="ac">Bílý, jméno<input id="tWhiteFirst" autocomplete="off" autocapitalize="words" data-color="White" data-part="First"><ul class="sugg" hidden></ul></label>
+          <label class="ac">Černý, příjmení<input id="tBlackLast" autocomplete="off" autocapitalize="words" data-color="Black" data-part="Last"><ul class="sugg" hidden></ul></label>
+          <label class="ac">Černý, jméno<input id="tBlackFirst" autocomplete="off" autocapitalize="words" data-color="Black" data-part="First"><ul class="sugg" hidden></ul></label>
           <label class="wide">Výsledek
             <select id="tResult">
               <option value="*">* (nedohráno)</option>
@@ -482,6 +544,7 @@ textarea.fen { min-height: 0; font-size: 14px; word-break: break-all; }
       <button class="mi" type="button" id="copyPgn"><svg class="mi-ic" viewBox="0 0 24 24" width="22" height="22" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="8" y="8" width="12" height="12" rx="2"/><path d="M16 8V6a2 2 0 0 0-2-2H6a2 2 0 0 0-2 2v8a2 2 0 0 0 2 2h2"/></svg><span class="mi-l">Kopírovat PGN</span></button>
       <button class="mi" type="button" data-page="pgText"><svg class="mi-ic" viewBox="0 0 24 24" width="22" height="22" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M14 3H7a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2V8z"/><path d="M14 3v5h5M9 13h6M9 17h6"/></svg><span class="mi-l">PGN text</span><svg class="mi-chev" viewBox="0 0 24 24" width="18" height="18" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 6l6 6-6 6"/></svg></button>
       <div class="msep"></div>
+      <button class="mi" type="button" data-page="pgImage"><svg class="mi-ic" viewBox="0 0 24 24" width="22" height="22" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="16" rx="2"/><circle cx="9" cy="10" r="2"/><path d="M21 16l-5-5-9 9"/></svg><span class="mi-l">Obrázek pozice</span><svg class="mi-chev" viewBox="0 0 24 24" width="18" height="18" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 6l6 6-6 6"/></svg></button>
       <button class="mi" type="button" data-page="pgFen"><svg class="mi-ic" viewBox="0 0 24 24" width="22" height="22" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="4" y="4" width="16" height="16" rx="1.5"/><path d="M4 12h16M12 4v16"/><path d="M4 8h4v4H4zM12 12h4v4h-4zM8 4v4M16 8h4v4M8 16h4v4"/></svg><span class="mi-l">Nová partie z pozice</span><svg class="mi-chev" viewBox="0 0 24 24" width="18" height="18" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 6l6 6-6 6"/></svg></button>
       <button class="mi danger" type="button" id="newGame"><svg class="mi-ic" viewBox="0 0 24 24" width="22" height="22" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M14 3H7a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2V8z"/><path d="M14 3v5h5M12 11v6M9 14h6"/></svg><span class="mi-l">Nový soubor</span></button>
       <div class="msep"></div>
@@ -522,6 +585,22 @@ textarea.fen { min-height: 0; font-size: 14px; word-break: break-all; }
       
     </div>
   </section>
+  <section class="dpage" id="pgImage" hidden>
+    <div class="phead">
+      <button class="icon-btn plain" type="button" data-back aria-label="Zpět"><svg viewBox="0 0 24 24" width="22" height="22" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M15 6l-6 6 6 6"/></svg></button>
+      <h2>Obrázek pozice</h2>
+    </div>
+    <div class="pbody">
+        <img class="diag" id="diagImg" alt="Náhled obrázku pozice">
+        <label class="field">Popisek<input id="diagCaption" autocomplete="off" placeholder="bez popisku"></label>
+        <label class="srow"><span class="st"><b>Souřadnice</b></span><input type="checkbox" class="tgl" id="diagCoords" checked></label>
+        <p class="note">Obrázek odpovídá zobrazené pozici a otočení šachovnice.</p>
+    </div>
+    <div class="pfoot">
+      <button class="btn primary" id="diagShare" type="button">Sdílet</button>
+      <button class="btn" id="diagSave" type="button">Uložit</button>
+    </div>
+  </section>
   <section class="dpage" id="pgFen" hidden>
     <div class="phead">
       <button class="icon-btn plain" type="button" data-back aria-label="Zpět"><svg viewBox="0 0 24 24" width="22" height="22" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M15 6l-6 6 6 6"/></svg></button>
@@ -552,11 +631,21 @@ textarea.fen { min-height: 0; font-size: 14px; word-break: break-all; }
           <label class="srow"><span class="st"><b>Hodnocení tahů</b><small>Tlačítko !? v horní liště.</small></span><input type="checkbox" class="tgl" id="optNags"></label>
           <label class="srow"><span class="st"><b>Vracení akcí</b><small>Tlačítko ↶ v horní liště.</small></span><input type="checkbox" class="tgl" id="optUndo"></label>
           <label class="srow"><span class="st"><b>Česká notace</b><small>Jen zobrazení (J, S, V, D, K). Do souboru se tahy ukládají anglicky.</small></span><input type="checkbox" class="tgl" id="czNotation"></label>
+          <label class="srow"><span class="st"><b>Hlasové zadávání</b><small>Tlačítko s mikrofonem v horní liště. Řekni třeba „jezdec f3“ nebo „e4“.</small></span><input type="checkbox" class="tgl" id="optMic"></label>
+          <div class="ssub" id="micOpts" hidden>
+            <label class="srow sub"><span class="st"><b>Poslouchat dál po tahu</b><small>Pro diktování celé partie z papíru.</small></span><input type="checkbox" class="tgl small" id="optMicCont"></label>
+          </div>
+          <label class="srow"><span class="st"><b>Našeptávat jména hráčů</b><small>Z dříve zadaných partií. Jména zůstávají jen v telefonu.</small></span><input type="checkbox" class="tgl" id="optPlayers"></label>
+          <div class="ssub" id="playerOpts" hidden>
+            <div class="srow sub"><span class="st"><b>Uložená jména</b><small id="playersCount"></small></span><button class="btn small" id="playersClear" type="button">Vymazat</button></div>
+          </div>
+          <label class="srow"><span class="st"><b>Vibrace při tahu</b><small>Krátké zavibrování po každém tahu.</small></span><input type="checkbox" class="tgl" id="optHaptic"></label>
         </div>
         <div class="sgroup">
           <h3>Šachový motor</h3>
           <label class="srow"><span class="st"><b>Stockfish</b><small>Tlačítko s čipem v horní liště spustí rozbor pozice.</small></span><input type="checkbox" class="tgl" id="optEngine"></label>
           <div class="ssub" id="engineOpts" hidden>
+            <label class="srow sub"><span class="st"><b>Šipka nejlepšího tahu</b></span><input type="checkbox" class="tgl small" id="optArrow"></label>
             <label class="srow sub"><span class="st"><b>Počet pokračování</b></span>
               <select id="optEngLines"><option value="1">1</option><option value="2">2</option><option value="3">3</option></select></label>
             <label class="srow sub"><span class="st"><b>Délka rozboru</b><small>Delší rozbor víc vybíjí baterii.</small></span>
@@ -586,7 +675,10 @@ textarea.fen { min-height: 0; font-size: 14px; word-break: break-all; }
           <label class="srow"><span class="st"><b>Ikona rychlého odeslání</b><small>Obálka v horní liště.</small></span><input type="checkbox" class="tgl" id="optSend"></label>
         </div>
         <div class="sgroup">
-          <h3>Vzhled šachovnice</h3>
+          <h3>Vzhled</h3>
+          <label class="srow"><span class="st"><b>Pás tahů pod šachovnicí</b><small>Tahy aktuální linie v jednom řádku.</small></span><input type="checkbox" class="tgl" id="optStrip"></label>
+          <label class="srow"><span class="st"><b>Souřadnice</b></span>
+            <select id="optCoords"><option value="s">malé</option><option value="l">velké</option><option value="n">skryté</option></select></label>
           <div class="srow col"><span class="st"><b>Barvy</b></span>
             <div class="presets" id="presets"></div>
             <div class="colors">
@@ -605,7 +697,7 @@ textarea.fen { min-height: 0; font-size: 14px; word-break: break-all; }
     </div>
     <div class="pbody prose">
 
-        <p><strong>PGN editor</strong> <span class="ver-badge">verze 0.16</span></p>
+        <p><strong>PGN editor</strong> <span class="ver-badge">verze 0.17</span></p>
         <p>Jednoduchý editor pro zápis a úpravu šachových partií ve formátu PGN, určený hlavně pro telefon s Androidem. Aplikaci programuje Claude (umělá inteligence od společnosti Anthropic) ve spolupráci s Michalem Slivou, který určuje, co má aplikace umět a jak má vypadat.</p>
         <h3>Co aplikace umí</h3>
         <ul>
@@ -617,6 +709,7 @@ textarea.fen { min-height: 0; font-size: 14px; word-break: break-all; }
           <li>Otevření souboru PGN nebo vloženého textu, uložení do souboru .pgn, kopírování do schránky. Soubor .pgn jde otevřít i přímo z Gmailu nebo Správce souborů.</li>
           <li>Volitelně varianty a hodnocení tahů (!, ?, !!, ??, !?, ?!). Varianty, komentáře i hodnocení se načítají ze souboru a ukládají standardně, takže je přečte ChessBase.</li>
           <li>Automatický výsledek při matu i remíze (pat, nedostatek materiálu, trojí opakování, pravidlo 50 tahů).</li>
+          <li>Volitelně hlasové zadávání tahů, vibrace při tahu, našeptávání jmen hráčů a obrázek pozice ke sdílení.</li>
           <li>Volitelně šachový motor Stockfish: rozbor pozice s hodnocením, nejlepší pokračování s vložením do zápisu a kontrola celé partie. Funguje bez internetu.</li>
           <li>Nová partie z libovolné pozice: rozestavením figur na šachovnici, nebo vložením FEN. FEN zobrazené pozice jde zkopírovat.</li>
           <li>Odeslání partie přes sdílení Androidu, nebo rovnou e-mailem na adresu z Nastavení. PGN je v textu i jako příloha. V Nastavení lze zapnout ikonu pro rychlé odeslání v horní liště.</li>
@@ -654,6 +747,18 @@ textarea.fen { min-height: 0; font-size: 14px; word-break: break-all; }
       <h2>Verze a změny</h2>
     </div>
     <div class="pbody log">
+        <section>
+          <div class="head"><span class="ver-badge">0.17</span><span class="date">31. 10. 2026</span></div>
+          <ul>
+            <li>Hlasové zadávání tahů (zapíná se v Nastavení): tlačítko s mikrofonem, například „jezdec f3“, „pěšec bere d5“, „krátká rošáda“, „zpět“. Volitelně poslouchá dál pro diktování celé partie, „konec“ diktování ukončí.</li>
+            <li>Přepínání partií v souboru přetažením prstu doleva nebo doprava mimo šachovnici.</li>
+            <li>Kompaktnější ovládání: šipky a počítadlo tahů v jednom řádku, pás tahů pod šachovnicí, souhrn hlavičky a zápisu v zavřených panelech.</li>
+            <li>Našeptávání jmen hráčů z dříve zadaných partií, jména zůstávají jen v telefonu.</li>
+            <li>Obrázek pozice (menu): diagram s popiskem a souřadnicemi ke sdílení nebo uložení.</li>
+            <li>Šipka nejlepšího tahu od Stockfishe přímo na šachovnici.</li>
+            <li>Volitelná vibrace při tahu a volba velikosti nebo skrytí souřadnic.</li>
+          </ul>
+        </section>
         <section>
           <div class="head"><span class="ver-badge">0.16</span><span class="date">30. 10. 2026</span></div>
           <ul>
@@ -923,13 +1028,15 @@ textarea.fen { min-height: 0; font-size: 14px; word-break: break-all; }
   const eng = { worker: null, loading: null, ready: false, searching: false, stopping: false, job: null, next: null,
     liveFen: null, liveDone: false, lines: [], depth: 0, checking: null, renderTimer: null, error: '' };
   let engineOn = false;
+  const voice = { on: false, busy: false, misses: 0 }; // hlasové zadávání
   let selected = null;
   let pendingPromo = null;
   let history = [];
   let czech = false;
   let opts = { undo: false, comments: false, sendIcon: false, variants: false, nags: false,
     prefill: false, preEvent: true, preSite: true, preRound: true, preDate: 'prev',
-    engine: false, engLines: 1, engDepth: 20 };
+    engine: false, engLines: 1, engDepth: 20, arrow: true,
+    strip: true, coords: 's', haptic: false, players: true, mic: false, micCont: true };
   try { const o = JSON.parse(localStorage.getItem('pgn-opts') || 'null'); if (o) opts = Object.assign(opts, o); } catch (e) {}
 
   function serializeFile() { return JSON.stringify(FILE, (k, v) => k === 'moves' ? undefined : v); }
@@ -1046,6 +1153,7 @@ textarea.fen { min-height: 0; font-size: 14px; word-break: break-all; }
       }
     }
     analyzeCurrent();
+    drawArrow();
   }
 
   boardEl.addEventListener('click', e => {
@@ -1100,6 +1208,7 @@ textarea.fen { min-height: 0; font-size: 14px; word-break: break-all; }
     const m = g.move({ from, to, promotion: promotion || 'q' });
     selected = null;
     if (!m) { renderBoard(); return; }
+    haptic(m.captured ? 40 : 20);
     const node = LINE[k];
     const existing = node.ch.findIndex(c => c.s === m.san);
     if (existing !== -1) { // tah už v partii je, jen se po něm posuneme
@@ -1234,6 +1343,53 @@ textarea.fen { min-height: 0; font-size: 14px; word-break: break-all; }
     if ($('pMoves').open) scrollMovesToCur();
   }
 
+  // Pás tahů aktuální linie pod šachovnicí
+  function renderStrip() {
+    const el = $('strip');
+    el.hidden = !opts.strip || !state.moves.length;
+    if (el.hidden) return;
+    el.innerHTML = '';
+    let cur = null;
+    LINE.slice(1).forEach((node, i) => {
+      const white = isWhiteMove(i);
+      if (white || i === 0) {
+        const n = document.createElement('span'); n.className = 'no';
+        n.textContent = moveNumber(i) + (white ? '.' : '...');
+        el.appendChild(n);
+      }
+      const b = document.createElement('button');
+      b.type = 'button';
+      b.className = 'mv' + (i === state.ply - 1 ? ' cur' : '');
+      b.textContent = show(node.s) + nagText(node.n);
+      b.addEventListener('click', () => goPath(state.path.slice(0, i + 1)));
+      el.appendChild(b);
+      if (i === state.ply - 1) cur = b;
+    });
+    const end = document.createElement('span'); end.className = 'end'; el.appendChild(end);
+    // posun jen v rámci pásu, stránka zůstane na místě
+    if (!cur) el.scrollLeft = 0;
+    else el.scrollLeft = Math.max(0, cur.offsetLeft - el.clientWidth / 2 + cur.offsetWidth / 2);
+  }
+  function fmtDate(d) {
+    const m = /^(\d{4})\.(\d{2}|\?\?)\.(\d{2}|\?\?)$/.exec(d || '');
+    if (!m) return '';
+    if (m[2] === '??') return m[1];
+    if (m[3] === '??') return (+m[2]) + '/' + m[1];
+    return (+m[3]) + '. ' + (+m[2]) + '. ' + m[1];
+  }
+  function renderSums() {
+    const h = state.headers, parts = [];
+    if (h.Event !== '?') parts.push(h.Event);
+    if (h.Round !== '?') parts.push(h.Round + '. kolo');
+    const d = fmtDate(h.Date); if (d) parts.push(d);
+    if (h.Site !== '?') parts.push(h.Site);
+    if (h.Result !== '*') parts.push(h.Result);
+    $('tagsSum').textContent = parts.join(', ') || 'nevyplněno';
+    const n = mainLength(state);
+    const full = Math.ceil(n / 2);
+    $('movesSum').textContent = n ? full + ' ' + plural(full, 'tah', 'tahy', 'tahů') + (h.Result !== '*' ? ', ' + h.Result : '') : 'bez tahů';
+  }
+
   // Posune jen seznam tahů, aby byl aktuální tah vidět. Stránka sama zůstane na místě.
   function scrollMovesToCur() {
     const box = $('moves'), cur = box.querySelector('.cur');
@@ -1249,6 +1405,8 @@ textarea.fen { min-height: 0; font-size: 14px; word-break: break-all; }
     const cur = state.ply === 0 ? 0 : moveNumber(state.ply - 1) - first + 1;
     const total = state.moves.length === 0 ? 0 : moveNumber(state.moves.length - 1) - first + 1;
     $('counter').textContent = 'Tah ' + cur + ' z ' + total;
+    renderStrip();
+    renderSums();
     $('navStart').disabled = $('navPrev').disabled = state.ply === 0;
     $('navNext').disabled = $('navEnd').disabled = state.ply >= state.moves.length;
     $('undoLast').disabled = state.moves.length === 0;
@@ -1288,7 +1446,7 @@ textarea.fen { min-height: 0; font-size: 14px; word-break: break-all; }
       $('t' + t + 'First').value = parts[1];
     });
   }
-  function onTagChange() { renderMoves(); persist(); syncText(); renderSend(); renderGames(); }
+  function onTagChange() { renderMoves(); renderSums(); persist(); syncText(); renderSend(); renderGames(); }
   SIMPLE.forEach(t => {
     $('t' + t).addEventListener('input', e => {
       state.headers[t] = e.target.value.trim() || DEFAULTS[t];
@@ -1539,6 +1697,7 @@ textarea.fen { min-height: 0; font-size: 14px; word-break: break-all; }
     return r;
   }
   function afterLoad(r, label) {
+    if (opts.players) { const ns = new Set(); r.games.forEach(g => ['White', 'Black'].forEach(t => { const v = g.headers[t]; if (v && v !== '?') ns.add(v); })); players = [...ns].concat(players.filter(p => !ns.has(p))).slice(0, 1000); savePlayers(); }
     fillTags(); renderAll();
     if (drawerOpen()) setDrawer(false);
     const n = r.games.length;
@@ -1981,6 +2140,7 @@ textarea.fen { min-height: 0; font-size: 14px; word-break: break-all; }
   }
 
   window.androidBack = () => {
+    if (voice.on && $('modal').hidden && $('chModal').hidden) { voiceStop(); $('voiceBar').hidden = true; return true; }
     if (editor && $('modal').hidden) { closeEditor(); return true; }
     if (!$('modal').hidden && $('modalCancel').hidden) { $('modalOk').click(); return true; }
     for (const [box, btn] of [['modal', 'modalCancel'], ['cModal', 'cCancel'], ['nModal', 'nCancel'], ['chModal', 'chCancel'], ['lModal', 'lClose'], ['promo', 'promoCancel']]) {
@@ -2189,7 +2349,25 @@ textarea.fen { min-height: 0; font-size: 14px; word-break: break-all; }
     if (eng.renderTimer) return;
     eng.renderTimer = setTimeout(() => { eng.renderTimer = null; renderEngine(); }, 200);
   }
+  // Šipka nejlepšího tahu přes šachovnici
+  function drawArrow() {
+    const a = $('bestArrow');
+    const best = eng.lines[0];
+    if (!engineOn || !opts.arrow || eng.checking || editor || !best || !best.pv || !best.pv[0] || eng.liveFen !== gameAt(state.ply).fen()) { a.setAttribute('visibility', 'hidden'); return; }
+    const u = best.pv[0];
+    const xy = sq => {
+      let c = 'abcdefgh'.indexOf(sq[0]), r = 8 - +sq[1];
+      if (state.flipped) { c = 7 - c; r = 7 - r; }
+      return [c + .5, r + .5];
+    };
+    const [x1, y1] = xy(u.slice(0, 2)), [x2, y2] = xy(u.slice(2, 4));
+    const len = Math.hypot(x2 - x1, y2 - y1), k = (len - .32) / len; // konec před hrotem
+    a.setAttribute('x1', x1); a.setAttribute('y1', y1);
+    a.setAttribute('x2', x1 + (x2 - x1) * k); a.setAttribute('y2', y1 + (y2 - y1) * k);
+    a.setAttribute('visibility', 'visible');
+  }
   function renderEngine(msg) {
+    drawArrow();
     const box = $('engineBox');
     box.hidden = !engineOn;
     $('engineBtn').classList.toggle('primary', engineOn);
@@ -2398,6 +2576,19 @@ textarea.fen { min-height: 0; font-size: 14px; word-break: break-all; }
     $('prePSite').checked = opts.preSite;
     $('prePRound').checked = opts.preRound;
     $('prePDate').value = opts.preDate;
+    $('optArrow').checked = opts.arrow;
+    $('optStrip').checked = opts.strip;
+    $('optCoords').value = opts.coords;
+    document.body.classList.toggle('coords-l', opts.coords === 'l');
+    document.body.classList.toggle('coords-n', opts.coords === 'n');
+    $('optHaptic').checked = opts.haptic;
+    $('optPlayers').checked = opts.players;
+    $('playerOpts').hidden = !opts.players;
+    $('optMic').checked = opts.mic;
+    $('micOpts').hidden = !opts.mic;
+    $('optMicCont').checked = opts.micCont;
+    $('micBtn').hidden = !opts.mic;
+    if (!opts.mic && voice.on) voiceStop();
     $('optEngine').checked = opts.engine;
     $('engineOpts').hidden = !opts.engine;
     $('engineBtn').hidden = !opts.engine;
@@ -2417,6 +2608,13 @@ textarea.fen { min-height: 0; font-size: 14px; word-break: break-all; }
     $(id).addEventListener('change', e => { opts[key] = e.target.checked; saveOpts(); }));
   $('prePDate').addEventListener('change', e => { opts.preDate = e.target.value; saveOpts(); });
   $('optEngine').addEventListener('change', e => { opts.engine = e.target.checked; saveOpts(); applyOpts(); });
+  $('optArrow').addEventListener('change', e => { opts.arrow = e.target.checked; saveOpts(); drawArrow(); });
+  $('optStrip').addEventListener('change', e => { opts.strip = e.target.checked; saveOpts(); renderStrip(); });
+  $('optCoords').addEventListener('change', e => { opts.coords = e.target.value; saveOpts(); applyOpts(); });
+  $('optHaptic').addEventListener('change', e => { opts.haptic = e.target.checked; saveOpts(); if (opts.haptic) haptic(20); });
+  $('optPlayers').addEventListener('change', e => { opts.players = e.target.checked; saveOpts(); applyOpts(); });
+  $('optMic').addEventListener('change', e => { opts.mic = e.target.checked; saveOpts(); applyOpts(); });
+  $('optMicCont').addEventListener('change', e => { opts.micCont = e.target.checked; saveOpts(); });
   $('optEngLines').addEventListener('change', e => { opts.engLines = +e.target.value; saveOpts(); eng.liveFen = null; analyzeCurrent(); });
   $('optEngDepth').addEventListener('change', e => { opts.engDepth = +e.target.value; saveOpts(); eng.liveFen = null; analyzeCurrent(); });
   applyOpts();
@@ -2619,6 +2817,7 @@ textarea.fen { min-height: 0; font-size: 14px; word-break: break-all; }
     document.querySelectorAll('#drawer .dpage').forEach(p => { p.hidden = p.id !== id; });
     curPage = id;
     if (id === 'pgGames') { renderGames(true); }
+    if (id === 'pgImage') { $('diagCaption').value = autoCaption(); refreshDiagram(); }
     const pb = $(id).querySelector('.pbody, .mlist');
     if (pb && id !== 'pgGames') pb.scrollTop = 0;
   }
@@ -2637,6 +2836,7 @@ textarea.fen { min-height: 0; font-size: 14px; word-break: break-all; }
   $('menuBtn').addEventListener('click', () => setDrawer(true));
   // Náhledy pro kontrolu vzhledu při sestavení (#menu, #vse = všechna volitelná tlačítka)
   if (location.hash === '#menu') setTimeout(() => setDrawer(true), 0);
+  if (location.hash === '#obrazek') setTimeout(() => { goPath([0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0]); setDrawer(true); openPage('pgImage'); }, 0);
   if (location.hash === '#nastaveni') setTimeout(() => { setDrawer(true); openPage('pgSettings'); }, 0);
   if (location.hash === '#partie') setTimeout(() => {
     const games = [];
@@ -2660,6 +2860,377 @@ textarea.fen { min-height: 0; font-size: 14px; word-break: break-all; }
     $('fileInfo').textContent = (FILE.name ? FILE.name + '.pgn, ' : '') + n + ' ' + plural(n, 'partie', 'partie', 'partií') + ', aktuální č. ' + (FILE.cur + 1);
     $('verLabel').textContent = (document.querySelector('.ver-badge') || {}).textContent.replace('verze ', '') || '';
   }
+
+  /* ---------- Přepnutí partie přetažením do strany ---------- */
+  (() => {
+    let t0 = null;
+    const ignore = el => el.closest('.board-wrap, .strip, input, textarea, select, .engine, .sugg, .moves .var');
+    document.querySelector('.app').addEventListener('touchstart', e => {
+      t0 = null;
+      if (e.touches.length !== 1 || FILE.games.length < 2 || editor || eng.checking || drawerOpen()) return;
+      const t = e.touches[0];
+      if (t.clientX < 28 || t.clientX > window.innerWidth - 28 || ignore(e.target)) return; // okraje patří gestu Zpět
+      t0 = { x: t.clientX, y: t.clientY, time: Date.now() };
+    }, { passive: true });
+    document.querySelector('.app').addEventListener('touchend', e => {
+      if (!t0) return;
+      const t = e.changedTouches[0], dx = t.clientX - t0.x, dy = t.clientY - t0.y, dt = Date.now() - t0.time;
+      t0 = null;
+      if (dt > 700 || Math.abs(dx) < 70 || Math.abs(dx) < 2.2 * Math.abs(dy)) return;
+      switchGame(dx < 0 ? 1 : -1);
+    }, { passive: true });
+  })();
+  function switchGame(dir) {
+    const i = FILE.cur + dir;
+    if (i < 0 || i >= FILE.games.length) { toast(dir > 0 ? 'Toto je poslední partie v souboru.' : 'Toto je první partie v souboru.'); return; }
+    useGame(i, state.flipped);
+    fillTags(); renderAll();
+    const bw = document.querySelector('.board-wrap');
+    bw.classList.remove('sl', 'sr'); void bw.offsetWidth; bw.classList.add(dir > 0 ? 'sl' : 'sr');
+    toast('Partie ' + (i + 1) + ' z ' + FILE.games.length + ': ' + gameNames(state));
+  }
+
+  /* ---------- Vibrace ---------- */
+  function haptic(ms) {
+    if (!opts.haptic) return;
+    try { if (ANDROID && ANDROID.vibrate) ANDROID.vibrate(ms); else if (navigator.vibrate) navigator.vibrate(ms); } catch (e) {}
+  }
+
+  /* ---------- Našeptávání jmen hráčů ---------- */
+  const PLAYERS_KEY = 'pgn-players';
+  let players = [];
+  try { players = JSON.parse(localStorage.getItem(PLAYERS_KEY) || '[]'); if (!Array.isArray(players)) players = []; } catch (e) { players = []; }
+  function savePlayers() { try { localStorage.setItem(PLAYERS_KEY, JSON.stringify(players)); } catch (e) {} renderPlayersCount(); }
+  function rememberPlayer(name) {
+    if (!opts.players || !name || name === '?') return;
+    players = [name].concat(players.filter(p => p !== name)).slice(0, 1000);
+    savePlayers();
+  }
+  function renderPlayersCount() {
+    $('playersCount').textContent = players.length ? players.length + ' ' + plural(players.length, 'jméno', 'jména', 'jmen') : 'zatím žádná';
+    $('playersClear').disabled = !players.length;
+  }
+  $('playersClear').addEventListener('click', async () => {
+    if (!(await askConfirm('Vymazat uložená jména?', 'Našeptávání zapomene všech ' + players.length + ' ' + plural(players.length, 'jméno', 'jména', 'jmen') + '. Partie zůstanou beze změny.', 'Vymazat'))) return;
+    players = []; savePlayers();
+  });
+  function candidateNames() {
+    const set = new Set(players);
+    FILE.games.forEach(g => ['White', 'Black'].forEach(t => { const v = g.headers[t]; if (v && v !== '?') set.add(v); }));
+    return [...set];
+  }
+  const norm = v => toAscii(v || '').toLowerCase();
+  document.querySelectorAll('label.ac input').forEach(inp => {
+    const list = inp.parentNode.querySelector('.sugg');
+    const color = inp.dataset.color, part = inp.dataset.part;
+    const close = () => { list.hidden = true; list.innerHTML = ''; };
+    const show = () => {
+      list.innerHTML = '';
+      const q = norm(inp.value).trim();
+      if (!opts.players || !q) { close(); return; }
+      const current = state.headers[color];
+      const hits = candidateNames().filter(n => {
+        if (n === current) return false;
+        const [last, first] = splitName(n);
+        return norm(part === 'Last' ? last : first).startsWith(q) || (part === 'Last' && norm(n).startsWith(q));
+      }).slice(0, 6);
+      if (!hits.length) { close(); return; }
+      hits.forEach(n => {
+        const [last, first] = splitName(n);
+        const li = document.createElement('li');
+        const b = document.createElement('button');
+        b.type = 'button';
+        const bb = document.createElement('b'); bb.textContent = last;
+        b.append(bb, first ? ' ' + first : '');
+        b.addEventListener('pointerdown', ev => ev.preventDefault()); // pole neztratí fokus dřív, než se jméno vybere
+        b.addEventListener('click', () => {
+          $('t' + color + 'Last').value = last;
+          $('t' + color + 'First').value = first;
+          state.headers[color] = joinName(last, first);
+          onTagChange(); close();
+          rememberPlayer(state.headers[color]);
+        });
+        li.appendChild(b); list.appendChild(li);
+      });
+      list.hidden = false;
+    };
+    inp.addEventListener('input', show);
+    inp.addEventListener('focus', show);
+    inp.addEventListener('blur', () => { setTimeout(close, 150); rememberPlayer(state.headers[color]); });
+    inp.addEventListener('keydown', e => { if (e.key === 'Escape') close(); });
+  });
+
+  /* ---------- Obrázek pozice ---------- */
+  const pieceImgs = {};
+  function pieceImage(code) {
+    if (pieceImgs[code]) return pieceImgs[code];
+    pieceImgs[code] = new Promise(resolve => {
+      const tmp = document.createElement('span'); tmp.className = 'piece p-' + code; tmp.style.display = 'none';
+      document.body.appendChild(tmp);
+      const bg = getComputedStyle(tmp).backgroundImage; tmp.remove();
+      const m = /url\(["']?(.*?)["']?\)$/.exec(bg);
+      const img = new Image();
+      img.onload = () => resolve(img); img.onerror = () => resolve(null);
+      img.src = m ? m[1] : '';
+    });
+    return pieceImgs[code];
+  }
+  function autoCaption() {
+    const k = state.ply, parts = [];
+    const p = splitName(state.headers.White), q = splitName(state.headers.Black);
+    if (p[0] || q[0]) parts.push((p[0] || 'Bílý') + ' - ' + (q[0] || 'Černý'));
+    if (k > 0) parts.push('po ' + moveNumber(k - 1) + (isWhiteMove(k - 1) ? '. ' : '... ') + show(state.moves[k - 1]));
+    parts.push(gameAt(k).turn() === 'w' ? 'bílý na tahu' : 'černý na tahu');
+    return parts.join(', ');
+  }
+  async function renderDiagram() {
+    const caption = $('diagCaption').value.trim(), coords = $('diagCoords').checked;
+    const S = 120, B = S * 8, M = coords ? 56 : 24, capH = caption ? 96 : 0;
+    const W = B + M + 24, H = 24 + B + (coords ? 48 : 24) + capH;
+    const cv = document.createElement('canvas'); cv.width = W; cv.height = H;
+    const c = cv.getContext('2d');
+    c.fillStyle = '#ffffff'; c.fillRect(0, 0, W, H);
+    const ox = M, oy = 24;
+    const css = getComputedStyle(document.documentElement);
+    const light = css.getPropertyValue('--sq-light').trim() || '#eeeed2', dark = css.getPropertyValue('--sq-dark').trim() || '#769656';
+    const board = gameAt(state.ply).board();
+    const files = 'abcdefgh';
+    for (let vr = 0; vr < 8; vr++) for (let vc = 0; vc < 8; vc++) {
+      const r = state.flipped ? 7 - vr : vr, col = state.flipped ? 7 - vc : vc;
+      c.fillStyle = (r + col) % 2 === 0 ? light : dark;
+      c.fillRect(ox + vc * S, oy + vr * S, S, S);
+      const p = board[r][col];
+      if (p) { const img = await pieceImage(p.color + p.type); if (img) c.drawImage(img, ox + vc * S + 4, oy + vr * S + 4, S - 8, S - 8); }
+    }
+    c.strokeStyle = '#333'; c.lineWidth = 3; c.strokeRect(ox, oy, B, B);
+    c.fillStyle = '#333'; c.textAlign = 'center'; c.textBaseline = 'middle';
+    if (coords) {
+      c.font = '600 30px "IBM Plex Sans", sans-serif';
+      for (let i = 0; i < 8; i++) {
+        c.fillText(state.flipped ? files[7 - i] : files[i], ox + i * S + S / 2, oy + B + 26);
+        c.fillText(String(state.flipped ? i + 1 : 8 - i), M / 2, oy + i * S + S / 2);
+      }
+    }
+    if (caption) {
+      c.font = '500 40px "IBM Plex Sans", sans-serif';
+      let txt = caption;
+      while (c.measureText(txt).width > W - 48 && txt.length > 4) txt = txt.slice(0, -2);
+      if (txt !== caption) txt = txt.slice(0, -1) + '…';
+      c.fillText(txt, W / 2, H - capH / 2 - 6);
+    }
+    return cv;
+  }
+  let diagCanvas = null;
+  async function refreshDiagram() {
+    diagCanvas = await renderDiagram();
+    $('diagImg').src = diagCanvas.toDataURL('image/png');
+  }
+  function diagName() {
+    return gameBase(state) + (state.ply ? '-tah' + moveNumber(state.ply - 1) + (isWhiteMove(state.ply - 1) ? '' : 'c') : '-start') + '.png';
+  }
+  $('diagCaption').addEventListener('input', () => { clearTimeout(refreshDiagram.t); refreshDiagram.t = setTimeout(refreshDiagram, 250); });
+  $('diagCoords').addEventListener('change', refreshDiagram);
+  async function diagExport(share) {
+    if (!diagCanvas) await refreshDiagram();
+    const b64 = diagCanvas.toDataURL('image/png').split(',')[1];
+    if (ANDROID && ANDROID.shareImage) {
+      if (share) { const r = ANDROID.shareImage(diagName(), b64); if (r !== 'ok') toast('Sdílení se nepodařilo: ' + r, 'err'); }
+      else ANDROID.saveBase64(diagName(), b64, 'image/png');
+      return;
+    }
+    const a = document.createElement('a'); a.href = diagCanvas.toDataURL('image/png'); a.download = diagName(); a.click();
+  }
+  $('diagShare').addEventListener('click', () => diagExport(true));
+  $('diagSave').addEventListener('click', () => diagExport(false));
+
+  /* ---------- Hlasové zadávání ---------- */
+  // Rozpoznávání řeči zajišťuje Android (služba rozpoznávání, obvykle Google). Aplikace dostane
+  // několik možných přepisů a hledá mezi tahy, které jsou v pozici možné, ten jediný, který sedí.
+  const V_PIECE = { jezdec: 'n', jezdcem: 'n', jezdce: 'n', kun: 'n', kone: 'n', konem: 'n', konik: 'n', knight: 'n',
+    strelec: 'b', strelcem: 'b', strelce: 'b', bishop: 'b', vez: 'r', vezi: 'r', vezici: 'r', rook: 'r',
+    dama: 'q', damou: 'q', damu: 'q', kralovna: 'q', kralovnou: 'q', queen: 'q', kral: 'k', kralem: 'k', krale: 'k', king: 'k',
+    pesec: 'p', pescem: 'p', pesak: 'p', pesce: 'p', pawn: 'p' };
+  const V_FILE = { a: 'a', aa: 'a', ah: 'a', b: 'b', be: 'b', bee: 'b', c: 'c', ce: 'c', cee: 'c', se: 'c', d: 'd', de: 'd', dee: 'd',
+    e: 'e', ee: 'e', f: 'f', ef: 'f', eff: 'f', g: 'g', ge: 'g', gee: 'g', h: 'h', ha: 'h', hah: 'h' };
+  const V_NUM = { jedna: 1, jednicka: 1, jeden: 1, one: 1, dva: 2, dve: 2, dvojka: 2, two: 2, tri: 3, trojka: 3, three: 3,
+    ctyri: 4, ctyrka: 4, four: 4, pet: 5, petka: 5, five: 5, sest: 6, sestka: 6, six: 6, sedm: 7, sedmicka: 7, seven: 7, osm: 8, osmicka: 8, eight: 8 };
+  const V_CAPTURE = /^(bere|bera|sebere|vezme|bije|bijou|x|kryt|takes|beru)$/;
+  function voiceTokens(text) {
+    let t = toAscii(text).toLowerCase().replace(/[-–,.;:!?()]/g, ' ');
+    t = t.replace(/\b([a-h])\s*x\s*([a-h])/g, '$1 x $2').replace(/([a-z])(\d)/g, '$1 $2').replace(/(\d)([a-z])/g, '$1 $2');
+    return t.split(/\s+/).filter(Boolean).map(w => V_NUM[w] ? String(V_NUM[w]) : w);
+  }
+  // Rozbor jednoho přepisu na popis tahu
+  function voiceParse(tokens) {
+    const d = { piece: null, capture: false, squares: [], fromFile: null, castle: null, promo: null };
+    const joined = tokens.join(' ');
+    if (/rosad/.test(joined)) {
+      d.castle = /dlouh|velk|long/.test(joined) ? 'q' : /kratk|mal|short/.test(joined) ? 'k' : '?';
+      return d;
+    }
+    for (let i = 0; i < tokens.length; i++) {
+      const w = tokens[i];
+      if (V_PIECE[w] !== undefined) { if (d.squares.length) d.promo = d.promo || V_PIECE[w]; else d.piece = d.piece || V_PIECE[w]; continue; }
+      if (/^promen|^men(i|im)|^promotes?$/.test(w)) continue;
+      if (V_CAPTURE.test(w)) { d.capture = true; continue; }
+      if (V_FILE[w] && /^[1-8]$/.test(tokens[i + 1] || '')) { d.squares.push(V_FILE[w] + tokens[i + 1]); i++; continue; }
+      if (V_FILE[w] && !d.squares.length) { d.fromFile = V_FILE[w]; continue; }
+      // samostatné písmeno figury v anglické nebo české notaci: N, B, R, Q, K / J, S, V, D
+      if (!d.squares.length && !d.piece && /^[nbrqkjsvd]$/.test(w) && w !== 'b' && w !== 'd') d.piece = { n: 'n', j: 'n', s: 'b', r: 'r', v: 'r', q: 'q', k: 'k' }[w] || null;
+    }
+    return d;
+  }
+  function voiceMatch(g, d) {
+    const legal = g.moves({ verbose: true });
+    if (d.castle) {
+      const c = legal.filter(m => d.castle === '?' ? /[kq]/.test(m.flags) : m.flags.indexOf(d.castle) !== -1);
+      return c;
+    }
+    if (!d.squares.length) return [];
+    const to = d.squares[d.squares.length - 1], from = d.squares.length > 1 ? d.squares[d.squares.length - 2] : null;
+    let c = legal.filter(m => m.to === to);
+    if (from) c = c.filter(m => m.from === from);
+    if (d.fromFile) c = c.filter(m => m.from[0] === d.fromFile);
+    if (d.piece) c = c.filter(m => m.piece === d.piece);
+    else if (!from) {
+      // jen pole bez figury znamená tah pěšcem; jinou figurou jen po potvrzení
+      const pawns = c.filter(m => m.piece === 'p');
+      if (pawns.length) c = pawns; else c.unsure = c.length > 0;
+    }
+    if (d.capture) { const cc = c.filter(m => m.captured); if (cc.length) c = cc; }
+    if (c.some(m => m.promotion)) { const u = c.unsure; c = c.filter(m => m.promotion === (d.promo && d.promo !== 'p' && d.promo !== 'k' ? d.promo : 'q')); c.unsure = u; }
+    return c;
+  }
+  // Více tahů v jedné větě ("e4 e5 jezdec f3"): rozdělí se za každým polem
+  function voiceSplit(tokens) {
+    const chunks = []; let cur = [];
+    for (let i = 0; i < tokens.length; i++) {
+      cur.push(tokens[i]);
+      const isSq = /^[1-8]$/.test(tokens[i]) && V_FILE[tokens[i - 1]];
+      if (isSq) { chunks.push(cur); cur = []; }
+    }
+    if (cur.length && chunks.length) chunks[chunks.length - 1] = chunks[chunks.length - 1].concat(cur);
+    return chunks;
+  }
+  const V_CMD = [
+    [/^(zpet|vrat|o tah zpet)$/, () => go(state.ply - 1), 'o tah zpět'],
+    [/^(dopredu|vpred|dal|o tah dopredu)$/, () => go(state.ply + 1), 'o tah vpřed'],
+    [/^(otoc|otocit|otoc sachovnici)$/, () => { state.flipped = !state.flipped; renderBoard(); persist(); }, 'otočeno'],
+    [/^(konec|stop|ukoncit|hotovo|dost)$/, () => voiceStop(), null]
+  ];
+  async function voiceHandle(cands) {
+    let heard = cands[0] || '';
+    for (const text of cands) {
+      const plain = toAscii(text).toLowerCase().trim();
+      const cmd = V_CMD.find(c => c[0].test(plain));
+      if (cmd) { cmd[1](); if (cmd[2]) voiceSay(cmd[2]); return true; }
+    }
+    // 1) celý přepis jako jeden tah
+    let ambiguous = null;
+    for (const text of cands) {
+      const m = voiceMatch(gameAt(state.ply), voiceParse(voiceTokens(text)));
+      if (m.length === 1 && !m.unsure) { await voicePlay([m[0]], text); return true; }
+      if (m.length && !ambiguous) { ambiguous = m; heard = text; }
+    }
+    // 2) několik tahů za sebou
+    for (const text of cands) {
+      const chunks = voiceSplit(voiceTokens(text));
+      if (chunks.length < 2) continue;
+      const g = gameAt(state.ply), seq = [];
+      for (const ch of chunks) {
+        const m = voiceMatch(g, voiceParse(ch));
+        if (m.length !== 1 || m.unsure) { seq.length = 0; break; }
+        seq.push(m[0]); g.move(m[0]);
+      }
+      if (seq.length) { await voicePlay(seq, text); return true; }
+    }
+    if (ambiguous) {
+      const opt = ambiguous.slice(0, 4);
+      const i = await askChoice(opt.length > 1 ? 'Který tah?' : 'Myslíš tento tah?', 'Rozuměl jsem „' + heard + '“.', opt.map(m => show(m.san)));
+      if (i >= 0) { await voicePlay([opt[i]], heard); return true; }
+      voiceSay('Zrušeno');
+      return false;
+    }
+    voiceSay('Nerozuměl jsem: „' + heard + '“');
+    return false;
+  }
+  async function voicePlay(moves, text) {
+    const sans = [];
+    for (const m of moves) {
+      const before = state.ply;
+      await playMove(m.from, m.to, m.promotion);
+      if (state.ply === before) break; // tah zrušen (např. odmítnuté přepsání)
+      sans.push(show(m.san));
+    }
+    voiceSay(sans.length ? 'Zahráno: ' + sans.join(' ') : 'Nezahráno');
+  }
+  function voiceSay(t) { $('voiceText').textContent = t; }
+  function voiceUi() {
+    $('voiceBar').hidden = !voice.on;
+    $('micBtn').classList.toggle('on', voice.on);
+  }
+  function voiceListen() {
+    if (!voice.on) return;
+    $('voiceBar').classList.add('listening');
+    if (ANDROID && ANDROID.voiceStart) { ANDROID.voiceStart(); return; }
+    const SR = window.SpeechRecognition || window.webkitSpeechRecognition;
+    if (!SR) { voiceSay('Hlasové zadávání tady není dostupné.'); voiceStop(true); return; }
+    const r = new SR(); r.lang = 'cs-CZ'; r.maxAlternatives = 5; r.interimResults = false;
+    r.onresult = e => window.onVoiceResult(JSON.stringify([...e.results[0]].map(a => a.transcript)));
+    r.onerror = e => window.onVoiceError(e.error === 'no-speech' ? 6 : e.error === 'not-allowed' ? 9 : 7);
+    voice.web = r; r.start();
+  }
+  function voiceStart() {
+    if (editor) return;
+    voice.on = true; voice.misses = 0;
+    voiceSay('Poslouchám…'); voiceUi(); voiceListen();
+  }
+  function voiceStop(keepText) {
+    voice.on = false;
+    try { if (ANDROID && ANDROID.voiceStop) ANDROID.voiceStop(); else if (voice.web) voice.web.abort(); } catch (e) {}
+    $('voiceBar').classList.remove('listening');
+    voiceUi();
+  }
+  window.onVoiceState = st => {
+    if (!voice.on) return;
+    if (st === 'listening') { $('voiceBar').classList.add('listening'); if (!voice.busy) voiceSay('Poslouchám…'); }
+    else if (st === 'processing') { $('voiceBar').classList.remove('listening'); voiceSay('Zpracovávám…'); }
+  };
+  window.onVoiceResult = async json => {
+    if (!voice.on) return;
+    $('voiceBar').classList.remove('listening');
+    let cands = [];
+    try { cands = JSON.parse(json).filter(Boolean); } catch (e) {}
+    voice.busy = true;
+    const ok = cands.length ? await voiceHandle(cands) : false;
+    voice.busy = false;
+    voice.misses = ok ? 0 : voice.misses + 1;
+    if (!voice.on) return;
+    if ((ok && !opts.micCont) || voice.misses >= 4) { voiceStop(); return; }
+    setTimeout(voiceListen, 350);
+  };
+  window.onVoiceError = code => {
+    if (!voice.on) return;
+    $('voiceBar').classList.remove('listening');
+    const msg = { 1: 'Chyba sítě.', 2: 'Chyba sítě.', 3: 'Chyba mikrofonu.', 4: 'Chyba služby rozpoznávání.', 5: 'Chyba rozpoznávání.', 8: 'Rozpoznávání je zaneprázdněné.',
+      9: 'Bez povolení mikrofonu hlasové zadávání nefunguje. Povolíš ho v nastavení Androidu u aplikace PGN editor.', 10: 'Chyba rozpoznávání.',
+      12: 'Čeština není pro rozpoznávání řeči dostupná.', 13: 'Čeština pro rozpoznávání řeči ještě není stažená.', 100: 'V telefonu chybí služba rozpoznávání řeči (aplikace Google).' }[code];
+    const silent = code === 6 || code === 7;
+    if (silent) {
+      voice.misses++;
+      if (voice.misses >= 4) { voiceSay('Nic jsem neslyšel, hlasové zadávání vypnuto.'); voiceStop(true); return; }
+      setTimeout(voiceListen, 300);
+      return;
+    }
+    if (code === 8) { setTimeout(voiceListen, 600); return; }
+    voiceSay(msg || 'Chyba rozpoznávání (' + code + ').');
+    voiceStop(true);
+    $('voiceBar').hidden = false;
+    setTimeout(() => { if (!voice.on) $('voiceBar').hidden = true; }, 6000);
+  };
+  $('micBtn').addEventListener('click', () => { if (voice.on) voiceStop(); else voiceStart(); });
+  $('voiceStop').addEventListener('click', () => { voiceStop(); $('voiceBar').hidden = true; });
+  document.addEventListener('visibilitychange', () => { if (document.hidden && voice.on) voiceStop(); });
 
   /* ---------- Tahání figur prstem nebo myší ---------- */
   let drag = null;
@@ -2786,6 +3357,7 @@ textarea.fen { min-height: 0; font-size: 14px; word-break: break-all; }
   }
   fillTags();
   renderAll();
+  renderPlayersCount();
 })();
 </script>
 

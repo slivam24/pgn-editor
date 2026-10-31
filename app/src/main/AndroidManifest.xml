@@ -1,6 +1,18 @@
 <?xml version="1.0" encoding="utf-8"?>
 <manifest xmlns:android="http://schemas.android.com/apk/res/android">
 
+    <!-- Hlasové zadávání tahů (volitelné, povolení se vyžádá až při prvním použití) -->
+    <uses-permission android:name="android.permission.RECORD_AUDIO" />
+    <!-- Krátká vibrace po tahu (volitelné) -->
+    <uses-permission android:name="android.permission.VIBRATE" />
+
+    <!-- Od Androidu 11 musí aplikace uvést, že hledá službu rozpoznávání řeči -->
+    <queries>
+        <intent>
+            <action android:name="android.speech.RecognitionService" />
+        </intent>
+    </queries>
+
     <application
         android:allowBackup="true"
         android:icon="@mipmap/ic_launcher"
