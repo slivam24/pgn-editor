@@ -2985,8 +2985,23 @@ textarea.fen { min-height: 0; font-size: 14px; word-break: break-all; }
   }
   async function renderDiagram() {
     const caption = $('diagCaption').value.trim(), coords = $('diagCoords').checked;
-    const S = 120, B = S * 8, M = coords ? 56 : 24, capH = caption ? 96 : 0;
-    const W = B + M + 24, H = 24 + B + (coords ? 48 : 24) + capH;
+    const S = 120, B = S * 8, M = coords ? 56 : 24;
+    const W = B + M + 24, FONT = '500 40px "IBM Plex Sans", sans-serif';
+    // popisek se zalomí nejvýš do dvou řádků
+    const lines = [];
+    if (caption) {
+      const mc = document.createElement('canvas').getContext('2d'); mc.font = FONT;
+      let cur = '';
+      for (const word of caption.split(/\s+/)) {
+        const t = cur ? cur + ' ' + word : word;
+        if (mc.measureText(t).width <= W - 48 || !cur) cur = t; else { lines.push(cur); cur = word; }
+      }
+      if (cur) lines.push(cur);
+      if (lines.length > 2) { lines.length = 2; lines[1] += ' …'; }
+      lines.forEach((l, i) => { while (mc.measureText(lines[i]).width > W - 48 && lines[i].length > 4) lines[i] = lines[i].slice(0, -3) + '…'; });
+    }
+    const capH = lines.length ? 30 + lines.length * 52 : 0;
+    const H = 24 + B + (coords ? 48 : 24) + capH;
     const cv = document.createElement('canvas'); cv.width = W; cv.height = H;
     const c = cv.getContext('2d');
     c.fillStyle = '#ffffff'; c.fillRect(0, 0, W, H);
@@ -3011,13 +3026,8 @@ textarea.fen { min-height: 0; font-size: 14px; word-break: break-all; }
         c.fillText(String(state.flipped ? i + 1 : 8 - i), M / 2, oy + i * S + S / 2);
       }
     }
-    if (caption) {
-      c.font = '500 40px "IBM Plex Sans", sans-serif';
-      let txt = caption;
-      while (c.measureText(txt).width > W - 48 && txt.length > 4) txt = txt.slice(0, -2);
-      if (txt !== caption) txt = txt.slice(0, -1) + '…';
-      c.fillText(txt, W / 2, H - capH / 2 - 6);
-    }
+    c.font = FONT;
+    lines.forEach((l, i) => c.fillText(l, W / 2, H - capH + 14 + 26 + i * 52));
     return cv;
   }
   let diagCanvas = null;
