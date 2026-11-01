@@ -228,10 +228,13 @@ body.editing .engine { display: none !important; }
 .ev-fill { height: 100%; width: 50%; background: #f4f4f0; transition: width .3s ease; }
 .eng-head { display: flex; align-items: center; gap: 10px; min-width: 0; }
 .eng-head .ev { font-family: var(--font-mono); font-weight: 600; font-size: 17px; min-width: 64px; }
-.eng-head .eng-info { flex: 1; min-width: 0; font-size: 13px; color: var(--muted); overflow: hidden; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; }
+.eng-head { height: 40px; }
+.eng-head .eng-info { flex: 1; min-width: 0; font-size: 13px; line-height: 1.3; max-height: 2.6em; color: var(--muted); overflow: hidden; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; }
 button.btn.small { min-height: 34px; padding: 4px 10px; font-size: 13px; flex: none; }
-.eng-lines { display: grid; gap: 4px; }
-.eng-line { display: flex; gap: 8px; align-items: baseline; width: 100%; text-align: left; border: 0; border-top: 1px solid var(--line); background: none; color: var(--fg); font: inherit; padding: 6px 0 2px; cursor: pointer; min-width: 0; }
+.eng-lines { display: grid; gap: 0; grid-auto-rows: 34px; }
+.eng-line { display: flex; gap: 8px; align-items: center; width: 100%; height: 34px; text-align: left; border: 0; border-top: 1px solid var(--line); background: none; color: var(--fg); font: inherit; padding: 0; cursor: pointer; min-width: 0; }
+.eng-line.empty { cursor: default; }
+.eng-line.empty .pv::before { content: "…"; }
 .eng-line .sc { font-family: var(--font-mono); font-weight: 600; font-size: 14px; min-width: 64px; flex: none; }
 .eng-line .pv { font-family: var(--font-mono); font-size: 14px; color: var(--muted); overflow: hidden; text-overflow: ellipsis; white-space: nowrap; min-width: 0; }
 .eng-line:active .pv { color: var(--fg); }
@@ -300,7 +303,9 @@ pre.lic { margin: 0; max-height: 60vh; overflow: auto; white-space: pre-wrap; fo
 
 /* Kompaktní ovládání pod šachovnicí */
 .nav { flex-wrap: nowrap; align-items: center; max-width: 520px; }
-.nav .counter { flex: 1.6 1 0; min-width: 0; white-space: nowrap; font-size: 14px; }
+.nav .counter { flex: 1.25 1 0; min-width: 0; align-self: stretch; display: grid; place-content: center; text-align: center; gap: 1px; border: 1px solid var(--line); border-radius: 6px; background: var(--surface); padding: 2px 4px; line-height: 1.1; white-space: nowrap; overflow: hidden; }
+.nav .counter .cl { font-size: 11px; color: var(--muted); text-transform: uppercase; letter-spacing: .06em; }
+.nav .counter .cv { font-size: 14px; font-weight: 600; color: var(--fg); font-variant-numeric: tabular-nums; }
 .strip { display: flex; gap: 2px; overflow-x: auto; overscroll-behavior-x: contain; scrollbar-width: none; max-width: 520px; padding: 2px 0; font-family: var(--font-mono); font-size: 15px; white-space: nowrap; -webkit-mask-image: linear-gradient(90deg, transparent 0, #000 12px, #000 calc(100% - 12px), transparent 100%); mask-image: linear-gradient(90deg, transparent 0, #000 12px, #000 calc(100% - 12px), transparent 100%); }
 .strip::-webkit-scrollbar { display: none; }
 .strip[hidden] { display: none; }
@@ -309,6 +314,10 @@ pre.lic { margin: 0; max-height: 60vh; overflow: auto; white-space: pre-wrap; fo
 .strip .mv.cur { background: var(--accent); color: var(--accent-fg); }
 .strip .end { flex: none; width: 12px; }
 body.editing .strip { display: none !important; }
+.var-tools { display: grid; gap: 6px; padding-top: 8px; border-top: 1px solid var(--line); }
+.var-tools[hidden] { display: none; }
+.var-tools .note { font-size: 12px; text-transform: uppercase; letter-spacing: .06em; }
+.var-tools .btn { min-height: 38px; padding: 6px 12px; font-size: 14px; }
 .panel > summary .sh { display: grid; gap: 2px; min-width: 0; flex: 1; }
 .panel > summary .sum { font-size: 13px; color: var(--muted); overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
 .panel[open] > summary .sum { display: none; }
@@ -437,15 +446,6 @@ textarea.fen { min-height: 0; font-size: 14px; word-break: break-all; }
       </div>
     </div>
     <div class="player bottom" id="playerBottom"></div>
-    <section class="engine" id="engineBox" hidden aria-label="Rozbor motorem Stockfish">
-      <div class="ev-bar" aria-hidden="true"><div class="ev-fill" id="evFill"></div></div>
-      <div class="eng-head">
-        <span class="ev" id="evText">…</span>
-        <span class="eng-info" id="engInfo" role="status"></span>
-        <button class="btn small" id="engCheck" type="button">Zkontrolovat partii</button>
-      </div>
-      <div class="eng-lines" id="engLines"></div>
-    </section>
     <section class="editor" id="editor" hidden aria-label="Rozestavení pozice">
       <p class="note">Vyber figuru a klepej na pole, kam ji chceš postavit. Klepnutí na stejnou figuru ji zase odebere.</p>
       <div class="palette" id="palette"></div>
@@ -473,7 +473,6 @@ textarea.fen { min-height: 0; font-size: 14px; word-break: break-all; }
         <button class="btn primary" id="edDone" type="button">Hotovo, začít partii</button>
       </div>
     </section>
-    <p class="cur-comment" id="curComment" hidden></p>
     <div class="nav">
       <button class="btn" id="navStart" type="button" aria-label="Na začátek"><svg viewBox="0 0 24 24" width="24" height="24" aria-hidden="true" fill="currentColor"><rect x="5" y="5" width="2.5" height="14" rx="1"/><path d="M19 5.8v12.4a1 1 0 0 1-1.6.8L9.3 12.8a1 1 0 0 1 0-1.6l8.1-6.2a1 1 0 0 1 1.6.8z"/></svg></button>
       <button class="btn" id="navPrev" type="button" aria-label="O tah zpět"><svg viewBox="0 0 24 24" width="24" height="24" aria-hidden="true" fill="currentColor"><path d="M16 5.8v12.4a1 1 0 0 1-1.6.8L6.3 12.8a1 1 0 0 1 0-1.6l8.1-6.2a1 1 0 0 1 1.6.8z"/></svg></button>
@@ -482,6 +481,16 @@ textarea.fen { min-height: 0; font-size: 14px; word-break: break-all; }
       <button class="btn" id="navEnd" type="button" aria-label="Na konec"><svg viewBox="0 0 24 24" width="24" height="24" aria-hidden="true" fill="currentColor"><rect x="16.5" y="5" width="2.5" height="14" rx="1"/><path d="M5 5.8v12.4a1 1 0 0 0 1.6.8l8.1-6.2a1 1 0 0 0 0-1.6L6.6 5A1 1 0 0 0 5 5.8z"/></svg></button>
     </div>
     <div class="strip" id="strip" hidden></div>
+    <p class="cur-comment" id="curComment" hidden></p>
+    <section class="engine" id="engineBox" hidden aria-label="Rozbor motorem Stockfish">
+      <div class="ev-bar" aria-hidden="true"><div class="ev-fill" id="evFill"></div></div>
+      <div class="eng-head">
+        <span class="ev" id="evText">…</span>
+        <span class="eng-info" id="engInfo" role="status"></span>
+        <button class="btn small" id="engCheck" type="button">Zkontrolovat partii</button>
+      </div>
+      <div class="eng-lines" id="engLines"></div>
+    </section>
   </div>
 
   <div class="col">
@@ -492,9 +501,15 @@ textarea.fen { min-height: 0; font-size: 14px; word-break: break-all; }
         <div class="actions">
           <button class="btn danger" id="undoLast" type="button">Smazat poslední tah</button>
         </div>
-        <div class="actions" id="varActions" hidden>
-          <button class="btn" id="promoteVar" type="button">Povýšit variantu</button>
-          <button class="btn danger" id="delFromHere" type="button">Smazat od tohoto tahu</button>
+        <div class="var-tools" id="varActions" hidden>
+          <span class="note">Varianty</span>
+          <div class="actions">
+            <button class="btn" id="promoteVar" type="button">Povýšit o úroveň</button>
+            <button class="btn" id="mainVar" type="button">Udělat hlavní linií</button>
+            <button class="btn danger" id="delVar" type="button">Smazat tuto variantu</button>
+            <button class="btn danger" id="delFromHere" type="button">Smazat od tohoto tahu</button>
+            <button class="btn danger" id="delAllVars" type="button">Smazat všechny varianty</button>
+          </div>
         </div>
       </div>
     </details>
@@ -697,7 +712,7 @@ textarea.fen { min-height: 0; font-size: 14px; word-break: break-all; }
     </div>
     <div class="pbody prose">
 
-        <p><strong>PGN editor</strong> <span class="ver-badge">verze 0.17</span></p>
+        <p><strong>PGN editor</strong> <span class="ver-badge">verze 0.18</span></p>
         <p>Jednoduchý editor pro zápis a úpravu šachových partií ve formátu PGN, určený hlavně pro telefon s Androidem. Aplikaci programuje Claude (umělá inteligence od společnosti Anthropic) ve spolupráci s Michalem Slivou, který určuje, co má aplikace umět a jak má vypadat.</p>
         <h3>Co aplikace umí</h3>
         <ul>
@@ -747,6 +762,14 @@ textarea.fen { min-height: 0; font-size: 14px; word-break: break-all; }
       <h2>Verze a změny</h2>
     </div>
     <div class="pbody log">
+        <section>
+          <div class="head"><span class="ver-badge">0.18</span><span class="date">1. 11. 2026</span></div>
+          <ul>
+            <li>Počítadlo tahů je v rámečku mezi šipkami, slovo Tah nad číslem, takže se vejde i u dlouhých partií.</li>
+            <li>Šipky pro listování jsou hned pod šachovnicí, rozbor motorem až pod nimi a má pevnou výšku. Při posunu o tah už nic neposkakuje.</li>
+            <li>Práce s variantami v Zápisu partie: Udělat hlavní linií, Smazat tuto variantu a Smazat všechny varianty (zůstane jen hlavní linie). Nabídka se ukáže, kdykoli partie varianty obsahuje.</li>
+          </ul>
+        </section>
         <section>
           <div class="head"><span class="ver-badge">0.17</span><span class="date">31. 10. 2026</span></div>
           <ul>
@@ -1404,7 +1427,9 @@ textarea.fen { min-height: 0; font-size: 14px; word-break: break-all; }
     const first = si.num;
     const cur = state.ply === 0 ? 0 : moveNumber(state.ply - 1) - first + 1;
     const total = state.moves.length === 0 ? 0 : moveNumber(state.moves.length - 1) - first + 1;
-    $('counter').textContent = 'Tah ' + cur + ' z ' + total;
+    $('counter').innerHTML = '<span class="cl">Tah</span><span class="cv"></span>';
+    $('counter').lastChild.textContent = cur + ' z ' + total;
+    $('counter').setAttribute('aria-label', 'Tah ' + cur + ' z ' + total);
     renderStrip();
     renderSums();
     $('navStart').disabled = $('navPrev').disabled = state.ply === 0;
@@ -1419,8 +1444,13 @@ textarea.fen { min-height: 0; font-size: 14px; word-break: break-all; }
     $('commentBtn').classList.toggle('primary', !!txt);
     $('nagBtn').disabled = state.ply === 0;
     $('nagBtn').classList.toggle('primary', (node.n || []).some(x => x >= 1 && x <= 6));
-    $('promoteVar').disabled = !state.path.slice(0, state.ply).some(x => x > 0);
+    const inVar = state.path.slice(0, state.ply).some(x => x > 0);
+    const nVars = countVariants(state.root);
+    $('varActions').hidden = !(opts.variants || nVars);
+    $('promoteVar').disabled = $('mainVar').disabled = $('delVar').disabled = !inVar;
     $('delFromHere').disabled = state.ply === 0;
+    $('delAllVars').disabled = !nVars;
+    $('delAllVars').textContent = 'Smazat všechny varianty' + (nVars ? ' (' + nVars + ')' : '');
   }
 
   /* ---------- Hlavička ---------- */
@@ -2099,6 +2129,57 @@ textarea.fen { min-height: 0; font-size: 14px; word-break: break-all; }
     state.path[i] = 0;
     rebuildLine(); renderAll();
   });
+  // Počet variant (vedlejších pokračování) v celé partii
+  function countVariants(node) {
+    let n = Math.max(0, node.ch.length - 1);
+    node.ch.forEach(c => { n += countVariants(c); });
+    return n;
+  }
+  // Varianta se celá stane hlavní linií (povýší se na všech úrovních)
+  $('mainVar').addEventListener('click', () => {
+    if (!state.path.slice(0, state.ply).some(x => x > 0)) return;
+    snapshot();
+    for (let i = 0; i < state.ply; i++) {
+      if (state.path[i] > 0) {
+        const ch = LINE[i].ch;
+        const [x] = ch.splice(state.path[i], 1);
+        ch.unshift(x);
+        state.path[i] = 0;
+      }
+    }
+    rebuildLine(); renderAll();
+    toast('Varianta je teď hlavní linií.');
+  });
+  // Smaže variantu, ve které je zobrazený tah, od místa, kde se odbočuje
+  $('delVar').addEventListener('click', async () => {
+    let i = state.ply - 1;
+    while (i >= 0 && !(state.path[i] > 0)) i--;
+    if (i < 0) return;
+    const first = LINE[i + 1];
+    const ok = await askConfirm('Smazat variantu?', 'Smaže se varianta od tahu ' + moveNumber(i) + (isWhiteMove(i) ? '. ' : '... ') + show(first.s) + ' do konce, včetně jejích podvariant.', 'Smazat');
+    if (!ok) return;
+    snapshot();
+    LINE[i].ch.splice(state.path[i], 1);
+    state.path = state.path.slice(0, i);
+    state.ply = i;
+    selected = null; rebuildLine(); renderAll();
+  });
+  // Ponechá jen hlavní linii celé partie
+  $('delAllVars').addEventListener('click', async () => {
+    const n = countVariants(state.root);
+    if (!n) return;
+    const ok = await askConfirm('Smazat všechny varianty?', 'Z partie se smaže ' + n + ' ' + plural(n, 'varianta', 'varianty', 'variant') + ' a zůstane jen hlavní linie. Komentáře a hodnocení hlavní linie zůstanou.' + (opts.undo ? ' Omyl jde vrátit tlačítkem ↶.' : ''), 'Smazat');
+    if (!ok) return;
+    snapshot();
+    // zobrazená pozice: zůstane, pokud je v hlavní linii, jinak se přejde na místo odbočení
+    let k = 0;
+    while (k < state.ply && state.path[k] === 0) k++;
+    let node = state.root;
+    while (node.ch.length) { node.ch = [node.ch[0]]; node = node.ch[0]; }
+    state.path = []; state.ply = k;
+    selected = null; rebuildLine(); renderAll();
+    toast('Varianty smazány, zůstala hlavní linie.');
+  });
   $('delFromHere').addEventListener('click', async () => {
     const k = state.ply;
     if (k === 0) return;
@@ -2366,6 +2447,12 @@ textarea.fen { min-height: 0; font-size: 14px; word-break: break-all; }
     a.setAttribute('x2', x1 + (x2 - x1) * k); a.setAttribute('y2', y1 + (y2 - y1) * k);
     a.setAttribute('visibility', 'visible');
   }
+  function emptyEngLine() {
+    const e = document.createElement('div'); e.className = 'eng-line empty';
+    const a = document.createElement('span'); a.className = 'sc';
+    const b = document.createElement('span'); b.className = 'pv';
+    e.append(a, b); return e;
+  }
   function renderEngine(msg) {
     drawArrow();
     const box = $('engineBox');
@@ -2380,6 +2467,7 @@ textarea.fen { min-height: 0; font-size: 14px; word-break: break-all; }
       $('engInfo').textContent = d ? 'Ověřuji podezřelé tahy: ' + (d.k + 1) + ' z ' + d.n + '.' : 'Kontroluji partii: pozice ' + (eng.checking.i + 1) + ' z ' + eng.checking.n + '.';
       $('evFill').style.width = (d ? 100 * d.k / d.n : 100 * eng.checking.i / eng.checking.n) + '%';
       linesEl.innerHTML = '';
+      for (let li = 0; li < opts.engLines; li++) linesEl.appendChild(emptyEngLine());
       return;
     }
     const best = eng.lines[0];
@@ -2388,6 +2476,7 @@ textarea.fen { min-height: 0; font-size: 14px; word-break: break-all; }
       $('engInfo').textContent = msg || eng.error || (eng.ready ? 'Počítám…' : 'Spouštím Stockfish…');
       $('evFill').style.width = '50%';
       linesEl.innerHTML = '';
+      for (let li = 0; li < opts.engLines; li++) linesEl.appendChild(emptyEngLine());
       return;
     }
     const sc = whiteScore(best);
@@ -2395,10 +2484,10 @@ textarea.fen { min-height: 0; font-size: 14px; word-break: break-all; }
     $('evFill').style.width = whiteShare(sc) + '%';
     $('engInfo').textContent = 'Stockfish, hloubka ' + eng.depth + (eng.liveDone ? '' : '…');
     linesEl.innerHTML = '';
-    eng.lines.slice(0, opts.engLines).forEach(line => {
-      if (!line) return;
-      const sans = pvToSan(eng.liveFen, line.pv, 10);
-      if (!sans.length) return;
+    for (let li = 0; li < opts.engLines; li++) {
+      const line = eng.lines[li];
+      const sans = line ? pvToSan(eng.liveFen, line.pv, 10) : [];
+      if (!sans.length) { linesEl.appendChild(emptyEngLine()); continue; }
       const b = document.createElement('button');
       b.type = 'button';
       b.className = 'eng-line';
@@ -2408,7 +2497,7 @@ textarea.fen { min-height: 0; font-size: 14px; word-break: break-all; }
       b.append(s1, s2);
       b.addEventListener('click', () => insertLine(eng.liveFen, line.pv));
       linesEl.appendChild(b);
-    });
+    }
   }
   // Vloží pokračování motoru do zápisu; nic nepřepíše, jinak než stávající tahy jde jako varianta
   function insertLine(fen, pv) {
@@ -2569,7 +2658,7 @@ textarea.fen { min-height: 0; font-size: 14px; word-break: break-all; }
     $('nagBtn').hidden = !opts.nags;
     $('optNags').checked = opts.nags;
     $('optVariants').checked = opts.variants;
-    $('varActions').hidden = !opts.variants;
+    if (state) renderCounter();
     $('optPrefill').checked = opts.prefill;
     $('prefillOpts').hidden = !opts.prefill;
     $('prePEvent').checked = opts.preEvent;
