@@ -17,6 +17,7 @@ import android.speech.RecognitionListener;
 import android.speech.RecognizerIntent;
 import android.speech.SpeechRecognizer;
 import android.util.Base64;
+import android.provider.MediaStore;
 import android.provider.OpenableColumns;
 import android.webkit.JavascriptInterface;
 import android.webkit.ValueCallback;
@@ -67,9 +68,11 @@ public class MainActivity extends Activity {
     private static final int REQ_OPEN = 1;
     private static final int REQ_SAVE = 2;
     private static final int REQ_MIC = 3;
+    private static final int REQ_CAMERA = 4;
 
     private WebView web;
     private ValueCallback<Uri[]> fileCallback;
+    private Uri cameraUri;
     private byte[] pendingSaveBytes;
     private SpeechRecognizer recognizer;
     private boolean pageLoaded;
@@ -133,14 +136,38 @@ public class MainActivity extends Activity {
             public boolean onShowFileChooser(WebView view, ValueCallback<Uri[]> callback, FileChooserParams params) {
                 if (fileCallback != null) fileCallback.onReceiveValue(null);
                 fileCallback = callback;
-                Intent i = new Intent(Intent.ACTION_OPEN_DOCUMENT);
-                i.addCategory(Intent.CATEGORY_OPENABLE);
-                i.setType("*/*"); // soubory .pgn nemají v Androidu vlastní typ, proto nabízíme vše
+                boolean images = false;
+                for (String t : params.getAcceptTypes()) if (t != null && t.startsWith("image/")) images = true;
                 try {
+                    if (images && params.isCaptureEnabled()) {
+                        // Partie z fotky: rovnou fotoaparát, fotka se uloží do mezipaměti aplikace
+                        File dir = new File(getCacheDir(), "foto");
+                        if (!dir.isDirectory() && !dir.mkdirs()) throw new IOException("nelze připravit fotku");
+                        File[] old = dir.listFiles();
+                        if (old != null) for (File f : old) f.delete();
+                        File file = new File(dir, "partiar-" + System.currentTimeMillis() + ".jpg");
+                        cameraUri = FileProvider.getUriForFile(MainActivity.this, getPackageName() + ".files", file);
+                        Intent cam = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
+                        cam.putExtra(MediaStore.EXTRA_OUTPUT, cameraUri);
+                        cam.addFlags(Intent.FLAG_GRANT_WRITE_URI_PERMISSION | Intent.FLAG_GRANT_READ_URI_PERMISSION);
+                        startActivityForResult(cam, REQ_CAMERA);
+                        return true;
+                    }
+                    Intent i = new Intent(Intent.ACTION_OPEN_DOCUMENT);
+                    i.addCategory(Intent.CATEGORY_OPENABLE);
+                    if (images) {
+                        // Partie z fotky: fotky a PDF, i víc najednou
+                        i.setType("*/*");
+                        i.putExtra(Intent.EXTRA_MIME_TYPES, new String[]{"image/*", "application/pdf"});
+                        i.putExtra(Intent.EXTRA_ALLOW_MULTIPLE, params.getMode() == FileChooserParams.MODE_OPEN_MULTIPLE);
+                    } else {
+                        i.setType("*/*"); // soubory .pgn nemají v Androidu vlastní typ, proto nabízíme vše
+                    }
                     startActivityForResult(i, REQ_OPEN);
                     return true;
-                } catch (ActivityNotFoundException e) {
+                } catch (ActivityNotFoundException | IOException | IllegalArgumentException e) {
                     fileCallback = null;
+                    cameraUri = null;
                     return false;
                 }
             }
@@ -335,8 +362,19 @@ public class MainActivity extends Activity {
         Uri uri = (resultCode == RESULT_OK && data != null) ? data.getData() : null;
 
         if (requestCode == REQ_OPEN) {
-            if (fileCallback != null) fileCallback.onReceiveValue(uri != null ? new Uri[]{uri} : null);
+            Uri[] result = null;
+            if (resultCode == RESULT_OK && data != null && data.getClipData() != null && data.getClipData().getItemCount() > 0) {
+                ClipData clip = data.getClipData();
+                result = new Uri[clip.getItemCount()];
+                for (int k = 0; k < result.length; k++) result[k] = clip.getItemAt(k).getUri();
+            } else if (uri != null) result = new Uri[]{uri};
+            if (fileCallback != null) fileCallback.onReceiveValue(result);
             fileCallback = null;
+
+        } else if (requestCode == REQ_CAMERA) {
+            if (fileCallback != null) fileCallback.onReceiveValue(resultCode == RESULT_OK && cameraUri != null ? new Uri[]{cameraUri} : null);
+            fileCallback = null;
+            cameraUri = null;
 
         } else if (requestCode == REQ_SAVE) {
             byte[] bytes = pendingSaveBytes;

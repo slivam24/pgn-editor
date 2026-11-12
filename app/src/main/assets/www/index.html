@@ -268,6 +268,25 @@ pre.lic { margin: 0; max-height: 60vh; overflow: auto; white-space: pre-wrap; fo
 .pbody { flex: 1; overflow-y: auto; overscroll-behavior: contain; padding: 14px 16px 28px; display: grid; gap: 12px; align-content: start; }
 .pfoot { flex: none; display: flex; gap: 8px; padding: 10px 16px max(12px, env(safe-area-inset-bottom, 0px)); border-top: 1px solid var(--line); background: var(--bg); }
 .pfoot .btn { flex: 1; }
+/* Partie z fotky partiáře */
+.drawer.wide { width: min(100vw, 720px); }
+.scan-thumbs { display: flex; gap: 8px; flex-wrap: wrap; }
+.scan-thumb { width: 92px; border: 1px solid var(--line); border-radius: 8px; overflow: hidden; background: var(--surface); }
+.scan-thumb img { display: block; width: 100%; height: 116px; object-fit: cover; cursor: zoom-in; }
+.scan-thumb .pdf { height: 116px; display: flex; align-items: center; justify-content: center; font-weight: 600; color: var(--muted); }
+.scan-thumb .tools { display: flex; justify-content: space-between; padding: 3px; }
+.scan-thumb .tools button { font: inherit; font-size: 13px; border: 1px solid var(--line); background: var(--bg); color: var(--fg); border-radius: 5px; padding: 1px 8px; cursor: pointer; min-height: 30px; }
+.scan-status { margin: 0; font-size: 14px; min-height: 1.3em; }
+.scan-status.err { color: var(--warn); }
+.scan-spin { display: inline-block; width: 14px; height: 14px; border: 2px solid var(--line); border-top-color: var(--accent); border-radius: 50%; vertical-align: -2px; margin-right: 6px; }
+@media (prefers-reduced-motion: no-preference) { .scan-spin { animation: scanspin 1s linear infinite; } }
+@keyframes scanspin { to { transform: rotate(360deg); } }
+.scan-key { display: grid; gap: 8px; background: var(--surface); border: 1px solid var(--line); border-radius: 10px; padding: 12px; }
+.photo-view { position: fixed; inset: 0; z-index: 60; background: rgba(0,0,0,.9); display: flex; flex-direction: column; }
+.photo-view .pv-bar { display: flex; gap: 8px; justify-content: flex-end; padding: max(8px, env(safe-area-inset-top, 0px)) 10px 8px; }
+.photo-view .pv-scroll { flex: 1; overflow: auto; }
+.photo-view img { display: block; width: 100%; height: auto; }
+.photo-view.zoom img { width: 250%; max-width: none; }
 .phead .count { min-width: 24px; padding: 1px 7px; border-radius: 11px; background: var(--accent-soft); font-size: 13px; text-align: center; }
 
 /* Seznam partií */
@@ -543,6 +562,14 @@ textarea.fen { min-height: 0; font-size: 14px; word-break: break-all; }
   </div>
 </div>
 
+<div class="photo-view" id="photoView" hidden role="dialog" aria-label="Fotka partiáře">
+  <div class="pv-bar">
+    <button class="btn small" id="pvZoom" type="button">Přiblížit</button>
+    <button class="btn small" id="pvNext" type="button" hidden>Další strana</button>
+    <button class="btn small" id="pvClose" type="button">Zavřít</button>
+  </div>
+  <div class="pv-scroll"><img id="pvImg" alt="Fotka partiáře"></div>
+</div>
 <div class="drawer-bg" id="drawerBg" hidden></div>
 <aside class="drawer" id="drawer" aria-label="Menu">
   <section class="dpage main" id="pgMain">
@@ -559,6 +586,7 @@ textarea.fen { min-height: 0; font-size: 14px; word-break: break-all; }
       <button class="mi" type="button" id="copyPgn"><svg class="mi-ic" viewBox="0 0 24 24" width="22" height="22" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="8" y="8" width="12" height="12" rx="2"/><path d="M16 8V6a2 2 0 0 0-2-2H6a2 2 0 0 0-2 2v8a2 2 0 0 0 2 2h2"/></svg><span class="mi-l">Kopírovat PGN</span></button>
       <button class="mi" type="button" data-page="pgText"><svg class="mi-ic" viewBox="0 0 24 24" width="22" height="22" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M14 3H7a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2V8z"/><path d="M14 3v5h5M9 13h6M9 17h6"/></svg><span class="mi-l">PGN text</span><svg class="mi-chev" viewBox="0 0 24 24" width="18" height="18" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 6l6 6-6 6"/></svg></button>
       <div class="msep"></div>
+      <button class="mi" type="button" data-page="pgScan"><svg class="mi-ic" viewBox="0 0 24 24" width="22" height="22" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M4 8h3l1.5-2h7L17 8h3a1 1 0 0 1 1 1v9a1 1 0 0 1-1 1H4a1 1 0 0 1-1-1V9a1 1 0 0 1 1-1z"/><circle cx="12" cy="13" r="3.5"/></svg><span class="mi-l">Partie z fotky partiáře</span><svg class="mi-chev" viewBox="0 0 24 24" width="18" height="18" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 6l6 6-6 6"/></svg></button>
       <button class="mi" type="button" data-page="pgImage"><svg class="mi-ic" viewBox="0 0 24 24" width="22" height="22" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="16" rx="2"/><circle cx="9" cy="10" r="2"/><path d="M21 16l-5-5-9 9"/></svg><span class="mi-l">Obrázek pozice</span><svg class="mi-chev" viewBox="0 0 24 24" width="18" height="18" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 6l6 6-6 6"/></svg></button>
       <button class="mi" type="button" data-page="pgFen"><svg class="mi-ic" viewBox="0 0 24 24" width="22" height="22" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="4" y="4" width="16" height="16" rx="1.5"/><path d="M4 12h16M12 4v16"/><path d="M4 8h4v4H4zM12 12h4v4h-4zM8 4v4M16 8h4v4M8 16h4v4"/></svg><span class="mi-l">Nová partie z pozice</span><svg class="mi-chev" viewBox="0 0 24 24" width="18" height="18" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 6l6 6-6 6"/></svg></button>
       <button class="mi danger" type="button" id="newGame"><svg class="mi-ic" viewBox="0 0 24 24" width="22" height="22" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M14 3H7a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2V8z"/><path d="M14 3v5h5M12 11v6M9 14h6"/></svg><span class="mi-l">Nový soubor</span></button>
@@ -598,6 +626,38 @@ textarea.fen { min-height: 0; font-size: 14px; word-break: break-all; }
         <textarea id="pgnText" spellcheck="false" aria-label="PGN text"></textarea>
         <div class="actions"><button class="btn" id="loadText" type="button">Načíst vložený text</button></div>
       
+    </div>
+  </section>
+  <section class="dpage" id="pgScan" hidden>
+    <div class="phead">
+      <button class="icon-btn plain" type="button" data-back aria-label="Zpět"><svg viewBox="0 0 24 24" width="22" height="22" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M15 6l-6 6 6 6"/></svg></button>
+      <h2>Partie z fotky partiáře</h2>
+    </div>
+    <div class="pbody">
+        <p class="note">Vyfoť zapsaný partiář. Claude (umělá inteligence od Anthropicu) ho přečte, aplikace ověří každý tah podle pravidel a nejistá místa ukáže ke kontrole. Potřebuje internet a vlastní klíč k Claude API.</p>
+        <div class="scan-key" id="scanKeyBox" hidden>
+          <label class="field">Klíč k Claude API<input id="scanKeyIn" type="password" autocomplete="off" spellcheck="false" placeholder="sk-ant-…"></label>
+          <p class="note">Klíč získáš na platform.claude.com (Settings, API keys). Zůstává jen v telefonu, změnit ho jde v Nastavení.</p>
+        </div>
+        <div class="actions">
+          <button class="btn" id="scanCamera" type="button">Vyfotit</button>
+          <button class="btn" id="scanPick" type="button">Vybrat fotku nebo PDF</button>
+        </div>
+        <input type="file" id="scanCameraIn" accept="image/*" capture="environment" hidden>
+        <input type="file" id="scanFileIn" accept="image/*,application/pdf" multiple hidden>
+        <div class="scan-thumbs" id="scanThumbs"></div>
+        <p class="note" id="scanTip">Celý list rovně shora, ostře a bez stínu. Nejvýš 4 strany (třeba obě strany partiáře).</p>
+        <div class="actions">
+          <button class="btn primary" id="scanRead" type="button" disabled>Přečíst partiář</button>
+          <button class="btn" id="scanCancel" type="button" hidden>Zrušit</button>
+        </div>
+        <p class="scan-status" id="scanStatus" role="status"></p>
+        <div id="scanReview"></div>
+        <label class="srow" id="scanMarkRow" hidden><span class="st"><b>Označit nejisté tahy komentářem</b><small>Do partie se k nim zapíše, co bylo na papíře.</small></span><input type="checkbox" class="tgl small" id="scanMark"></label>
+    </div>
+    <div class="pfoot" id="scanFoot" hidden>
+      <button class="btn" id="scanPhotoBtn" type="button">Fotka</button>
+      <button class="btn primary" id="scanInsert" type="button">Vložit do souboru</button>
     </div>
   </section>
   <section class="dpage" id="pgImage" hidden>
@@ -673,6 +733,11 @@ textarea.fen { min-height: 0; font-size: 14px; word-break: break-all; }
           </div>
         </div>
         <div class="sgroup">
+          <h3>Partie z fotky partiáře</h3>
+          <label class="srow col"><span class="st"><b>Klíč k Claude API</b><small>Potřebný pro čtení partiářů z fotky. Získáš ho na platform.claude.com. Zůstává jen v telefonu, fotka partiáře se posílá ke čtení společnosti Anthropic. Přečtení jednoho partiáře stojí obvykle 0,10 až 0,30 USD.</small></span>
+            <input id="setClaudeKey" type="password" autocomplete="off" spellcheck="false" placeholder="sk-ant-…"></label>
+        </div>
+        <div class="sgroup">
           <h3>Nová partie v souboru</h3>
           <label class="srow"><span class="st"><b>Předvyplnit hlavičku</b><small>Podle předchozí partie v souboru.</small></span><input type="checkbox" class="tgl" id="optPrefill"></label>
           <div class="ssub" id="prefillOpts" hidden>
@@ -712,7 +777,7 @@ textarea.fen { min-height: 0; font-size: 14px; word-break: break-all; }
     </div>
     <div class="pbody prose">
 
-        <p><strong>PGN editor</strong> <span class="ver-badge">verze 0.18</span></p>
+        <p><strong>PGN editor</strong> <span class="ver-badge">verze 0.19</span></p>
         <p>Jednoduchý editor pro zápis a úpravu šachových partií ve formátu PGN, určený hlavně pro telefon s Androidem. Aplikaci programuje Claude (umělá inteligence od společnosti Anthropic) ve spolupráci s Michalem Slivou, který určuje, co má aplikace umět a jak má vypadat.</p>
         <h3>Co aplikace umí</h3>
         <ul>
@@ -728,7 +793,8 @@ textarea.fen { min-height: 0; font-size: 14px; word-break: break-all; }
           <li>Volitelně šachový motor Stockfish: rozbor pozice s hodnocením, nejlepší pokračování s vložením do zápisu a kontrola celé partie. Funguje bez internetu.</li>
           <li>Nová partie z libovolné pozice: rozestavením figur na šachovnici, nebo vložením FEN. FEN zobrazené pozice jde zkopírovat.</li>
           <li>Odeslání partie přes sdílení Androidu, nebo rovnou e-mailem na adresu z Nastavení. PGN je v textu i jako příloha. V Nastavení lze zapnout ikonu pro rychlé odeslání v horní liště.</li>
-          <li>Funguje bez připojení k internetu.</li>
+          <li>Partie z fotky partiáře: Claude přečte zapsaný partiář, aplikace tahy ověří podle pravidel a nejistá místa nabídne ke kontrole. Jako jediná funkce potřebuje internet a vlastní klíč k Claude API.</li>
+          <li>Funguje bez připojení k internetu (kromě čtení partiáře z fotky).</li>
           <li>Potvrzení před smazáním nebo přepsáním partie.</li>
           <li>Volitelně (zapíná se v Nastavení): tlačítko ↶ pro vrácení posledních akcí a komentáře k tahům tlačítkem ✎.</li>
           <li>Rozpracovaná partie se pamatuje i po zavření aplikace.</li>
@@ -762,6 +828,14 @@ textarea.fen { min-height: 0; font-size: 14px; word-break: break-all; }
       <h2>Verze a změny</h2>
     </div>
     <div class="pbody log">
+        <section>
+          <div class="head"><span class="ver-badge">0.19</span><span class="date">12. 11. 2026</span></div>
+          <ul>
+            <li>Partie z fotky partiáře (menu): vyfoť nebo vyber fotku či PDF zapsaného partiáře, Claude ho přečte a aplikace ověří každý tah podle pravidel. Rukopisné nejasnosti (S a 5, b a 6, chybějící braní) se vyřeší podle toho, které tahy jsou v pozici možné.</li>
+            <li>Nejisté tahy jsou zvýrazněné. Klepnutím na tah se ukáže pozice před tahem, co je na papíře a možné tahy k výběru. Každá oprava znovu přepočítá zbytek partie. Fotku jde mezitím zobrazit a přiblížit.</li>
+            <li>Čtení potřebuje internet a vlastní klíč k Claude API (Nastavení). Ostatní funkce dál fungují bez internetu.</li>
+          </ul>
+        </section>
         <section>
           <div class="head"><span class="ver-badge">0.18</span><span class="date">1. 11. 2026</span></div>
           <ul>
@@ -946,6 +1020,7 @@ textarea.fen { min-height: 0; font-size: 14px; word-break: break-all; }
           <li><strong>chess.js 0.10.3</strong>, pravidla šachu. © Jeff Hlywa, licence BSD.</li>
           <li><strong>Figury cburnett</strong>, autor Colin M. L. Burnett, převzaté z projektu chessground (Lichess), licence GPL 3.</li>
           <li><strong>Písma IBM Plex Sans a IBM Plex Mono</strong>, © IBM Corp., licence SIL Open Font License 1.1.</li>
+          <li><strong>Anthropic TypeScript SDK 1.3.0</strong>, spojení s Claude API pro čtení partiářů. © Anthropic, PBC, licence Apache 2.0. Zdrojový kód: <a href="https://github.com/anthropics/anthropic-sdk-typescript">github.com/anthropics/anthropic-sdk-typescript</a></li>
           <li><strong>AndroidX Core</strong>, © The Android Open Source Project, licence Apache 2.0.</li>
         </ul>
         <h3>Texty licencí</h3>
@@ -2221,6 +2296,7 @@ textarea.fen { min-height: 0; font-size: 14px; word-break: break-all; }
   }
 
   window.androidBack = () => {
+    if (!$('photoView').hidden) { closePhoto(); return true; }
     if (voice.on && $('modal').hidden && $('chModal').hidden) { voiceStop(); $('voiceBar').hidden = true; return true; }
     if (editor && $('modal').hidden) { closeEditor(); return true; }
     if (!$('modal').hidden && $('modalCancel').hidden) { $('modalOk').click(); return true; }
@@ -2645,6 +2721,7 @@ textarea.fen { min-height: 0; font-size: 14px; word-break: break-all; }
     czech = e.target.checked;
     try { localStorage.setItem('pgn-czech', czech ? '1' : '0'); } catch (err) {}
     renderMoves();
+    if (scan.review) scan.review.setCzech(czech);
   });
 
   /* ---------- Volitelné funkce ---------- */
@@ -2899,6 +2976,164 @@ textarea.fen { min-height: 0; font-size: 14px; word-break: break-all; }
 
   $('sendIcon').addEventListener('click', () => $('sendMail').click());
 
+  /* ---------- Partie z fotky partiáře ---------- */
+  // Čtení obstará Claude API (scoresheet-reader.js), kontrolu tahů podle pravidel scoresheet-core.js
+  // a opravy scoresheet-review.js. Knihovny se načtou až při prvním otevření stránky.
+  const CLAUDE_KEY = 'pgn-claude-key';
+  const scan = { files: [], libs: null, review: null, ctrl: null, read: false, photo: 0 };
+  function claudeKey() { try { return localStorage.getItem(CLAUDE_KEY) || ''; } catch (e) { return ''; } }
+  function setClaudeKey(v) {
+    v = String(v || '').trim();
+    try { if (v) localStorage.setItem(CLAUDE_KEY, v); else localStorage.removeItem(CLAUDE_KEY); } catch (e) {}
+    $('setClaudeKey').value = v;
+  }
+  $('setClaudeKey').value = claudeKey();
+  $('setClaudeKey').addEventListener('change', e => setClaudeKey(e.target.value));
+  $('scanKeyIn').addEventListener('change', e => setClaudeKey(e.target.value));
+
+  function loadScanLibs() {
+    if (!scan.libs) {
+      const load = src => new Promise((resolve, reject) => {
+        const sc = document.createElement('script');
+        sc.src = src; sc.onload = resolve; sc.onerror = () => reject(new Error('Nepodařilo se načíst ' + src));
+        document.head.append(sc);
+      });
+      scan.libs = load('anthropic-sdk.js').then(() => load('scoresheet-core.js')).then(() => load('scoresheet-reader.js')).then(() => load('scoresheet-review.js'))
+        .catch(e => { scan.libs = null; throw e; });
+    }
+    return scan.libs;
+  }
+  function scanStatus(text, kind) {
+    const s = $('scanStatus');
+    s.textContent = '';
+    s.className = 'scan-status' + (kind === 'err' ? ' err' : '');
+    if (kind === 'busy') s.append(Object.assign(document.createElement('span'), { className: 'scan-spin' }));
+    s.append(text || '');
+  }
+  function scanOpened() {
+    $('scanKeyBox').hidden = !!claudeKey();
+    $('scanKeyIn').value = '';
+    loadScanLibs().catch(e => scanStatus(e.message, 'err'));
+  }
+  function renderScanThumbs() {
+    const box = $('scanThumbs');
+    box.textContent = '';
+    scan.files.forEach((f, i) => {
+      const t = document.createElement('div');
+      t.className = 'scan-thumb';
+      if (f.kind === 'image') {
+        const img = document.createElement('img');
+        img.src = f.preview; img.alt = 'Strana ' + (i + 1);
+        img.addEventListener('click', () => openPhoto(i));
+        t.append(img);
+      } else t.append(Object.assign(document.createElement('div'), { className: 'pdf', textContent: 'PDF' }));
+      const tools = document.createElement('div');
+      tools.className = 'tools';
+      const btn = (txt, label, fn) => { const b = document.createElement('button'); b.type = 'button'; b.textContent = txt; b.setAttribute('aria-label', label); b.title = label; b.addEventListener('click', fn); return b; };
+      if (f.kind === 'image') tools.append(btn('↻', 'Otočit stranu ' + (i + 1), async () => { scan.files[i] = await ScoresheetReader.rotateImage(scan.files[i]); renderScanThumbs(); }));
+      else tools.append(document.createElement('span'));
+      tools.append(btn('✕', 'Odebrat stranu ' + (i + 1), () => { scan.files.splice(i, 1); renderScanThumbs(); }));
+      t.append(tools);
+      box.append(t);
+    });
+    $('scanRead').disabled = !scan.files.length || !!scan.ctrl;
+    $('scanTip').hidden = scan.files.length > 0;
+  }
+  async function addScanFiles(list) {
+    try { await loadScanLibs(); } catch (e) { scanStatus(e.message, 'err'); return; }
+    for (const f of list) {
+      if (scan.files.length >= ScoresheetReader.MAX_FILES) { scanStatus('Najednou jde poslat nejvýš ' + ScoresheetReader.MAX_FILES + ' strany.', 'err'); break; }
+      try { scan.files.push(await ScoresheetReader.prepareFile(f)); scanStatus(''); }
+      catch (e) { scanStatus(e.message, 'err'); }
+    }
+    renderScanThumbs();
+  }
+  $('scanCamera').addEventListener('click', () => $('scanCameraIn').click());
+  $('scanPick').addEventListener('click', () => $('scanFileIn').click());
+  ['scanCameraIn', 'scanFileIn'].forEach(id => $(id).addEventListener('change', e => { addScanFiles([...(e.target.files || [])]); e.target.value = ''; }));
+
+  $('scanRead').addEventListener('click', async () => {
+    const typed = $('scanKeyIn').value.trim();
+    if (typed) setClaudeKey(typed);
+    const apiKey = claudeKey();
+    if (!apiKey) { $('scanKeyBox').hidden = false; scanStatus('Nejdřív vlož klíč k Claude API.', 'err'); $('scanKeyIn').focus(); return; }
+    if (scan.read && !(await askConfirm('Přečíst znovu?', 'Dosavadní kontrola a opravy přečtené partie se zahodí.', 'Přečíst'))) return;
+    try { await loadScanLibs(); } catch (e) { scanStatus(e.message, 'err'); return; }
+    scan.ctrl = new AbortController();
+    $('scanRead').disabled = true; $('scanCancel').hidden = false;
+    const t0 = Date.now();
+    let last = 'Odesílám…';
+    const timer = setInterval(() => scanStatus(last + ' ' + Math.round((Date.now() - t0) / 1000) + ' s', 'busy'), 1000);
+    scanStatus(last, 'busy');
+    try {
+      const r = await ScoresheetReader.read({ apiKey, files: scan.files, signal: scan.ctrl.signal, onProgress: t => { last = t; scanStatus(t + ' ' + Math.round((Date.now() - t0) / 1000) + ' s', 'busy'); } });
+      if (!scan.review) scan.review = ScoresheetReview.create($('scanReview'), { Chess, czech });
+      scan.review.load(r.data);
+      scan.read = true;
+      $('scanFoot').hidden = false; $('scanMarkRow').hidden = false;
+      $('scanPhotoBtn').hidden = !scan.files.some(f => f.kind === 'image');
+      $('scanKeyBox').hidden = true;
+      const cost = ScoresheetReader.estimateCost(r.usage);
+      scanStatus('Přečteno za ' + Math.round((Date.now() - t0) / 1000) + ' s' + (cost != null ? ', cena asi ' + cost.toFixed(2).replace('.', ',') + ' USD' : '') + '.');
+    } catch (e) {
+      scanStatus(e.message, 'err');
+      if (/klíč/i.test(e.message)) $('scanKeyBox').hidden = false;
+    } finally {
+      clearInterval(timer);
+      scan.ctrl = null;
+      $('scanCancel').hidden = true;
+      renderScanThumbs();
+    }
+  });
+  $('scanCancel').addEventListener('click', () => { if (scan.ctrl) scan.ctrl.abort(); });
+
+  $('scanInsert').addEventListener('click', async () => {
+    if (!scan.review) return;
+    const st = scan.review.getStats();
+    if (!st || !st.done) { scanStatus('Zatím není co vložit, oprav první tah.', 'err'); return; }
+    if (st.stopped >= 0 || st.flagged) {
+      const why = st.stopped >= 0
+        ? 'Přepis se zastavil, vloží se jen prvních ' + st.done + ' ' + plural(st.done, 'půltah', 'půltahy', 'půltahů') + '.'
+        : st.flagged + ' ' + plural(st.flagged, 'tah zůstává', 'tahy zůstávají', 'tahů zůstává') + ' neověřen' + (st.flagged === 1 ? 'ý' : 'é') + '.';
+      if (!(await askConfirm('Vložit partii?', why + ' Opravit je půjde i později přímo v editoru.', 'Vložit'))) return;
+    }
+    const r = parseFile(scan.review.getPgn({ markUncertain: $('scanMark').checked }));
+    if (r.error || !r.games.length) { scanStatus('Partii se nepodařilo vložit. ' + (r.error || ''), 'err'); return; }
+    const g = r.games[0];
+    snapshot();
+    const flipped = state ? state.flipped : false;
+    if (isFileEmpty()) { FILE.games = [g]; useGame(0, flipped); }
+    else if (isEmptyGame(state)) { FILE.games[FILE.cur] = g; useGame(FILE.cur, flipped); } // prázdnou partii nahradí
+    else { FILE.games.push(g); useGame(FILE.games.length - 1, flipped); }
+    ['White', 'Black'].forEach(t => rememberPlayer(g.headers[t]));
+    fillTags(); renderAll();
+    setDrawer(false);
+    showMsg('Partie z partiáře je vložená' + (FILE.games.length > 1 ? ' jako ' + FILE.games.length + '. partie v souboru' : '') + '.', false);
+  });
+
+  /* Prohlížení fotky partiáře */
+  function scanImages() { return scan.files.filter(f => f.kind === 'image'); }
+  function openPhoto(i) {
+    const imgs = scanImages();
+    if (!imgs.length) return;
+    scan.photo = Math.max(0, Math.min(i || 0, imgs.length - 1));
+    $('pvImg').src = imgs[scan.photo].preview;
+    $('pvNext').hidden = imgs.length < 2;
+    $('photoView').classList.remove('zoom');
+    $('pvZoom').textContent = 'Přiblížit';
+    $('photoView').hidden = false;
+    $('pvClose').focus();
+  }
+  function closePhoto() { $('photoView').hidden = true; }
+  $('scanPhotoBtn').addEventListener('click', () => openPhoto(scan.photo));
+  $('pvClose').addEventListener('click', closePhoto);
+  $('pvNext').addEventListener('click', () => openPhoto((scan.photo + 1) % scanImages().length));
+  $('pvZoom').addEventListener('click', () => {
+    const z = $('photoView').classList.toggle('zoom');
+    $('pvZoom').textContent = z ? 'Celá fotka' : 'Přiblížit';
+  });
+  $('photoView').addEventListener('keydown', e => { if (e.key === 'Escape') { e.stopPropagation(); closePhoto(); } });
+
   /* ---------- Menu ---------- */
   let curPage = 'pgMain';
   const PARENT = { pgChanges: 'pgAbout', pgLicense: 'pgAbout' };
@@ -2907,6 +3142,8 @@ textarea.fen { min-height: 0; font-size: 14px; word-break: break-all; }
     curPage = id;
     if (id === 'pgGames') { renderGames(true); }
     if (id === 'pgImage') { $('diagCaption').value = autoCaption(); refreshDiagram(); }
+    if (id === 'pgScan') scanOpened();
+    $('drawer').classList.toggle('wide', id === 'pgScan');
     const pb = $(id).querySelector('.pbody, .mlist');
     if (pb && id !== 'pgGames') pb.scrollTop = 0;
   }

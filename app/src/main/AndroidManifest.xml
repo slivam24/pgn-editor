@@ -1,6 +1,8 @@
 <?xml version="1.0" encoding="utf-8"?>
 <manifest xmlns:android="http://schemas.android.com/apk/res/android">
 
+    <!-- Čtení partiáře z fotky přes Claude API (jediná funkce, která potřebuje internet) -->
+    <uses-permission android:name="android.permission.INTERNET" />
     <!-- Hlasové zadávání tahů (volitelné, povolení se vyžádá až při prvním použití) -->
     <uses-permission android:name="android.permission.RECORD_AUDIO" />
     <!-- Krátká vibrace po tahu (volitelné) -->
