@@ -20,6 +20,15 @@ jobs:
 
       - uses: gradle/actions/setup-gradle@v4
 
+      # Když testy neprojdou, APK se nesestaví
+      - name: Testy PGN
+        run: node --test tests/pgn.test.js
+
+      - name: Testy v prohlížeči
+        run: |
+          cd tests && npm init -y >/dev/null && npm install --silent puppeteer-core@23 && cd ..
+          node tests/prohlizec.js
+
       - name: Sestavit
         run: |
           chmod +x gradlew

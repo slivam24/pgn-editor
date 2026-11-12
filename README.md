@@ -19,6 +19,19 @@ Aplikace je stejná webová stránka jako dosud (`app/src/main/assets/www/index.
 3. Nahraj změněné soubory do repozitáře stejně jako v kroku 4. GitHub postaví nové APK samo.
 4. Nové APK nainstaluj přes staré. Partie i nastavení zůstanou.
 
+## Testy
+
+Při každém sestavení na GitHubu se nejdřív spustí testy. Když neprojdou, APK se nevytvoří a v záložce **Actions** je vidět, který test selhal.
+
+- `tests/pgn.test.js` zkouší čtení a zápis PGN: varianty, komentáře, chybné partie, FEN.
+- `tests/prohlizec.js` otevře aplikaci v prohlížeči Chrome a zkouší ukládání rozpracovaného souboru do paměti telefonu, velký soubor a přechod ze starší verze.
+
+Ruční spuštění v počítači s nainstalovaným Node.js:
+
+```bash
+node --test tests/pgn.test.js
+```
+
 ## Podpisový klíč
 
 Soubor `app/pgn-editor.keystore` podepisuje aplikaci. Díky němu jde každá další verze nainstalovat přes předchozí. Neztrať ho a repozitář nech soukromý, heslo je přímo v `app/build.gradle`. Bez tohoto klíče by šlo novou verzi nainstalovat jen po odinstalování staré (a tím i ztrátě uložené partie a nastavení).
@@ -27,10 +40,12 @@ Soubor `app/pgn-editor.keystore` podepisuje aplikaci. Díky němu jde každá da
 
 | Soubor | K čemu je |
 |---|---|
-| `app/src/main/assets/www/index.html` | celá aplikace (vzhled i logika) |
+| `app/src/main/assets/www/index.html` | aplikace (vzhled i logika) |
+| `app/src/main/assets/www/pgn.js` | čtení a zápis PGN (tahy, varianty, komentáře, FEN) |
 | `app/src/main/assets/www/chess.js` | pravidla šachu (chess.js 0.10.3) |
 | `app/src/main/assets/www/fonts/` | písma IBM Plex |
 | `app/src/main/java/.../MainActivity.java` | obal: otevírání a ukládání souborů, schránka, e-mail, tlačítko Zpět |
+| `tests/` | automatické testy, běží při každém sestavení |
 | `app/build.gradle` | číslo verze, podpis |
 | `.github/workflows/build.yml` | návod pro GitHub, jak APK sestavit |
 
