@@ -7,6 +7,7 @@ import android.content.ClipData;
 import android.content.ClipboardManager;
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.content.UriPermission;
 import android.content.pm.PackageManager;
 import android.database.Cursor;
 import android.net.Uri;
@@ -17,6 +18,7 @@ import android.speech.RecognitionListener;
 import android.speech.RecognizerIntent;
 import android.speech.SpeechRecognizer;
 import android.util.Base64;
+import android.provider.DocumentsContract;
 import android.provider.OpenableColumns;
 import android.webkit.JavascriptInterface;
 import android.webkit.ValueCallback;
@@ -47,12 +49,13 @@ import java.nio.charset.CodingErrorAction;
 import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 /**
  * Celá aplikace je webová stránka v assets/www/index.html zobrazená ve WebView.
  * Tahle třída jen doplňuje to, co stránka sama v Androidu neumí:
- * výběr souboru, uložení .pgn, schránku, odeslání e-mailem a tlačítko Zpět.
+ * výběr souboru, uložení .pgn (i zpět do otevřeného souboru), schránku, odeslání e-mailem a tlačítko Zpět.
  * Stránka s ní mluví přes objekt window.Android.
  */
 public class MainActivity extends Activity {
@@ -73,7 +76,10 @@ public class MainActivity extends Activity {
     private byte[] pendingSaveBytes;
     private SpeechRecognizer recognizer;
     private boolean pageLoaded;
-    private String pendingOpenText, pendingOpenName;
+    private String pendingOpenText, pendingOpenName, pendingOpenUri;
+    // Adresa souboru vybraného přes Otevřít soubor, pokud do něj jde zapisovat. Stránka si ji vyzvedne
+    // (takeOpenedUri) a Uložit pak zapisuje zpět do téhož souboru.
+    private volatile String lastPickedUri;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -271,6 +277,12 @@ public class MainActivity extends Activity {
             if (uri == null) text = intent.getStringExtra(Intent.EXTRA_TEXT);
         } else return;
         String name = "";
+        // Ukládat zpět jde jen do souboru otevřeného s právem zápisu (Správce souborů), ne do přílohy e-mailu
+        String uriText = "";
+        if (Intent.ACTION_VIEW.equals(action) && uri != null && writable(uri, intent.getFlags())) {
+            keepAccess(uri, intent.getFlags());
+            uriText = uri.toString();
+        }
         try {
             if (uri != null) {
                 text = readText(uri);
@@ -287,12 +299,13 @@ public class MainActivity extends Activity {
         }
         pendingOpenText = text;
         pendingOpenName = name;
+        pendingOpenUri = uriText;
         deliverOpen();
     }
 
     private void deliverOpen() {
         if (!pageLoaded || pendingOpenText == null) return;
-        String js = "window.androidOpenText && window.androidOpenText(" + JSONObject.quote(pendingOpenText) + "," + JSONObject.quote(pendingOpenName == null ? "" : pendingOpenName) + ")";
+        String js = "window.androidOpenText && window.androidOpenText(" + JSONObject.quote(pendingOpenText) + "," + JSONObject.quote(pendingOpenName == null ? "" : pendingOpenName) + "," + JSONObject.quote(pendingOpenUri == null ? "" : pendingOpenUri) + ")";
         pendingOpenText = null;
         web.evaluateJavascript(js, null);
     }
@@ -335,28 +348,68 @@ public class MainActivity extends Activity {
         Uri uri = (resultCode == RESULT_OK && data != null) ? data.getData() : null;
 
         if (requestCode == REQ_OPEN) {
+            lastPickedUri = null;
+            if (uri != null && writable(uri, data.getFlags())) {
+                keepAccess(uri, data.getFlags());
+                lastPickedUri = uri.toString();
+            }
             if (fileCallback != null) fileCallback.onReceiveValue(uri != null ? new Uri[]{uri} : null);
             fileCallback = null;
 
         } else if (requestCode == REQ_SAVE) {
             byte[] bytes = pendingSaveBytes;
             pendingSaveBytes = null;
-            if (uri == null || bytes == null) { saved(false, ""); return; }
+            if (uri == null || bytes == null) { saved(false, "", ""); return; }
             try {
-                OutputStream out;
-                try { out = getContentResolver().openOutputStream(uri, "wt"); }
-                catch (Exception e) { out = getContentResolver().openOutputStream(uri, "w"); }
-                if (out == null) throw new Exception("soubor nelze otevřít");
-                try (OutputStream o = out) { o.write(bytes); }
-                saved(true, displayName(uri));
+                writeBytes(uri, bytes);
+                // nově vytvořený soubor se stane otevřeným souborem, další Uložit zapisuje do něj
+                keepAccess(uri, data.getFlags());
+                saved(true, displayName(uri), uri.toString());
             } catch (Exception e) {
-                saved(false, e.getMessage() != null ? e.getMessage() : "neznámá chyba");
+                saved(false, e.getMessage() != null ? e.getMessage() : "neznámá chyba", "");
             }
         }
     }
 
-    private void saved(boolean ok, String name) {
-        web.evaluateJavascript("window.onAndroidSaved && window.onAndroidSaved(" + ok + "," + JSONObject.quote(name) + ")", null);
+    private void saved(boolean ok, String name, String uri) {
+        web.evaluateJavascript("window.onAndroidSaved && window.onAndroidSaved(" + ok + "," + JSONObject.quote(name) + "," + JSONObject.quote(uri) + ")", null);
+    }
+
+    private void writeBytes(Uri uri, byte[] bytes) throws Exception {
+        OutputStream out;
+        try { out = getContentResolver().openOutputStream(uri, "wt"); }
+        catch (Exception e) { out = getContentResolver().openOutputStream(uri, "w"); }
+        if (out == null) throw new Exception("soubor nelze otevřít");
+        try (OutputStream o = out) { o.write(bytes); }
+    }
+
+    /** Jde do souboru zapisovat? Musí k němu být právo zápisu a soubor ho musí podporovat. */
+    private boolean writable(Uri uri, int flags) {
+        if ((flags & Intent.FLAG_GRANT_WRITE_URI_PERMISSION) == 0) return false;
+        try {
+            if (!DocumentsContract.isDocumentUri(this, uri)) return true;
+            try (Cursor c = getContentResolver().query(uri, new String[]{DocumentsContract.Document.COLUMN_FLAGS}, null, null, null)) {
+                if (c != null && c.moveToFirst()) return (c.getInt(0) & DocumentsContract.Document.FLAG_SUPPORTS_WRITE) != 0;
+            }
+        } catch (Exception ignored) { }
+        return true; // nejde zjistit předem, ukáže se až při ukládání
+    }
+
+    /** Podrží přístup k souboru i po zavření aplikace, aby šlo příště uložit do stejného souboru. */
+    private void keepAccess(Uri uri, int flags) {
+        int rw = Intent.FLAG_GRANT_READ_URI_PERMISSION | Intent.FLAG_GRANT_WRITE_URI_PERMISSION;
+        try {
+            getContentResolver().takePersistableUriPermission(uri, flags & rw);
+            // Android dovolí držet jen omezený počet souborů, nejstarší se proto uvolňují
+            List<UriPermission> held = getContentResolver().getPersistedUriPermissions();
+            while (held.size() > 30) {
+                UriPermission oldest = held.get(0);
+                for (UriPermission q : held) if (q.getPersistedTime() < oldest.getPersistedTime()) oldest = q;
+                getContentResolver().releasePersistableUriPermission(oldest.getUri(),
+                        (oldest.isReadPermission() ? Intent.FLAG_GRANT_READ_URI_PERMISSION : 0) | (oldest.isWritePermission() ? Intent.FLAG_GRANT_WRITE_URI_PERMISSION : 0));
+                held = getContentResolver().getPersistedUriPermissions();
+            }
+        } catch (Exception ignored) { } // soubor trvalý přístup nenabízí, vydrží jen do zavření aplikace
     }
 
     private String displayName(Uri uri) {
@@ -393,6 +446,25 @@ public class MainActivity extends Activity {
             return d;
         }
 
+        /** Adresa souboru právě vybraného přes Otevřít soubor (prázdná, když do něj nejde zapisovat). */
+        @JavascriptInterface
+        public String takeOpenedUri() {
+            String u = lastPickedUri;
+            lastPickedUri = null;
+            return u == null ? "" : u;
+        }
+
+        /** Uložení zpět do otevřeného souboru. Vrací "ok", nebo popis chyby. */
+        @JavascriptInterface
+        public String saveToUri(String uri, String text) {
+            try {
+                writeBytes(Uri.parse(uri), text.getBytes(StandardCharsets.UTF_8));
+                return "ok";
+            } catch (Exception e) {
+                return e.getMessage() != null ? e.getMessage() : "neznámá chyba";
+            }
+        }
+
         @JavascriptInterface
         public void copy(String text) {
             runOnUiThread(() -> {
@@ -423,7 +495,7 @@ public class MainActivity extends Activity {
                     startActivityForResult(i, REQ_SAVE);
                 } catch (ActivityNotFoundException e) {
                     pendingSaveBytes = null;
-                    saved(false, "v telefonu chybí výběr umístění souboru");
+                    saved(false, "v telefonu chybí výběr umístění souboru", "");
                 }
             });
         }

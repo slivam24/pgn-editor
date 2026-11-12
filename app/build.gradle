@@ -11,17 +11,19 @@ android {
         minSdk 26          // Android 8.0 a novější
         targetSdk 34
         // S každou novou verzí zvýšit obě čísla (stejně jako v O aplikaci)
-        versionCode 18
-        versionName '0.18'
+        versionCode 21
+        versionName '0.21'
     }
 
-    // Stálý podpisový klíč, aby šlo novou verzi nainstalovat přes starou bez ztráty dat
+    // Stálý podpisový klíč, aby šlo novou verzi nainstalovat přes starou bez ztráty dat.
+    // Sestavení na GitHubu může klíč dostat z tajného úložiště (Secrets, viz README). Bez něj se
+    // použije klíč uložený v repozitáři, který je ale veřejně čitelný.
     signingConfigs {
         release {
-            storeFile file('pgn-editor.keystore')
-            storePassword 'pgneditor'
-            keyAlias 'pgn-editor'
-            keyPassword 'pgneditor'
+            storeFile file(System.getenv('PGN_KEYSTORE_FILE') ?: 'pgn-editor.keystore')
+            storePassword System.getenv('PGN_KEYSTORE_PASSWORD') ?: 'pgneditor'
+            keyAlias System.getenv('PGN_KEY_ALIAS') ?: 'pgn-editor'
+            keyPassword System.getenv('PGN_KEY_PASSWORD') ?: System.getenv('PGN_KEYSTORE_PASSWORD') ?: 'pgneditor'
         }
     }
 

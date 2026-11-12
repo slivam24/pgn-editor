@@ -6,3 +6,7 @@ local.properties
 *.iml
 .github/nahled/node_modules/
 .github/nahled/package*.json
+
+# Balíčky pro testy v prohlížeči (stahují se při sestavení)
+node_modules/
+tests/package*.json

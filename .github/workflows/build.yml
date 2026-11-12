@@ -10,6 +10,10 @@ permissions:
 jobs:
   build:
     runs-on: ubuntu-latest
+    env:
+      # Sestavení z hlavní větve je běžné vydání, z ostatních větví zkušební
+      ZKUSEBNI: ${{ github.ref_name != github.event.repository.default_branch }}
+      MA_KLIC: ${{ secrets.KEYSTORE_BASE64 != '' }}
     steps:
       - uses: actions/checkout@v4
 
@@ -20,7 +24,29 @@ jobs:
 
       - uses: gradle/actions/setup-gradle@v4
 
+      # Když testy neprojdou, APK se nesestaví
+      - name: Testy PGN
+        run: node --test tests/pgn.test.js tests/verze.test.js
+
+      - name: Testy v prohlížeči
+        run: |
+          cd tests && npm init -y >/dev/null && npm install --silent puppeteer-core@23 && cd ..
+          node tests/prohlizec.js
+
+      # Podpisový klíč z tajného úložiště GitHubu (Settings, Secrets and variables, Actions).
+      # Když tam není, podepíše se klíčem z repozitáře.
+      - name: Podpisový klíč z tajného úložiště
+        if: env.MA_KLIC == 'true'
+        env:
+          KEYSTORE_BASE64: ${{ secrets.KEYSTORE_BASE64 }}
+        run: |
+          echo "$KEYSTORE_BASE64" | base64 -d > "$RUNNER_TEMP/podpis.keystore"
+          echo "PGN_KEYSTORE_FILE=$RUNNER_TEMP/podpis.keystore" >> "$GITHUB_ENV"
+
       - name: Sestavit
+        env:
+          PGN_KEYSTORE_PASSWORD: ${{ secrets.KEYSTORE_PASSWORD }}
+          PGN_KEY_ALIAS: ${{ secrets.KEY_ALIAS }}
         run: |
           chmod +x gradlew
           ./gradlew assembleRelease --no-daemon
@@ -54,5 +80,18 @@ jobs:
         uses: softprops/action-gh-release@v2
         with:
           tag_name: v${{ env.VER }}-${{ github.run_number }}
-          name: PGN editor ${{ env.VER }} (sestavení ${{ github.run_number }})
+          name: PGN editor ${{ env.VER }}${{ env.ZKUSEBNI == 'true' && ' zkušební' || '' }} (sestavení ${{ github.run_number }})
+          prerelease: ${{ env.ZKUSEBNI == 'true' }}
+          target_commitish: ${{ github.sha }}
+          body: ${{ env.MA_KLIC == 'true' && 'Podepsáno klíčem z tajného úložiště.' || 'Podepsáno klíčem z repozitáře, který je veřejný (viz README, Podpisový klíč).' }}
           files: pgn-editor-*.apk
+
+      # Zkušebních sestavení zůstává posledních pět, starší se mažou. Běžných vydání se to netýká.
+      - name: Uklidit stará zkušební sestavení
+        continue-on-error: true
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          gh release list --limit 200 --json tagName,isPrerelease,createdAt \
+            --jq '[.[] | select(.isPrerelease and (.tagName | test("^v[0-9.]+-[0-9]+$")))] | sort_by(.createdAt) | reverse | .[5:] | .[].tagName' \
+            | while read -r t; do gh release delete "$t" --yes --cleanup-tag; done
