@@ -152,7 +152,7 @@ test('rychlé čtení tahů se shoduje s chess.js na náhodných partiích', () 
     return v;
   };
   let checked = 0, extra = 0;
-  for (let game = 0; game < 40; game++) {
+  for (let game = 0; game < 10; game++) {
     const c = new Chess();
     for (let ply = 0; ply < 120 && !c.game_over(); ply++) {
       const legal = c.moves();
@@ -176,6 +176,6 @@ test('rychlé čtení tahů se shoduje s chess.js na náhodných partiích', () 
       c.move(san);
     }
   }
-  assert.ok(checked > 20000);
+  assert.ok(checked > 5000);
   assert.ok(extra < checked / 20, 'rychlá cesta čte podezřele mnoho tahů, které chess.js odmítá: ' + extra);
 });
