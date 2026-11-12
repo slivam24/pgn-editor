@@ -217,3 +217,27 @@ test('čas na hodinách: ruční zápis, značka [%clk] a zachování komentář
   const again = PGN.parseFile(PGN.buildPgn(g)).games[0];
   assert.equal(PGN.getClock(again.root.ch[0].c), 5100);
 });
+
+test('osamocená závorka } a vnořený komentář aplikaci nezaseknou', () => {
+  // osamocená } se přeskočí
+  assert.deepEqual(mainLine(round('[Event "Z"]\n\n1. e4 } e5 2. Nf3 Nc6 *\n').g), ['e4', 'e5', 'Nf3', 'Nc6']);
+  // vnořený komentář: text za vnitřní } se nezahodí, zůstane v komentáři
+  const { g, out } = round('[Event "Z"]\n\n1. e4 e5 2. Nf3 {a {b} c} Nc6 *\n');
+  assert.deepEqual(mainLine(g), ['e4', 'e5', 'Nf3']);
+  assert.match(out, /2\. Nf3 \{a \(b .* c\) Nc6 \*\}/);
+});
+
+// Žádný vstup nesmí čtení zacyklit: náhodně poskládané kousky PGN se musí přečíst rychle
+test('náhodně poškozené soubory se přečtou bez zamrznutí', () => {
+  const parts = ['e4', ' ', '\n', '{', '}', '(', ')', ';', '%', '$1', '1.', '1...', '!', '?', '[', ']', '"', 'Nf3', 'O-O', '1-0', '*', '\r', '\t', 'x', '#', '+', '=', '0-0', 'a', '\\', '½-½', '[Event "x"]\n'];
+  let seed = 99;
+  const rnd = n => { seed = (seed * 1103515245 + 12345) & 0x7fffffff; return seed % n; };
+  for (let k = 0; k < 4000; k++) {
+    let s = '[Event "x"]\n\n';
+    for (let i = 0, l = rnd(60); i < l; i++) s += parts[rnd(parts.length)];
+    const t0 = Date.now();
+    const r = PGN.parseFile(s);
+    if (r.games) r.games.forEach(x => PGN.gamePgn(x));
+    assert.ok(Date.now() - t0 < 1000, 'pomalé čtení: ' + JSON.stringify(s));
+  }
+});

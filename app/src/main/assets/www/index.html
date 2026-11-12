@@ -759,7 +759,7 @@ textarea.fen { min-height: 0; font-size: 14px; word-break: break-all; }
     </div>
     <div class="pbody prose">
 
-        <p><strong>PGN editor</strong> <span class="ver-badge">verze 0.21</span></p>
+        <p><strong>PGN editor</strong> <span class="ver-badge">verze 0.22</span></p>
         <p>Jednoduchý editor pro zápis a úpravu šachových partií ve formátu PGN, určený hlavně pro telefon s Androidem. Aplikaci programuje Claude (umělá inteligence od společnosti Anthropic) ve spolupráci s Michalem Slivou, který určuje, co má aplikace umět a jak má vypadat.</p>
         <h3>Co aplikace umí</h3>
         <ul>
@@ -816,6 +816,13 @@ textarea.fen { min-height: 0; font-size: 14px; word-break: break-all; }
       <h2>Verze a změny</h2>
     </div>
     <div class="pbody log">
+        <section>
+          <div class="head"><span class="ver-badge">0.22</span><span class="date">12. 11. 2026</span></div>
+          <ul>
+            <li>Opraveno: Otevřít soubor a Přidat ze souboru zamrzly aplikaci u souboru, ve kterém byla osamocená závorka } (bývá po vnořeném komentáři z ChessBase).</li>
+            <li>Čtení souborů PGN se nově zkouší na desítkách tisíc náhodně poškozených souborů, aby žádný další nemohl aplikaci zaseknout.</li>
+          </ul>
+        </section>
         <section>
           <div class="head"><span class="ver-badge">0.21</span><span class="date">12. 11. 2026</span></div>
           <ul>

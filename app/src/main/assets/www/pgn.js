@@ -249,7 +249,9 @@
       }
       if (ch === '%' && (i === 0 || src[i - 1] === '\n')) { const e = src.indexOf('\n', i); i = e === -1 ? src.length : e; continue; }
       if (ch === '(' || ch === ')') { out.push({ type: ch, pos: i }); i++; numPos = -1; continue; }
-      if (/\s/.test(ch)) { i++; continue; }
+      // Osamocená uzavírací závorka komentáře (bývá po vnořeném komentáři {a {b} c}) se přeskočí.
+      // Dřív se na ní čtení zacyklilo a aplikace zamrzla.
+      if (/\s/.test(ch) || ch === '}') { i++; continue; }
       let j = i;
       while (j < src.length && !/[\s{}();]/.test(src[j])) j++;
       let w = src.slice(i, j);

@@ -402,7 +402,8 @@ public class MainActivity extends Activity {
             getContentResolver().takePersistableUriPermission(uri, flags & rw);
             // Android dovolí držet jen omezený počet souborů, nejstarší se proto uvolňují
             List<UriPermission> held = getContentResolver().getPersistedUriPermissions();
-            while (held.size() > 30) {
+            // nejvýš 20 kroků, aby se aplikace nemohla zacyklit, kdyby Android přístup neuvolnil
+            for (int guard = 0; held.size() > 30 && guard < 20; guard++) {
                 UriPermission oldest = held.get(0);
                 for (UriPermission q : held) if (q.getPersistedTime() < oldest.getPersistedTime()) oldest = q;
                 getContentResolver().releasePersistableUriPermission(oldest.getUri(),
