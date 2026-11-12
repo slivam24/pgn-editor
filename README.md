@@ -53,6 +53,8 @@ Sestavení je na to připravené. Když v repozitáři na GitHubu existují tajn
 | `KEYSTORE_PASSWORD` | heslo ke klíči |
 | `KEY_ALIAS` | název klíče v souboru |
 
+U každého vydání v Releases je napsáno, kterým klíčem je podepsané. Nový klíč připravený v listopadu 2026 má otisk SHA-256 `D0:D0:5F:D3:29:32:A2:83:D1:4A:27:36:1B:28:35:D7:25:F7:0E:21:5C:59:C6:5C:34:7F:D9:D1:38:77:25:5B`.
+
 Nový klíč znamená jednorázově aplikaci odinstalovat a nainstalovat znovu, protože Android nedovolí přeinstalovat aplikaci podepsanou jiným klíčem. Před tím si partie ulož do souboru. Starý klíč pak může z repozitáře pryč.
 
 ## Co je kde

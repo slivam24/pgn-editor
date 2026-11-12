@@ -145,6 +145,25 @@ const OLD = JSON.stringify({ games: [{ headers: { Event: 'Stary', Site: '?', Dat
     assert.equal(await page.$eval('#graph', e => e.hidden), true);
   });
 
+  await step('čas na hodinách se zapíše k tahu, ukáže u hráče a uloží do PGN', async page => {
+    await open(page);
+    await page.evaluate(() => { const e = document.getElementById('optClock'); e.checked = true; e.dispatchEvent(new Event('change')); });
+    await paste(page, game(1, '1. e4 e5 { [%clk 1:28:00] } *'));
+    assert.equal(await page.$eval('#playerTop .clk', e => e.textContent), '1:28'); // čas ze souboru
+    await click(page, 'navPrev');
+    await click(page, 'clockBtn');
+    assert.equal(await text(page, 'kTitle'), 'Čas po tahu 1. e4');
+    await page.$eval('#kText', e => { e.value = 'nesmysl'; });
+    await click(page, 'kSave');
+    assert.match(await text(page, 'kMsg'), /nerozumím/);
+    await page.$eval('#kText', e => { e.value = '1.25'; });
+    await click(page, 'kSave');
+    assert.equal(await page.$eval('#kModal', e => e.hidden), true);
+    assert.equal(await page.$eval('#playerBottom .clk', e => e.textContent), '1:25');
+    assert.equal(await page.$('#playerTop .clk'), null); // černý ještě netáhl
+    assert.match(await pgnOut(page), /1\. e4 \{\[%clk 1:25:00\]\} 1\.\.\. e5 \{\[%clk 1:28:00\]\}/);
+  });
+
   await step('nepovedené uložení do paměti telefonu se ohlásí', async page => {
     await open(page);
     await paste(page, game(1, '1. e4 e5 *'));

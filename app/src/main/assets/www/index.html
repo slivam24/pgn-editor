@@ -161,6 +161,7 @@ body.editing .graph { display: none !important; }
 .icon-btn:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
 .player { flex: 1; min-width: 0; display: flex; align-items: center; gap: 8px; font-weight: 500; }
 .player .nm { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.player .clk { flex: none; margin-left: auto; font-family: var(--font-mono); font-size: 14px; padding: 1px 7px; border: 1px solid var(--line); border-radius: 6px; background: var(--surface); color: var(--fg); }
 .player.empty .nm { color: var(--muted); font-weight: 400; }
 .player { max-width: 520px; }
 .player.bottom { margin-top: -4px; }
@@ -438,6 +439,7 @@ textarea.fen { min-height: 0; font-size: 14px; word-break: break-all; }
       <button class="icon-btn" id="undo" type="button" aria-label="Vrátit poslední akci" title="Vrátit poslední akci" hidden><svg viewBox="0 0 24 24" width="24" height="24" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 14L4 9l5-5"/><path d="M4 9h10.5a5.5 5.5 0 0 1 0 11H11"/></svg></button>
       <button class="icon-btn" id="commentBtn" type="button" aria-label="Komentář k tahu" title="Komentář k tahu" hidden><svg viewBox="0 0 24 24" width="24" height="24" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 20h4L19 9a2.8 2.8 0 0 0-4-4L4 16v4z"/><path d="M13.5 6.5l4 4"/></svg></button>
       <button class="icon-btn txt" id="nagBtn" type="button" aria-label="Hodnocení tahu" title="Hodnocení tahu" hidden>!?</button>
+      <button class="icon-btn" id="clockBtn" type="button" aria-label="Čas na hodinách po tahu" title="Čas na hodinách po tahu" hidden><svg viewBox="0 0 24 24" width="24" height="24" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="13" r="8"/><path d="M12 9v4l2.5 2.5M9.5 2.5h5"/></svg></button>
       <button class="icon-btn" id="micBtn" type="button" aria-label="Hlasové zadávání tahů" title="Hlasové zadávání tahů" hidden><svg viewBox="0 0 24 24" width="24" height="24" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="3" width="6" height="11" rx="3"/><path d="M5.5 11a6.5 6.5 0 0 0 13 0M12 17.5V21"/></svg></button>
       <button class="icon-btn" id="engineBtn" type="button" aria-label="Rozbor motorem Stockfish" title="Rozbor motorem Stockfish" hidden><svg viewBox="0 0 24 24" width="24" height="24" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="6" y="6" width="12" height="12" rx="2"/><rect x="9.5" y="9.5" width="5" height="5" rx="1"/><path d="M9 2.5V6M15 2.5V6M9 18v3.5M15 18v3.5M2.5 9H6M2.5 15H6M18 9h3.5M18 15h3.5"/></svg></button>
       <button class="icon-btn" id="sendIcon" type="button" aria-label="Odeslat e-mailem" title="Odeslat e-mailem" hidden><svg viewBox="0 0 24 24" width="24" height="24" aria-hidden="true"><rect x="3" y="5.5" width="18" height="13" rx="2" stroke="currentColor" stroke-width="2" fill="none"/><path d="M3.5 7l8.5 6 8.5-6" stroke="currentColor" stroke-width="2" stroke-linejoin="round" fill="none"/></svg></button>
@@ -685,6 +687,7 @@ textarea.fen { min-height: 0; font-size: 14px; word-break: break-all; }
           <label class="srow"><span class="st"><b>Varianty</b><small>Jiný tah se uloží jako varianta, nic se nepřepíše.</small></span><input type="checkbox" class="tgl" id="optVariants"></label>
           <label class="srow"><span class="st"><b>Komentáře k tahům</b><small>Tlačítko ✎ v horní liště.</small></span><input type="checkbox" class="tgl" id="optComments"></label>
           <label class="srow"><span class="st"><b>Hodnocení tahů</b><small>Tlačítko !? v horní liště.</small></span><input type="checkbox" class="tgl" id="optNags"></label>
+          <label class="srow"><span class="st"><b>Časy na hodinách</b><small>Tlačítko s hodinami v horní liště. Čas zbývající po tahu je vidět u jména hráče.</small></span><input type="checkbox" class="tgl" id="optClock"></label>
           <label class="srow"><span class="st"><b>Vracení akcí</b><small>Tlačítko ↶ v horní liště.</small></span><input type="checkbox" class="tgl" id="optUndo"></label>
           <label class="srow"><span class="st"><b>Česká notace</b><small>Jen zobrazení (J, S, V, D, K). Do souboru se tahy ukládají anglicky.</small></span><input type="checkbox" class="tgl" id="czNotation"></label>
           <label class="srow"><span class="st"><b>Hlasové zadávání</b><small>Tlačítko s mikrofonem v horní liště. Řekni třeba „jezdec f3“ nebo „e4“.</small></span><input type="checkbox" class="tgl" id="optMic"></label>
@@ -756,7 +759,7 @@ textarea.fen { min-height: 0; font-size: 14px; word-break: break-all; }
     </div>
     <div class="pbody prose">
 
-        <p><strong>PGN editor</strong> <span class="ver-badge">verze 0.20</span></p>
+        <p><strong>PGN editor</strong> <span class="ver-badge">verze 0.21</span></p>
         <p>Jednoduchý editor pro zápis a úpravu šachových partií ve formátu PGN, určený hlavně pro telefon s Androidem. Aplikaci programuje Claude (umělá inteligence od společnosti Anthropic) ve spolupráci s Michalem Slivou, který určuje, co má aplikace umět a jak má vypadat.</p>
         <h3>Co aplikace umí</h3>
         <ul>
@@ -770,6 +773,7 @@ textarea.fen { min-height: 0; font-size: 14px; word-break: break-all; }
           <li>Velké soubory s tisíci partiemi se otevřou hned, tahy partie se čtou až při jejím otevření.</li>
           <li>V seznamu partií jde přidat partie z jiného souboru a měnit pořadí partií.</li>
           <li>Volitelně další údaje v hlavičce (Elo, družstva, tempo, kód ECO, zahájení) a automatické doplnění kódu ECO a názvu zahájení podle tahů.</li>
+          <li>Volitelně časy na hodinách: čas zbývající po tahu se zapíše tlačítkem s hodinami, ukazuje se u jména hráče a ukládá se do souboru tak, jak ho čte ChessBase i Lichess.</li>
           <li>Graf průběhu partie po kontrole Stockfishem nebo z hodnocení uložených v souboru. Klepnutím do grafu skočíš na tah.</li>
           <li>Partie s chybou v zápisu se nezahodí: načtou se tahy před chybou a zbytek zápisu zůstane jako text v komentáři.</li>
           <li>Volitelně varianty a hodnocení tahů (!, ?, !!, ??, !?, ?!). Varianty, komentáře i hodnocení se načítají ze souboru a ukládají standardně, takže je přečte ChessBase.</li>
@@ -812,6 +816,15 @@ textarea.fen { min-height: 0; font-size: 14px; word-break: break-all; }
       <h2>Verze a změny</h2>
     </div>
     <div class="pbody log">
+        <section>
+          <div class="head"><span class="ver-badge">0.21</span><span class="date">12. 11. 2026</span></div>
+          <ul>
+            <li>Časy na hodinách (zapínají se v Nastavení): tlačítko s hodinami v horní liště zapíše k zobrazenému tahu čas, který hráči zbývá. Stačí napsat 1:25, 1.25 nebo počet minut.</li>
+            <li>Poslední zapsaný čas je vidět u jména hráče nad a pod šachovnicí a mění se při listování partií. Ukazují se tak i časy z partií stažených z Lichessu.</li>
+            <li>Čas se ukládá do souboru jako značka [%clk] v komentáři tahu, kterou čte ChessBase i Lichess.</li>
+            <li>Aplikace se nově podepisuje klíčem z tajného úložiště GitHubu, pokud tam je (viz README).</li>
+          </ul>
+        </section>
         <section>
           <div class="head"><span class="ver-badge">0.20</span><span class="date">12. 11. 2026</span></div>
           <ul>
@@ -1050,6 +1063,21 @@ textarea.fen { min-height: 0; font-size: 14px; word-break: break-all; }
   </div>
 </div>
 
+<div class="modal" id="kModal" hidden>
+  <div class="modal-box" role="dialog" aria-modal="true" aria-labelledby="kTitle">
+    <h3 id="kTitle">Čas na hodinách</h3>
+    <label class="field">Čas, který hráči po tahu zbývá<input id="kText" inputmode="decimal" autocomplete="off" placeholder="např. 1:25 nebo 85"></label>
+    <p class="note">1:25 nebo 1.25 je hodina a 25 minut, samotné číslo jsou minuty, 1:25:30 i se sekundami.</p>
+    <p class="msg err" id="kMsg" role="status"></p>
+    <div class="actions">
+      <button class="btn danger" id="kDelete" type="button">Smazat</button>
+      <span class="spacer"></span>
+      <button class="btn" id="kCancel" type="button">Zrušit</button>
+      <button class="btn primary" id="kSave" type="button">Uložit</button>
+    </div>
+  </div>
+</div>
+
 <div class="modal" id="lModal" hidden>
   <div class="modal-box wide" role="dialog" aria-modal="true" aria-labelledby="lTitle">
     <h3 id="lTitle">Licence</h3>
@@ -1148,7 +1176,7 @@ textarea.fen { min-height: 0; font-size: 14px; word-break: break-all; }
     prefill: false, preEvent: true, preSite: true, preRound: true, preDate: 'prev',
     engine: false, engLines: 1, engDepth: 20, arrow: true,
     strip: true, coords: 's', haptic: false, players: true, mic: false, micCont: true,
-    moreTags: false, opening: false, graph: true };
+    moreTags: false, opening: false, graph: true, clock: false };
   try { const o = JSON.parse(localStorage.getItem('pgn-opts') || 'null'); if (o) opts = Object.assign(opts, o); } catch (e) {}
 
   // Krok zpět si pamatuje jen kopii právě upravované partie, ostatní partie souboru se sdílejí.
@@ -1577,6 +1605,7 @@ textarea.fen { min-height: 0; font-size: 14px; word-break: break-all; }
     cc.hidden = !txt;
     $('commentBtn').classList.toggle('primary', !!txt);
     $('nagBtn').disabled = state.ply === 0;
+    $('clockBtn').classList.toggle('primary', state.ply > 0 && PGN.getClock(node.c) !== null);
     $('nagBtn').classList.toggle('primary', (node.n || []).some(x => x >= 1 && x <= 6));
     const inVar = state.path.slice(0, state.ply).some(x => x > 0);
     const nVars = countVariants(state.root);
@@ -2236,7 +2265,7 @@ textarea.fen { min-height: 0; font-size: 14px; word-break: break-all; }
     if (voice.on && $('modal').hidden && $('chModal').hidden) { voiceStop(); $('voiceBar').hidden = true; return true; }
     if (editor && $('modal').hidden) { closeEditor(); return true; }
     if (!$('modal').hidden && $('modalCancel').hidden) { $('modalOk').click(); return true; }
-    for (const [box, btn] of [['modal', 'modalCancel'], ['cModal', 'cCancel'], ['nModal', 'nCancel'], ['chModal', 'chCancel'], ['lModal', 'lClose'], ['promo', 'promoCancel']]) {
+    for (const [box, btn] of [['modal', 'modalCancel'], ['cModal', 'cCancel'], ['kModal', 'kCancel'], ['nModal', 'nCancel'], ['chModal', 'chCancel'], ['lModal', 'lClose'], ['promo', 'promoCancel']]) {
       if (!$(box).hidden) { $(btn).click(); return true; }
     }
     if (drawerOpen()) { if (curPage !== 'pgMain') pageBack(); else setDrawer(false); return true; }
@@ -2770,6 +2799,8 @@ textarea.fen { min-height: 0; font-size: 14px; word-break: break-all; }
     $('optEngLines').value = String(opts.engLines);
     $('optEngDepth').value = String(opts.engDepth);
     $('optGraph').checked = opts.graph;
+    $('optClock').checked = opts.clock;
+    $('clockBtn').hidden = !opts.clock;
     $('optMoreTags').checked = opts.moreTags;
     $('optOpening').checked = opts.opening;
     document.querySelectorAll('#pTags .xt').forEach(el => { el.hidden = !opts.moreTags; });
@@ -2799,6 +2830,7 @@ textarea.fen { min-height: 0; font-size: 14px; word-break: break-all; }
   $('optEngLines').addEventListener('change', e => { opts.engLines = +e.target.value; saveOpts(); eng.liveFen = null; analyzeCurrent(); });
   $('optEngDepth').addEventListener('change', e => { opts.engDepth = +e.target.value; saveOpts(); eng.liveFen = null; analyzeCurrent(); });
   $('optGraph').addEventListener('change', e => { opts.graph = e.target.checked; saveOpts(); renderGraph(); });
+  $('optClock').addEventListener('change', e => { opts.clock = e.target.checked; saveOpts(); applyOpts(); });
   $('optMoreTags').addEventListener('change', e => { opts.moreTags = e.target.checked; saveOpts(); applyOpts(); });
   $('optOpening').addEventListener('change', e => { opts.opening = e.target.checked; saveOpts(); applyOpts(); });
   applyOpts();
@@ -2826,6 +2858,50 @@ textarea.fen { min-height: 0; font-size: 14px; word-break: break-all; }
   $('cCancel').addEventListener('click', closeComment);
   $('cModal').addEventListener('click', e => { if (e.target === $('cModal')) closeComment(); });
   $('cModal').addEventListener('keydown', e => { if (e.key === 'Escape') closeComment(); });
+
+  /* ---------- Čas na hodinách ---------- */
+  // Čas se ukládá k tahu jako značka [%clk] v komentáři (viz pgn.js) a ukazuje se u jména hráče
+  function clockAt(color) { // poslední zapsaný čas hráče v zobrazené linii až po zobrazený tah
+    for (let k = state.ply; k >= 1; k--) {
+      if ((isWhiteMove(k - 1) ? 'w' : 'b') !== color) continue;
+      const c = PGN.getClock(LINE[k].c);
+      if (c !== null) return c;
+    }
+    return null;
+  }
+  function openClock() {
+    const k = state.ply;
+    if (k === 0) { toast('Čas se zapisuje k tahu. Nejdřív zadej nebo vyber tah.'); return; }
+    $('kTitle').textContent = 'Čas po tahu ' + moveNumber(k - 1) + (isWhiteMove(k - 1) ? '. ' : '... ') + show(state.moves[k - 1]);
+    const cur = PGN.getClock(LINE[k].c);
+    $('kText').value = cur === null ? '' : PGN.fmtClock(cur);
+    $('kDelete').hidden = cur === null;
+    $('kMsg').textContent = '';
+    $('kModal').hidden = false;
+    $('kText').focus(); $('kText').select();
+  }
+  function closeClock() { $('kModal').hidden = true; $('clockBtn').focus(); }
+  function setClockAt(sec) {
+    const node = LINE[state.ply];
+    const c = PGN.setClock(node.c, sec);
+    if (c === (node.c || '')) return;
+    snapshot();
+    node.c = c;
+    renderAll();
+  }
+  function saveClock() {
+    const raw = $('kText').value.trim();
+    if (!raw) { setClockAt(null); closeClock(); return; }
+    const sec = PGN.parseClock(raw);
+    if (sec === null) { $('kMsg').textContent = 'Tomuhle času nerozumím. Napiš ho třeba jako 1:25 nebo 85.'; return; }
+    setClockAt(sec); closeClock();
+  }
+  $('clockBtn').addEventListener('click', openClock);
+  $('kSave').addEventListener('click', saveClock);
+  $('kDelete').addEventListener('click', () => { setClockAt(null); closeClock(); });
+  $('kCancel').addEventListener('click', closeClock);
+  $('kModal').addEventListener('click', e => { if (e.target === $('kModal')) closeClock(); });
+  $('kModal').addEventListener('keydown', e => { if (e.key === 'Escape') closeClock(); else if (e.key === 'Enter') { e.preventDefault(); saveClock(); } });
 
   /* ---------- Barvy šachovnice ---------- */
   const PRESETS = [
@@ -2920,6 +2996,8 @@ textarea.fen { min-height: 0; font-size: 14px; word-break: break-all; }
       const nm = document.createElement('span'); nm.className = 'nm'; nm.textContent = name || (color === 'w' ? 'Bílý' : 'Černý');
       el.classList.toggle('empty', !name);
       el.append(st, nm);
+      const clk = opts.clock ? clockAt(color) : null;
+      if (clk !== null) { const c = document.createElement('span'); c.className = 'clk'; c.textContent = PGN.fmtClock(clk); c.setAttribute('aria-label', 'zbývá ' + PGN.fmtClock(clk)); el.appendChild(c); }
       el.setAttribute('aria-label', (color === 'w' ? 'Bílý: ' : 'Černý: ') + (name || 'nevyplněno'));
     };
     // Jméno je vždy na straně svých figur, po otočení šachovnice se prohodí
@@ -3489,7 +3567,7 @@ textarea.fen { min-height: 0; font-size: 14px; word-break: break-all; }
   $('undo').addEventListener('click', undo);
   $('flip').addEventListener('click', () => { state.flipped = !state.flipped; renderBoard(); persist(); });
   document.addEventListener('keydown', e => {
-    if (/^(INPUT|TEXTAREA|SELECT)$/.test(e.target.tagName) || !$('modal').hidden || !$('cModal').hidden) return;
+    if (/^(INPUT|TEXTAREA|SELECT)$/.test(e.target.tagName) || !$('modal').hidden || !$('cModal').hidden || !$('kModal').hidden) return;
     if (e.key === 'ArrowLeft') go(state.ply - 1);
     else if (e.key === 'ArrowRight') go(state.ply + 1);
     else if (e.key === 'Home') go(0);

@@ -83,6 +83,7 @@ jobs:
           name: PGN editor ${{ env.VER }}${{ env.ZKUSEBNI == 'true' && ' zkušební' || '' }} (sestavení ${{ github.run_number }})
           prerelease: ${{ env.ZKUSEBNI == 'true' }}
           target_commitish: ${{ github.sha }}
+          body: ${{ env.MA_KLIC == 'true' && 'Podepsáno klíčem z tajného úložiště.' || 'Podepsáno klíčem z repozitáře, který je veřejný (viz README, Podpisový klíč).' }}
           files: pgn-editor-*.apk
 
       # Zkušebních sestavení zůstává posledních pět, starší se mažou. Běžných vydání se to netýká.

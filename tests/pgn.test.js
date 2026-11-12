@@ -193,3 +193,27 @@ test('zahájení podle tahů: kód ECO a název', () => {
   // stejný výsledek s rychlým i pomalým čtením tahů
   assert.deepEqual(ECO.find(Chess, 'd4 d5 c4 e6 Nc3 Nf6'.split(' ')), find('d4 d5 c4 e6 Nc3 Nf6'));
 });
+
+test('čas na hodinách: ruční zápis, značka [%clk] a zachování komentáře', () => {
+  assert.equal(PGN.parseClock('1:25'), 5100);
+  assert.equal(PGN.parseClock('1.25'), 5100);
+  assert.equal(PGN.parseClock('1,25'), 5100);
+  assert.equal(PGN.parseClock('85'), 5100);
+  assert.equal(PGN.parseClock('0:05:30'), 330);
+  assert.equal(PGN.parseClock('1:75'), null);
+  assert.equal(PGN.parseClock('abc'), null);
+  assert.equal(PGN.parseClock(''), null);
+  assert.equal(PGN.fmtClock(5100), '1:25');
+  assert.equal(PGN.fmtClock(330), '0:05:30');
+  assert.equal(PGN.setClock('', 5100), '[%clk 1:25:00]');
+  assert.equal(PGN.setClock('dobrý tah [%clk 0:10:00] [%eval 0.3]', 5100), '[%clk 1:25:00] dobrý tah [%eval 0.3]');
+  assert.equal(PGN.setClock('[%clk 1:25:00] dobrý tah', null), 'dobrý tah');
+  assert.equal(PGN.getClock('[%clk 1:25:00] dobrý tah'), 5100);
+  assert.equal(PGN.getClock('{[%clk 0:04:58.3]}'), 298);
+  assert.equal(PGN.getClock('bez času'), null);
+  // čas projde uložením a novým otevřením
+  const g = PGN.parseFile('[Event "C"]\n\n1. e4 e5 *\n').games[0];
+  g.root.ch[0].c = PGN.setClock(g.root.ch[0].c, 5100);
+  const again = PGN.parseFile(PGN.buildPgn(g)).games[0];
+  assert.equal(PGN.getClock(again.root.ch[0].c), 5100);
+});

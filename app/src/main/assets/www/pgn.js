@@ -431,6 +431,39 @@
     return n;
   }
 
+  /* ---------- Čas na hodinách ---------- */
+  // Čas, který hráči po tahu zbývá, se ukládá do komentáře tahu jako značka [%clk 1:25:00].
+  // Stejně ho zapisuje Lichess i ChessBase.
+  const CLK_RE = /\[%clk\s+(\d+):(\d\d?)(?::(\d\d?)(?:\.\d+)?)?\]/;
+  // Čas napsaný ručně: 1:25 nebo 1.25 jsou hodiny a minuty, 1:25:30 i se sekundami, samotné číslo jsou minuty.
+  // Vrací sekundy, nebo null, když zápisu nejde rozumět.
+  function parseClock(text) {
+    const t = String(text || '').trim().replace(/[.,;\s]+/g, ':');
+    if (!/^\d+(:\d{1,2}){0,2}$/.test(t)) return null;
+    const p = t.split(':').map(Number);
+    if (p.length === 1) return p[0] <= 5999 ? p[0] * 60 : null;
+    if (p[1] > 59 || (p.length === 3 && p[2] > 59) || p[0] > 99) return null;
+    return p[0] * 3600 + p[1] * 60 + (p[2] || 0);
+  }
+  function clockTag(sec) { // značka do souboru, vždy hodiny:minuty:sekundy
+    const h = Math.floor(sec / 3600), m = Math.floor(sec % 3600 / 60), x = sec % 60;
+    return '[%clk ' + h + ':' + String(m).padStart(2, '0') + ':' + String(x).padStart(2, '0') + ']';
+  }
+  function fmtClock(sec) { // zobrazení: 1:25, sekundy jen když nejsou nulové
+    const h = Math.floor(sec / 3600), m = Math.floor(sec % 3600 / 60), x = sec % 60;
+    return h + ':' + String(m).padStart(2, '0') + (x ? ':' + String(x).padStart(2, '0') : '');
+  }
+  function getClock(comment) {
+    const m = CLK_RE.exec(comment || '');
+    return m ? +m[1] * 3600 + +m[2] * 60 + (+m[3] || 0) : null;
+  }
+  // Vrátí komentář s nastaveným časem (sec = null čas odebere). Ostatní text komentáře zůstane.
+  function setClock(comment, sec) {
+    const rest = String(comment || '').replace(new RegExp(CLK_RE.source, 'g'), ' ').replace(/\s+/g, ' ').trim();
+    if (sec === null || sec === undefined) return rest;
+    return clockTag(sec) + (rest ? ' ' + rest : '');
+  }
+
   // Věta do upozornění, když partii nešlo přečíst celou
   function errorText(e) {
     if (!e) return '';
@@ -456,5 +489,6 @@
   }
 
   return { START, TAGS, DEFAULTS, newNode, freshState, isLazy, toAscii, buildPgn, normalizeFen, sanMove, fastMove,
-    splitGames, tokenize, stubGame, parseMoves, materialize, gamePgn, countMoves, mainLength, errorText, parseFile };
+    splitGames, tokenize, stubGame, parseMoves, materialize, gamePgn, countMoves, mainLength, errorText, parseFile,
+    parseClock, fmtClock, getClock, setClock };
 });
