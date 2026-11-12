@@ -119,6 +119,32 @@ const OLD = JSON.stringify({ games: [{ headers: { Event: 'Stary', Site: '?', Dat
     assert.match(await text(page, 'fileInfo'), /^stary\.pgn, 1 partie/);
   });
 
+  await step('zahájení podle tahů a další údaje v hlavičce se zapíšou do PGN', async page => {
+    await open(page);
+    await page.evaluate(() => { for (const id of ['optMoreTags', 'optOpening']) { const e = document.getElementById(id); e.checked = true; e.dispatchEvent(new Event('change')); } });
+    await paste(page, game(1, '1. e4 c5 2. Nf3 d6 3. d4 cxd4 4. Nxd4 Nf6 5. Nc3 *'));
+    await tap(page, 'a7'); await tap(page, 'a6');
+    assert.match(await text(page, 'movesSum'), /B90 Sicilian Defense: Najdorf Variation/);
+    await page.$eval('#xWhiteElo', e => { e.value = '2150'; e.dispatchEvent(new Event('input')); });
+    const out = await pgnOut(page);
+    assert.match(out, /\[ECO "B90"\] \[Opening "Sicilian Defense: Najdorf Variation"\]/);
+    assert.match(out, /\[WhiteElo "2150"\]/);
+  });
+
+  await step('graf průběhu partie z hodnocení v souboru, klepnutí skočí na tah', async page => {
+    await open(page);
+    await page.evaluate(() => { const e = document.getElementById('optEngine'); e.checked = true; e.dispatchEvent(new Event('change')); });
+    await paste(page, game(1, '1. e4 { [%eval 0.3] } e5 { [%eval 0.2] } 2. Nf3 { [%eval 0.3] } Nc6 { [%eval 0.2] } 3. Bc4 { [%eval 0.1] } Nd4 { [%eval 1.4] } *'));
+    assert.equal(await page.$eval('#graph', e => e.hidden), false);
+    const r = await page.$eval('#graphPlot', e => { const b = e.getBoundingClientRect(); return { x: b.left, y: b.top, w: b.width, h: b.height }; });
+    await page.mouse.click(r.x + r.w / 3, r.y + r.h / 2);
+    await page.waitForFunction(() => /2 z 3|1 z 3/.test(document.getElementById('counter').textContent));
+    assert.match(await text(page, 'graphVal'), /1\.\.\. e5\s+\+0,20/);
+    // bez hodnocení se graf neukazuje
+    await paste(page, game(2, '1. d4 d5 *'));
+    assert.equal(await page.$eval('#graph', e => e.hidden), true);
+  });
+
   await step('nepovedené uložení do paměti telefonu se ohlásí', async page => {
     await open(page);
     await paste(page, game(1, '1. e4 e5 *'));

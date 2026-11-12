@@ -120,6 +120,18 @@ a.btn { display: inline-flex; align-items: center; text-decoration: none; font-w
 .log .date { color: var(--muted); font-size: 13px; }
 .log ul { margin: 0; padding-left: 20px; display: grid; gap: 3px; }
 .toggles { display: grid; gap: 10px; margin-top: 4px; }
+.graph { display: grid; gap: 4px; max-width: 520px; }
+.graph[hidden] { display: none; }
+body.editing .graph { display: none !important; }
+.graph-head { display: flex; justify-content: space-between; gap: 8px; font-size: 12.5px; color: var(--muted); }
+.graph-val { font-family: var(--font-mono); color: var(--fg); }
+.graph-plot { position: relative; height: 56px; background: var(--surface); border: 1px solid var(--line); border-radius: 8px; overflow: hidden; touch-action: none; cursor: pointer; }
+.graph-plot svg { display: block; width: 100%; height: 100%; }
+.graph-plot .mid { stroke: var(--line); stroke-width: 1; vector-effect: non-scaling-stroke; }
+#graphArea { fill: var(--fg); opacity: .12; }
+#graphLine { fill: none; stroke: var(--fg); stroke-width: 2; stroke-linejoin: round; vector-effect: non-scaling-stroke; }
+.graph-cur { position: absolute; top: 0; bottom: 0; width: 2px; margin-left: -1px; background: var(--accent); pointer-events: none; }
+.graph-cur::after { content: ''; position: absolute; left: 50%; top: var(--y, 50%); width: 10px; height: 10px; margin: -5px 0 0 -5px; border-radius: 50%; background: var(--accent); box-shadow: 0 0 0 2px var(--surface); }
 .cur-comment { margin: 0; font-size: 14px; color: var(--muted); font-style: italic; text-align: center; overflow-wrap: anywhere; }
 .moves .cm { font-family: var(--font-ui); font-style: italic; color: var(--muted); font-size: 14px; margin-right: 6px; cursor: pointer; }
 .c-text { font-family: var(--font-ui); font-size: 15px; min-height: 96px; }
@@ -270,6 +282,9 @@ body.booting { pointer-events: none; }
 .pbody { flex: 1; overflow-y: auto; overscroll-behavior: contain; padding: 14px 16px 28px; display: grid; gap: 12px; align-content: start; }
 .pfoot { flex: none; display: flex; gap: 8px; padding: 10px 16px max(12px, env(safe-area-inset-bottom, 0px)); border-top: 1px solid var(--line); background: var(--bg); }
 .pfoot .btn { flex: 1; }
+.pfoot.rows { flex-direction: column; }
+.pfoot .prow { display: flex; gap: 8px; }
+.pfoot .btn.fix { flex: none; width: 52px; padding-left: 0; padding-right: 0; display: grid; place-items: center; }
 .phead .count { min-width: 24px; padding: 1px 7px; border-radius: 11px; background: var(--accent-soft); font-size: 13px; text-align: center; }
 
 /* Seznam partií */
@@ -484,6 +499,15 @@ textarea.fen { min-height: 0; font-size: 14px; word-break: break-all; }
     </div>
     <div class="strip" id="strip" hidden></div>
     <p class="cur-comment" id="curComment" hidden></p>
+    <div class="graph" id="graph" hidden>
+      <div class="graph-head"><span class="graph-title">Průběh partie</span><span class="graph-val" id="graphVal"></span></div>
+      <div class="graph-plot" id="graphPlot" role="slider" tabindex="0" aria-label="Průběh partie, hodnocení po jednotlivých tazích">
+        <svg viewBox="0 0 100 100" preserveAspectRatio="none" aria-hidden="true">
+          <path id="graphArea"/><line class="mid" x1="0" y1="50" x2="100" y2="50"/><path id="graphLine"/>
+        </svg>
+        <span class="graph-cur" id="graphCur"></span>
+      </div>
+    </div>
     <section class="engine" id="engineBox" hidden aria-label="Rozbor motorem Stockfish">
       <div class="ev-bar" aria-hidden="true"><div class="ev-fill" id="evFill"></div></div>
       <div class="eng-head">
@@ -538,6 +562,13 @@ textarea.fen { min-height: 0; font-size: 14px; word-break: break-all; }
               <option value="1/2-1/2">1/2-1/2 (remíza)</option>
             </select>
           </label>
+          <label class="xt" hidden>Elo bílého<input id="xWhiteElo" autocomplete="off" inputmode="numeric"></label>
+          <label class="xt" hidden>Elo černého<input id="xBlackElo" autocomplete="off" inputmode="numeric"></label>
+          <label class="xt" hidden>Družstvo bílého<input id="xWhiteTeam" autocomplete="off"></label>
+          <label class="xt" hidden>Družstvo černého<input id="xBlackTeam" autocomplete="off"></label>
+          <label class="xt" hidden>Tempo<input id="xTimeControl" autocomplete="off" placeholder="např. 90+30"></label>
+          <label class="xt" hidden>Kód ECO<input id="xECO" autocomplete="off" autocapitalize="characters"></label>
+          <label class="xt wide" hidden>Zahájení<input id="xOpening" autocomplete="off"></label>
         </div>
       </div>
     </details>
@@ -586,9 +617,16 @@ textarea.fen { min-height: 0; font-size: 14px; word-break: break-all; }
         <p class="note" id="gamesEmpty" hidden>Žádná partie neodpovídá hledání.</p>
 
     </div>
-    <div class="pfoot">
-      <button class="btn primary" id="addGame" type="button">Přidat partii</button>
-      <button class="btn danger" id="delGame" type="button">Smazat aktuální</button>
+    <div class="pfoot rows">
+      <div class="prow">
+        <button class="btn primary" id="addGame" type="button">Přidat partii</button>
+        <button class="btn" id="addFile" type="button">Přidat ze souboru</button>
+      </div>
+      <div class="prow">
+        <button class="btn fix" id="gameUp" type="button" aria-label="Posunout aktuální partii výš" title="Posunout aktuální partii výš"><svg viewBox="0 0 24 24" width="22" height="22" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 19V5M6 11l6-6 6 6"/></svg></button>
+        <button class="btn fix" id="gameDown" type="button" aria-label="Posunout aktuální partii níž" title="Posunout aktuální partii níž"><svg viewBox="0 0 24 24" width="22" height="22" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 5v14M6 13l6 6 6-6"/></svg></button>
+        <button class="btn danger" id="delGame" type="button">Smazat aktuální</button>
+      </div>
     </div>
   </section>
   <section class="dpage" id="pgText" hidden>
@@ -657,6 +695,8 @@ textarea.fen { min-height: 0; font-size: 14px; word-break: break-all; }
           <div class="ssub" id="playerOpts" hidden>
             <div class="srow sub"><span class="st"><b>Uložená jména</b><small id="playersCount"></small></span><button class="btn small" id="playersClear" type="button">Vymazat</button></div>
           </div>
+          <label class="srow"><span class="st"><b>Další údaje v hlavičce</b><small>Elo, družstva, tempo, kód ECO a název zahájení.</small></span><input type="checkbox" class="tgl" id="optMoreTags"></label>
+          <label class="srow"><span class="st"><b>Zahájení podle tahů</b><small>Kód ECO a název zahájení se doplní samy. Názvy jsou anglicky.</small></span><input type="checkbox" class="tgl" id="optOpening"></label>
           <label class="srow"><span class="st"><b>Vibrace při tahu</b><small>Krátké zavibrování po každém tahu.</small></span><input type="checkbox" class="tgl" id="optHaptic"></label>
         </div>
         <div class="sgroup">
@@ -673,6 +713,7 @@ textarea.fen { min-height: 0; font-size: 14px; word-break: break-all; }
                 <option value="26">dlouhá</option>
                 <option value="0">bez omezení</option>
               </select></label>
+            <label class="srow sub"><span class="st"><b>Graf průběhu partie</b><small>Po kontrole partie, nebo z hodnocení uložených v souboru (Lichess).</small></span><input type="checkbox" class="tgl small" id="optGraph"></label>
           </div>
         </div>
         <div class="sgroup">
@@ -715,7 +756,7 @@ textarea.fen { min-height: 0; font-size: 14px; word-break: break-all; }
     </div>
     <div class="pbody prose">
 
-        <p><strong>PGN editor</strong> <span class="ver-badge">verze 0.19</span></p>
+        <p><strong>PGN editor</strong> <span class="ver-badge">verze 0.20</span></p>
         <p>Jednoduchý editor pro zápis a úpravu šachových partií ve formátu PGN, určený hlavně pro telefon s Androidem. Aplikaci programuje Claude (umělá inteligence od společnosti Anthropic) ve spolupráci s Michalem Slivou, který určuje, co má aplikace umět a jak má vypadat.</p>
         <h3>Co aplikace umí</h3>
         <ul>
@@ -727,6 +768,9 @@ textarea.fen { min-height: 0; font-size: 14px; word-break: break-all; }
           <li>Otevření souboru PGN nebo vloženého textu, uložení do souboru .pgn, kopírování do schránky. Soubor .pgn jde otevřít i přímo z Gmailu nebo Správce souborů.</li>
           <li>Uložit zapisuje zpět do otevřeného souboru, Uložit jako vytvoří nový. V menu je vidět, že soubor má neuložené změny.</li>
           <li>Velké soubory s tisíci partiemi se otevřou hned, tahy partie se čtou až při jejím otevření.</li>
+          <li>V seznamu partií jde přidat partie z jiného souboru a měnit pořadí partií.</li>
+          <li>Volitelně další údaje v hlavičce (Elo, družstva, tempo, kód ECO, zahájení) a automatické doplnění kódu ECO a názvu zahájení podle tahů.</li>
+          <li>Graf průběhu partie po kontrole Stockfishem nebo z hodnocení uložených v souboru. Klepnutím do grafu skočíš na tah.</li>
           <li>Partie s chybou v zápisu se nezahodí: načtou se tahy před chybou a zbytek zápisu zůstane jako text v komentáři.</li>
           <li>Volitelně varianty a hodnocení tahů (!, ?, !!, ??, !?, ?!). Varianty, komentáře i hodnocení se načítají ze souboru a ukládají standardně, takže je přečte ChessBase.</li>
           <li>Automatický výsledek při matu i remíze (pat, nedostatek materiálu, trojí opakování, pravidlo 50 tahů).</li>
@@ -768,6 +812,16 @@ textarea.fen { min-height: 0; font-size: 14px; word-break: break-all; }
       <h2>Verze a změny</h2>
     </div>
     <div class="pbody log">
+        <section>
+          <div class="head"><span class="ver-badge">0.20</span><span class="date">12. 11. 2026</span></div>
+          <ul>
+            <li>Další údaje v hlavičce (zapínají se v Nastavení): Elo obou hráčů, družstva, tempo, kód ECO a název zahájení. Ze souborů se načítaly už dřív, teď jdou i upravit.</li>
+            <li>Zahájení podle tahů (zapíná se v Nastavení): kód ECO a název zahájení se doplní samy a jsou vidět v souhrnu zápisu. Zahájení se pozná i po přehození tahů. Názvy jsou anglicky.</li>
+            <li>Partie v souboru: tlačítko Přidat ze souboru připojí partie z jiného souboru PGN, šipkami se mění pořadí partií.</li>
+            <li>Graf průběhu partie pod šachovnicí: ukáže se po kontrole partie Stockfishem nebo u partií s hodnocením uloženým v souboru (Lichess). Klepnutím nebo tažením po grafu skočíš na tah.</li>
+            <li>Zkušební sestavení z rozpracovaných větví jsou na GitHubu označená jako zkušební a stará se sama mažou.</li>
+          </ul>
+        </section>
         <section>
           <div class="head"><span class="ver-badge">0.19</span><span class="date">12. 11. 2026</span></div>
           <ul>
@@ -966,6 +1020,7 @@ textarea.fen { min-height: 0; font-size: 14px; word-break: break-all; }
           <li><strong>chess.js 0.10.3</strong>, pravidla šachu. © Jeff Hlywa, licence BSD.</li>
           <li><strong>Figury cburnett</strong>, autor Colin M. L. Burnett, převzaté z projektu chessground (Lichess), licence GPL 3.</li>
           <li><strong>Písma IBM Plex Sans a IBM Plex Mono</strong>, © IBM Corp., licence SIL Open Font License 1.1.</li>
+          <li><strong>Tabulka zahájení</strong> (kódy ECO a názvy) z projektu chess-openings, Lichess, volné dílo (CC0). Zdroj: <a href="https://github.com/lichess-org/chess-openings">github.com/lichess-org/chess-openings</a></li>
           <li><strong>AndroidX Core</strong>, © The Android Open Source Project, licence Apache 2.0.</li>
         </ul>
         <h3>Texty licencí</h3>
@@ -1041,6 +1096,7 @@ textarea.fen { min-height: 0; font-size: 14px; word-break: break-all; }
 
 <script src="chess.js"></script>
 <script src="pgn.js"></script>
+<script src="eco.js"></script>
 <script>
 (function () {
   // Jednorázový přesun uložených dat ze staré adresy aplikace (file://) na novou (https),
@@ -1063,6 +1119,7 @@ textarea.fen { min-height: 0; font-size: 14px; word-break: break-all; }
   const PGN = window.PGN || {};
   const { START, TAGS, DEFAULTS, newNode, freshState, isLazy, toAscii, normalizeFen } = PGN;
   const SIMPLE = ['Event', 'Site', 'Date', 'Round', 'Result'];
+  const XTAGS = ['WhiteElo', 'BlackElo', 'WhiteTeam', 'BlackTeam', 'TimeControl', 'ECO', 'Opening'];
   const STORE_KEY = 'pgn-editor-file-v2';
   const OLD_STORE_KEY = 'pgn-editor-draft-v1';
   const NAMES = { k: 'král', q: 'dáma', r: 'věž', b: 'střelec', n: 'jezdec', p: 'pěšec' };
@@ -1090,7 +1147,8 @@ textarea.fen { min-height: 0; font-size: 14px; word-break: break-all; }
   let opts = { undo: false, comments: false, sendIcon: false, variants: false, nags: false,
     prefill: false, preEvent: true, preSite: true, preRound: true, preDate: 'prev',
     engine: false, engLines: 1, engDepth: 20, arrow: true,
-    strip: true, coords: 's', haptic: false, players: true, mic: false, micCont: true };
+    strip: true, coords: 's', haptic: false, players: true, mic: false, micCont: true,
+    moreTags: false, opening: false, graph: true };
   try { const o = JSON.parse(localStorage.getItem('pgn-opts') || 'null'); if (o) opts = Object.assign(opts, o); } catch (e) {}
 
   // Krok zpět si pamatuje jen kopii právě upravované partie, ostatní partie souboru se sdílejí.
@@ -1105,6 +1163,7 @@ textarea.fen { min-height: 0; font-size: 14px; word-break: break-all; }
     history.push({ games, cur: FILE.cur, name: FILE.name, uri: FILE.uri, dirty: FILE.dirty, gen: FILE.gen, saveOk: FILE.saveOk });
     if (history.length > 50) history.shift();
     FILE.dirty = true;
+    ecoPending = state; // po změně se při vykreslení přepočítá zahájení
   }
   function undo() {
     if (!history.length) return;
@@ -1148,6 +1207,29 @@ textarea.fen { min-height: 0; font-size: 14px; word-break: break-all; }
     if (flipped !== undefined) state.flipped = flipped;
     selected = null;
     rebuildLine();
+  }
+  // Hlavní linie partie jako tahy (nejvýš prvních max půltahů)
+  function mainSans(g, max) {
+    const a = []; let x = g.root;
+    while (x.ch.length && !(a.length >= max)) { x = x.ch[0]; a.push(x.s); }
+    return a;
+  }
+  // Zahájení podle pozic hlavní linie (tabulka v eco.js). Jen pro partie ze základního postavení.
+  const ecoCache = new Map();
+  function openingOf(g) {
+    if (!window.ECO || g.startFen !== START) return null;
+    const sans = mainSans(g, ECO.MAX_PLY), key = sans.join(' ');
+    if (!ecoCache.has(key)) { if (ecoCache.size > 300) ecoCache.clear(); ecoCache.set(key, ECO.find(Chess, sans, PGN.sanMove)); }
+    return ecoCache.get(key);
+  }
+  // Po změně tahů se kód ECO a název zahájení zapíšou do hlavičky (jen se zapnutou volbou)
+  let ecoPending = null; // partie, ve které se právě mění tahy
+  function updateOpening() {
+    if (!opts.opening) return;
+    const o = openingOf(state);
+    if (!o || (state.extra.ECO === o.eco && state.extra.Opening === o.name)) return;
+    state.extra.ECO = o.eco; state.extra.Opening = o.name;
+    fillTags();
   }
   function isMainLine(k) { return state.path.slice(0, k).every(x => x === 0); }
   function isEmptyGame(g) {
@@ -1460,7 +1542,8 @@ textarea.fen { min-height: 0; font-size: 14px; word-break: break-all; }
     $('tagsSum').textContent = parts.join(', ') || 'nevyplněno';
     const n = mainLength(state);
     const full = Math.ceil(n / 2);
-    $('movesSum').textContent = n ? full + ' ' + plural(full, 'tah', 'tahy', 'tahů') + (h.Result !== '*' ? ', ' + h.Result : '') : 'bez tahů';
+    const op = opts.opening ? openingOf(state) : null;
+    $('movesSum').textContent = n ? full + ' ' + plural(full, 'tah', 'tahy', 'tahů') + (h.Result !== '*' ? ', ' + h.Result : '') + (op ? ', ' + op.eco + ' ' + op.name : '') : 'bez tahů';
   }
 
   // Posune jen seznam tahů, aby byl aktuální tah vidět. Stránka sama zůstane na místě.
@@ -1482,6 +1565,7 @@ textarea.fen { min-height: 0; font-size: 14px; word-break: break-all; }
     $('counter').setAttribute('aria-label', 'Tah ' + cur + ' z ' + total);
     renderStrip();
     renderSums();
+    renderGraph();
     $('navStart').disabled = $('navPrev').disabled = state.ply === 0;
     $('navNext').disabled = $('navEnd').disabled = state.ply >= state.moves.length;
     $('undoLast').disabled = state.moves.length === 0;
@@ -1525,7 +1609,16 @@ textarea.fen { min-height: 0; font-size: 14px; word-break: break-all; }
       $('t' + t + 'Last').value = parts[0];
       $('t' + t + 'First').value = parts[1];
     });
+    XTAGS.forEach(t => { if (document.activeElement !== $('x' + t)) $('x' + t).value = state.extra[t] || ''; });
   }
+  // Další údaje hlavičky (zapínají se v Nastavení). Prázdné pole se do souboru nezapisuje.
+  XTAGS.forEach(t => {
+    $('x' + t).addEventListener('input', e => {
+      const v = e.target.value.trim();
+      if (v) state.extra[t] = v; else delete state.extra[t];
+      onTagChange();
+    });
+  });
   function onTagChange() { FILE.dirty = true; renderMoves(); renderSums(); persist(); syncText(); renderSend(); renderGames(); }
   SIMPLE.forEach(t => {
     $('t' + t).addEventListener('input', e => {
@@ -1616,14 +1709,16 @@ textarea.fen { min-height: 0; font-size: 14px; word-break: break-all; }
     let msg = label + (n > 1 ? ' (' + n + ' ' + plural(n, 'partie', 'partie', 'partií') + ', seznam najdeš v menu).' : '.');
     showMsg(msg, false);
   }
-  $('openFile').addEventListener('click', async () => { if (await confirmCloseFile('Otevřít jiný soubor?', 'Otevřít')) $('fileInput').click(); });
+  $('openFile').addEventListener('click', async () => { if (await confirmCloseFile('Otevřít jiný soubor?', 'Otevřít')) { pickAppend = false; $('fileInput').click(); } });
   $('fileInput').addEventListener('change', e => {
     const f = e.target.files && e.target.files[0];
     // adresa právě vybraného souboru, aby šlo ukládat zpět do něj
     const uri = ANDROID && ANDROID.takeOpenedUri ? ANDROID.takeOpenedUri() : '';
+    const append = pickAppend; pickAppend = false;
     if (!f) return;
     const reader = new FileReader();
     reader.onload = () => {
+      if (append) { appendFile(decodeBytes(reader.result), f.name); return; }
       const r = loadFile(decodeBytes(reader.result), f.name, uri);
       if (r.error) { showMsg(r.error, true); return; }
       afterLoad(r, 'Otevřeno: ' + f.name);
@@ -1812,6 +1907,8 @@ textarea.fen { min-height: 0; font-size: 14px; word-break: break-all; }
     });
     $('gamesEmpty').hidden = shown > 0;
     $('delGame').disabled = FILE.games.length === 1 && isEmptyGame(state);
+    $('gameUp').disabled = FILE.cur === 0;
+    $('gameDown').disabled = FILE.cur >= FILE.games.length - 1;
     if (scrollToCur) { const c = ol.querySelector('.game.cur'); if (c && c.scrollIntoView) c.scrollIntoView({ block: 'center' }); }
   }
   $('gameSearch').addEventListener('input', () => renderGames(false));
@@ -1820,6 +1917,34 @@ textarea.fen { min-height: 0; font-size: 14px; word-break: break-all; }
     setDrawer(false);
     toast('Nová partie č. ' + FILE.games.length + '.');
   });
+  // Přidání partií z jiného souboru na konec otevřeného
+  let pickAppend = false;
+  $('addFile').addEventListener('click', () => { pickAppend = true; $('fileInput').click(); });
+  function appendFile(text, name) {
+    const r = PGN.parseFile(text);
+    if (r.error) { showMsg(r.error, true); return; }
+    snapshot();
+    const flipped = state.flipped;
+    const keep = FILE.games.filter(g => !isEmptyGame(g)); // prázdná nevyplněná partie se nahradí
+    FILE.games = keep.concat(r.games);
+    useGame(keep.length, flipped);
+    if (r.firstError) notice = PGN.errorText(r.firstError);
+    if (opts.players) { const ns = new Set(); r.games.forEach(g => ['White', 'Black'].forEach(t => { const v = g.headers[t]; if (v && v !== '?') ns.add(v); })); players = [...ns].concat(players.filter(p => !ns.has(p))).slice(0, 1000); savePlayers(); }
+    fillTags(); renderAll(); renderGames(true);
+    const n = r.games.length;
+    toast('Přidáno ' + n + ' ' + plural(n, 'partie', 'partie', 'partií') + ' ze souboru ' + (name || '') + '.');
+  }
+  // Změna pořadí: aktuální partie se prohodí se sousední
+  function moveGame(dir) {
+    const i = FILE.cur, j = i + dir;
+    if (j < 0 || j >= FILE.games.length) return;
+    snapshot();
+    const a = FILE.games[i]; FILE.games[i] = FILE.games[j]; FILE.games[j] = a;
+    FILE.cur = j;
+    renderAll(); renderGames(true);
+  }
+  $('gameUp').addEventListener('click', () => moveGame(-1));
+  $('gameDown').addEventListener('click', () => moveGame(1));
   $('delGame').addEventListener('click', async () => {
     const ok = await askConfirm('Smazat partii?', 'Partie č. ' + (FILE.cur + 1) + ' ' + gameNames(state) + ' se ze souboru smaže.' + (opts.undo ? ' Omyl jde vrátit tlačítkem ↶.' : ''), 'Smazat');
     if (!ok) return;
@@ -2402,6 +2527,73 @@ textarea.fen { min-height: 0; font-size: 14px; word-break: break-all; }
     renderAll();
     toast(asVariant ? 'Pokračování vloženo do zápisu jako varianta.' : 'Pokračování vloženo do zápisu.');
   }
+  /* ---------- Graf průběhu partie ---------- */
+  // Hodnocení pozic hlavní linie z pohledu bílého: v = podíl bílého 0 až 100, s = text hodnocení.
+  // Bere se z poslední kontroly partie (state.ev, platí jen pro stejné tahy), nebo ze značek [%eval]
+  // v komentářích, které do souboru ukládá Lichess.
+  function evalSeries() {
+    const sans = mainSans(state);
+    if (!sans.length) return null;
+    if (state.ev && state.ev.key === sans.join(' ')) return state.ev;
+    const v = [], s = [];
+    let node = state.root, found = 0;
+    while (node.ch.length) {
+      node = node.ch[0];
+      const m = /\[%eval\s+(#?-?\d+(?:\.\d+)?)/.exec(node.c || '');
+      if (!m) { v.push(null); s.push(''); continue; }
+      const sc = m[1][0] === '#' ? { mate: +m[1].slice(1) } : { cp: Math.round(+m[1] * 100) };
+      v.push(Math.round(whiteShare(sc))); s.push(fmtScore(sc)); found++;
+    }
+    if (found < 4 || found < sans.length * 0.6) return null;
+    for (let i = 0; i < v.length; i++) if (v[i] === null) { v[i] = i ? v[i - 1] : v.find(x => x !== null); s[i] = i ? s[i - 1] : ''; }
+    return { v: [v[0]].concat(v), s: [''].concat(s) };
+  }
+  let graphData = null;
+  function renderGraph() {
+    const box = $('graph');
+    graphData = opts.engine && opts.graph && state ? evalSeries() : null;
+    box.hidden = !graphData;
+    if (!graphData) return;
+    const v = graphData.v, n = v.length - 1;
+    // okraje 3 % po stranách a 8 % nahoře a dole, aby čára ani značka nebyly u kraje oříznuté
+    const gx = i => 3 + i / n * 94, gy = i => 8 + (100 - v[i]) * 0.84;
+    const line = v.map((_, i) => (i ? 'L' : 'M') + gx(i).toFixed(2) + ' ' + gy(i).toFixed(1)).join('');
+    $('graphLine').setAttribute('d', line);
+    $('graphArea').setAttribute('d', line + 'L97 50L3 50Z');
+    // značka zobrazeného tahu; ve variantě stojí na místě, kde se z hlavní linie odbočilo
+    let k = 0;
+    while (k < state.ply && state.path[k] === 0) k++;
+    const cur = $('graphCur');
+    cur.style.left = gx(k) + '%';
+    cur.style.setProperty('--y', gy(k) + '%');
+    const label = k === 0 ? 'začátek' : moveNumber(k - 1) + (isWhiteMove(k - 1) ? '. ' : '... ') + show(LINE[k] && isMainLine(k) ? LINE[k].s : mainSans(state)[k - 1]);
+    $('graphVal').textContent = label + (graphData.s[k] ? '  ' + graphData.s[k] : '');
+    const plot = $('graphPlot');
+    plot.setAttribute('aria-valuemin', 0); plot.setAttribute('aria-valuemax', n); plot.setAttribute('aria-valuenow', k);
+    plot.setAttribute('aria-valuetext', label + (graphData.s[k] ? ', hodnocení ' + graphData.s[k] : ''));
+  }
+  // Klepnutí nebo tažení po grafu skočí na příslušný tah hlavní linie
+  (() => {
+    const plot = $('graphPlot');
+    let down = false, want = -1, raf = 0;
+    const seek = e => {
+      if (!graphData || eng.checking) return;
+      const r = plot.getBoundingClientRect(), n = graphData.v.length - 1;
+      want = Math.max(0, Math.min(n, Math.round(((e.clientX - r.left) / r.width * 100 - 3) / 94 * n)));
+      if (raf) return;
+      raf = requestAnimationFrame(() => { raf = 0; if (want !== state.ply || !isMainLine(state.ply)) goPath(Array(want).fill(0)); });
+    };
+    plot.addEventListener('pointerdown', e => { down = true; try { plot.setPointerCapture(e.pointerId); } catch (err) {} seek(e); });
+    plot.addEventListener('pointermove', e => { if (down) seek(e); });
+    ['pointerup', 'pointercancel'].forEach(t => plot.addEventListener(t, () => { down = false; }));
+    plot.addEventListener('keydown', e => {
+      if (!graphData || (e.key !== 'ArrowLeft' && e.key !== 'ArrowRight')) return;
+      e.preventDefault(); e.stopPropagation();
+      let k = 0; while (k < state.ply && state.path[k] === 0) k++;
+      goPath(Array(Math.max(0, Math.min(graphData.v.length - 1, k + (e.key === 'ArrowRight' ? 1 : -1)))).fill(0));
+    });
+  })();
+
   function setEngineOn(on) {
     engineOn = on;
     if (!on) { engineStop(); eng.liveFen = null; }
@@ -2476,6 +2668,13 @@ textarea.fen { min-height: 0; font-size: 14px; word-break: break-all; }
     eng.checking = null; eng.liveFen = null;
     if (aborted) { renderEngine(); analyzeCurrent(); toast('Kontrola přerušena, partie zůstala beze změny.'); return; }
     snapshot();
+    // hodnocení všech pozic pro graf průběhu partie (do souboru PGN se neukládá)
+    state.ev = { key: main.map(x => x.s).join(' '), v: [], s: [] };
+    evals.forEach(e => {
+      if (e.mate === 0) { state.ev.v.push(e.turn === 'w' ? 0 : 100); state.ev.s.push('mat'); return; }
+      const sc = whiteScore(e);
+      state.ev.v.push(Math.round(whiteShare(sc))); state.ev.s.push(fmtScore(sc));
+    });
     const stats = { w: [0, 0, 0], b: [0, 0, 0] };
     for (const i of suspects) {
       const before = evals[i], mover = before.turn;
@@ -2570,6 +2769,12 @@ textarea.fen { min-height: 0; font-size: 14px; word-break: break-all; }
     $('engineBtn').hidden = !opts.engine;
     $('optEngLines').value = String(opts.engLines);
     $('optEngDepth').value = String(opts.engDepth);
+    $('optGraph').checked = opts.graph;
+    $('optMoreTags').checked = opts.moreTags;
+    $('optOpening').checked = opts.opening;
+    document.querySelectorAll('#pTags .xt').forEach(el => { el.hidden = !opts.moreTags; });
+    ['xECO', 'xOpening'].forEach(id => { $(id).disabled = opts.opening; $(id).placeholder = opts.opening ? 'doplní se podle tahů' : ''; });
+    if (state) { fillTags(); renderCounter(); }
     if (!opts.engine && engineOn) setEngineOn(false);
     if (!opts.engine && eng.worker && !eng.checking) engineQuit();
   }
@@ -2593,6 +2798,9 @@ textarea.fen { min-height: 0; font-size: 14px; word-break: break-all; }
   $('optMicCont').addEventListener('change', e => { opts.micCont = e.target.checked; saveOpts(); });
   $('optEngLines').addEventListener('change', e => { opts.engLines = +e.target.value; saveOpts(); eng.liveFen = null; analyzeCurrent(); });
   $('optEngDepth').addEventListener('change', e => { opts.engDepth = +e.target.value; saveOpts(); eng.liveFen = null; analyzeCurrent(); });
+  $('optGraph').addEventListener('change', e => { opts.graph = e.target.checked; saveOpts(); renderGraph(); });
+  $('optMoreTags').addEventListener('change', e => { opts.moreTags = e.target.checked; saveOpts(); applyOpts(); });
+  $('optOpening').addEventListener('change', e => { opts.opening = e.target.checked; saveOpts(); applyOpts(); });
   applyOpts();
 
   /* ---------- Komentář k tahu ---------- */
@@ -2843,7 +3051,7 @@ textarea.fen { min-height: 0; font-size: 14px; word-break: break-all; }
   /* ---------- Přepnutí partie přetažením do strany ---------- */
   (() => {
     let t0 = null;
-    const ignore = el => el.closest('.board-wrap, .strip, input, textarea, select, .engine, .sugg, .moves .var');
+    const ignore = el => el.closest('.board-wrap, .strip, .graph, input, textarea, select, .engine, .sugg, .moves .var');
     document.querySelector('.app').addEventListener('touchstart', e => {
       t0 = null;
       if (e.touches.length !== 1 || FILE.games.length < 2 || editor || eng.checking || drawerOpen()) return;
@@ -3421,6 +3629,7 @@ textarea.fen { min-height: 0; font-size: 14px; word-break: break-all; }
 
   const SAMPLE = '[Event "Ukázka"]\n[Site "Paříž"]\n[Date "1858.??.??"]\n[Round "?"]\n[White "Morphy, Paul"]\n[Black "Vévoda Brunšvický a hrabě Isouard"]\n[Result "1-0"]\n\n1. e4 e5 2. Nf3 d6 3. d4 Bg4 4. dxe5 Bxf3 5. Qxf3 dxe5 6. Bc4 Nf6 7. Qb3 Qe7 8. Nc3 c6 9. Bg5 b5 10. Nxb5 cxb5 11. Bxb5+ Nbd7 12. O-O-O Rd8 13. Rxd7 Rxd7 14. Rd1 Qe6 15. Bxd7+ Nxd7 16. Qb8+ Nxb8 17. Rd8# 1-0';
   function renderAll() {
+    if (ecoPending) { if (ecoPending === state) updateOpening(); ecoPending = null; }
     renderBoard(); renderMoves(); renderCounter(); syncText(); renderSend(); renderGames(); persist();
     if (notice && booted) { // partii nešlo přečíst celou
       const t = notice; notice = '';

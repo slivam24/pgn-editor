@@ -23,18 +23,37 @@ Aplikace je stejná webová stránka jako dosud (`app/src/main/assets/www/index.
 
 Při každém sestavení na GitHubu se nejdřív spustí testy. Když neprojdou, APK se nevytvoří a v záložce **Actions** je vidět, který test selhal.
 
-- `tests/pgn.test.js` zkouší čtení a zápis PGN: varianty, komentáře, chybné partie, FEN.
+- `tests/pgn.test.js` zkouší čtení a zápis PGN: varianty, komentáře, chybné partie, FEN, názvy zahájení.
+- `tests/verze.test.js` hlídá, že je číslo verze stejné v `app/build.gradle`, v O aplikaci i ve Verze a změny.
 - `tests/prohlizec.js` otevře aplikaci v prohlížeči Chrome a zkouší ukládání rozpracovaného souboru do paměti telefonu, velký soubor a přechod ze starší verze.
 
 Ruční spuštění v počítači s nainstalovaným Node.js:
 
 ```bash
-node --test tests/pgn.test.js
+node --test tests/pgn.test.js tests/verze.test.js
 ```
+
+## Vydání a zkušební sestavení
+
+Sestavení z hlavní větve `main` je běžné vydání. Sestavení z jakékoli jiné větve se v **Releases** označí jako zkušební (Pre-release) a zůstává jich posledních pět, starší se mažou samy.
 
 ## Podpisový klíč
 
-Soubor `app/pgn-editor.keystore` podepisuje aplikaci. Díky němu jde každá další verze nainstalovat přes předchozí. Neztrať ho a repozitář nech soukromý, heslo je přímo v `app/build.gradle`. Bez tohoto klíče by šlo novou verzi nainstalovat jen po odinstalování staré (a tím i ztrátě uložené partie a nastavení).
+Aplikaci podepisuje klíč. Díky stejnému klíči jde každá další verze nainstalovat přes předchozí bez ztráty partií a nastavení.
+
+**Pozor:** klíč `app/pgn-editor.keystore` i jeho heslo (v `app/build.gradle`) jsou součástí repozitáře a repozitář je veřejný. Kdokoli si je tedy může stáhnout a podepsat jimi vlastní APK, které se bude tvářit jako aktualizace PGN editoru. Dokud aplikaci instaluješ jen z vlastních Releases, nic se neděje. Pokud ji ale budeš šířit dál nebo ji dáš na Google Play, je potřeba nový klíč, který v repozitáři není.
+
+### Přechod na tajný klíč
+
+Sestavení je na to připravené. Když v repozitáři na GitHubu existují tajné hodnoty (**Settings > Secrets and variables > Actions > New repository secret**), použijí se místo klíče z repozitáře:
+
+| Název | Obsah |
+|---|---|
+| `KEYSTORE_BASE64` | soubor s klíčem převedený na text (base64) |
+| `KEYSTORE_PASSWORD` | heslo ke klíči |
+| `KEY_ALIAS` | název klíče v souboru |
+
+Nový klíč znamená jednorázově aplikaci odinstalovat a nainstalovat znovu, protože Android nedovolí přeinstalovat aplikaci podepsanou jiným klíčem. Před tím si partie ulož do souboru. Starý klíč pak může z repozitáře pryč.
 
 ## Co je kde
 
@@ -42,6 +61,7 @@ Soubor `app/pgn-editor.keystore` podepisuje aplikaci. Díky němu jde každá da
 |---|---|
 | `app/src/main/assets/www/index.html` | aplikace (vzhled i logika) |
 | `app/src/main/assets/www/pgn.js` | čtení a zápis PGN (tahy, varianty, komentáře, FEN) |
+| `app/src/main/assets/www/eco.js` | tabulka zahájení (kód ECO a název), vytváří ji `tools/eco.js` |
 | `app/src/main/assets/www/chess.js` | pravidla šachu (chess.js 0.10.3) |
 | `app/src/main/assets/www/fonts/` | písma IBM Plex |
 | `app/src/main/java/.../MainActivity.java` | obal: otevírání a ukládání souborů, schránka, e-mail, tlačítko Zpět |
@@ -60,10 +80,9 @@ PGN editor je svobodný software pod licencí **GNU GPL verze 3** (soubor `LICEN
 | chess.js 0.10.3 | Jeff Hlywa | BSD |
 | Figury cburnett (z projektu chessground) | Colin M. L. Burnett | GPL 3 |
 | Písma IBM Plex Sans a Mono | IBM Corp. | SIL OFL 1.1 |
+| Tabulka zahájení (chess-openings) | Lichess | CC0 |
 | AndroidX Core | The Android Open Source Project | Apache 2.0 |
 
 Texty licencí jsou ve složce `app/src/main/assets/www/licence/` a v aplikaci v menu Licence. Zdrojový kód Stockfishe: https://github.com/official-stockfish/Stockfish, Stockfish.js: https://github.com/nmrugg/stockfish.js.
-
-**Před zveřejněním repozitáře** je potřeba přesunout podpisový klíč `app/pgn-editor.keystore` a jeho heslo z repozitáře do tajného úložiště GitHubu (Secrets) a odstranit je i z historie.
 
 Alternativa ke GitHubu: projekt jde otevřít v Android Studiu a sestavit přes **Build > Generate App Bundles or APKs > Build APK(s)**.

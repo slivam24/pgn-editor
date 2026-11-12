@@ -179,3 +179,17 @@ test('rychlé čtení tahů se shoduje s chess.js na náhodných partiích', () 
   assert.ok(checked > 5000);
   assert.ok(extra < checked / 20, 'rychlá cesta čte podezřele mnoho tahů, které chess.js odmítá: ' + extra);
 });
+
+// Tabulka zahájení (eco.js): hledá se podle pozice, takže se zahájení pozná i po přehození tahů
+test('zahájení podle tahů: kód ECO a název', () => {
+  const ECO = require('../app/src/main/assets/www/eco.js');
+  const find = s => ECO.find(Chess, s.split(' '), PGN.sanMove);
+  assert.deepEqual(find('e4 c5 Nf3 d6 d4 cxd4 Nxd4 Nf6 Nc3 a6'), { eco: 'B90', name: 'Sicilian Defense: Najdorf Variation', ply: 10 });
+  assert.equal(find('e4 e5 Nf3 d6 d4 Bg4').eco, 'C41');
+  // královská indická přes 1. Nf3 dojde do stejné pozice jako přes 1. d4
+  assert.equal(find('Nf3 Nf6 c4 g6 Nc3 Bg7 e4 d6 d4').eco, find('d4 Nf6 c4 g6 Nc3 Bg7 e4 d6 Nf3').eco);
+  assert.match(find('Nf3 Nf6 c4 g6 Nc3 Bg7 e4 d6 d4').name, /^King's Indian Defense/);
+  assert.equal(find(''), null);
+  // stejný výsledek s rychlým i pomalým čtením tahů
+  assert.deepEqual(ECO.find(Chess, 'd4 d5 c4 e6 Nc3 Nf6'.split(' ')), find('d4 d5 c4 e6 Nc3 Nf6'));
+});
