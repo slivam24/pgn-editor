@@ -1,6 +1,8 @@
 <?xml version="1.0" encoding="utf-8"?>
 <manifest xmlns:android="http://schemas.android.com/apk/res/android">
 
+    <!-- Internet jen pro funkci Stáhnout z odkazu (Lichess, Chess.com). Jinak aplikace funguje bez připojení. -->
+    <uses-permission android:name="android.permission.INTERNET" />
     <!-- Hlasové zadávání tahů (volitelné, povolení se vyžádá až při prvním použití) -->
     <uses-permission android:name="android.permission.RECORD_AUDIO" />
     <!-- Krátká vibrace po tahu (volitelné) -->
@@ -15,6 +17,7 @@
 
     <application
         android:allowBackup="true"
+        android:enableOnBackInvokedCallback="true"
         android:icon="@mipmap/ic_launcher"
         android:roundIcon="@mipmap/ic_launcher"
         android:label="@string/app_name"

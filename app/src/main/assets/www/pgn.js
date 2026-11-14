@@ -210,6 +210,15 @@
   function sanMove(chess, san) {
     return fastMove(chess, san) || chess.move(san, { sloppy: true });
   }
+  // Česká notace (J jezdec, S střelec, V věž, D dáma, braní dvojtečkou). Anglický zápis má přednost,
+  // český se zkusí, až když tah anglicky přečíst nejde. Písmena J, S, V, D anglická notace nepoužívá.
+  const CZ_PIECE = { J: 'N', S: 'B', V: 'R', D: 'Q' };
+  function czToEn(san) {
+    return san.replace(/^[JSVD]/, c => CZ_PIECE[c]).replace(/([1-8]=?)([JSVD])(?=[+#]*$)/, (m, a, c) => a + CZ_PIECE[c]).replace(':', 'x');
+  }
+  function anyMove(chess, san) {
+    return sanMove(chess, san) || (/[JSVD:]/.test(san) ? sanMove(chess, czToEn(san)) : null);
+  }
 
   /* ---------- Čtení PGN ---------- */
   const SUFFIX_NAG = { '!': 1, '?': 2, '!!': 3, '??': 4, '!?': 5, '?!': 6 };
@@ -356,7 +365,7 @@
         const sm = san.match(/^(.*?)([!?]{1,2})$/);
         if (sm) { san = sm[1]; suffix = sm[2]; }
         san = san.replace(/^0-0-0/, 'O-O-O').replace(/^0-0/, 'O-O').replace(/e\.p\.$/, '');
-        const mv = sanMove(chess, san);
+        const mv = anyMove(chess, san);
         if (!mv) {
           if (stack.length) {
             // varianta: přečtené tahy zůstanou, zbytek jde do komentáře u posledního z nich,
@@ -467,6 +476,88 @@
     return clockTag(sec) + (rest ? ' ' + rest : '');
   }
 
+  // Tahy hlavní linie v jednotné podobě (bez značek šachu a hodnocení), pro hledání stejných partií.
+  // Neotevřená partie se kvůli tomu nečte celá, stačí její text.
+  function mainMoves(g) {
+    const out = [];
+    if (isLazy(g)) {
+      let depth = 0;
+      for (const t of tokenize(g.raw)) {
+        if (t.type === '(') depth++;
+        else if (t.type === ')') depth = Math.max(0, depth - 1);
+        else if (t.type === 'move' && depth === 0) out.push(czToEn(t.v.replace(/[+#!?]/g, '').replace(/^0-0-0/, 'O-O-O').replace(/^0-0/, 'O-O')));
+      }
+      return out;
+    }
+    let x = g.root;
+    while (x.ch.length) { x = x.ch[0]; out.push(x.s.replace(/[+#]/g, '')); }
+    return out;
+  }
+
+  /* ---------- Partie z odkazu (Lichess, Chess.com) ---------- */
+  // Z odkazu na partii pozná, odkud a co stáhnout. Vrací { site, url }, nebo null.
+  const LICHESS_WORDS = ['analysis', 'training', 'practice', 'features', 'insights', 'storm', 'racer', 'streak', 'coach', 'learn', 'forum', 'team', 'player', 'tournament', 'swiss', 'simul', 'broadcast', 'editor', 'video', 'blog', 'inbox', 'page', 'account', 'login', 'signup', 'opening', 'api', 'tv', 'games', 'paste', 'variant'];
+  function linkInfo(text) {
+    const t = String(text || '').trim();
+    if (!t || /\s/.test(t)) return null;
+    let m = /^(?:https?:\/\/)?(?:www\.)?lichess\.org\/(.+)$/i.exec(t);
+    if (m) {
+      const seg = m[1].split(/[?#]/)[0].split('/').filter(Boolean);
+      if (seg[0] === 'study' && /^[A-Za-z0-9]{8}$/.test(seg[1] || '')) {
+        return { site: 'lichess', url: 'https://lichess.org/api/study/' + seg[1] + (/^[A-Za-z0-9]{8}$/.test(seg[2] || '') ? '/' + seg[2] : '') + '.pgn' };
+      }
+      const first = seg[0] === 'embed' ? (seg[1] === 'game' ? seg[2] : seg[1]) : seg[0];
+      if (first && /^[A-Za-z0-9]{8}([A-Za-z0-9]{4})?$/.test(first) && LICHESS_WORDS.indexOf(first.toLowerCase()) === -1) {
+        return { site: 'lichess', url: 'https://lichess.org/game/export/' + first.slice(0, 8) + '?clocks=true&evals=true' };
+      }
+      return null;
+    }
+    m = /^(?:https?:\/\/)?(?:www\.)?chess\.com\/(?:[a-z]{2}(?:-[A-Z]{2})?\/)?(?:analysis\/)?(?:game\/(live|daily)|(live|daily)\/game)\/(\d+)/i.exec(t);
+    if (m) return { site: 'chesscom', url: 'https://www.chess.com/callback/' + (m[1] || m[2]).toLowerCase() + '/game/' + m[3] };
+    m = /^(?:https?:\/\/)?(?:www\.)?chess\.com\/(?:[a-z]{2}(?:-[A-Z]{2})?\/)?game\/(\d+)/i.exec(t);
+    if (m) return { site: 'chesscom', url: 'https://www.chess.com/callback/live/game/' + m[1] };
+    return null;
+  }
+  // Chess.com posílá partii jako data s tahy ve vlastním kódování (dva znaky na tah). Převede je na PGN.
+  const TCN = 'abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789!?{~}(^)[_]@#$,./&-*++=';
+  function chessComPgn(data) {
+    const g = data && data.game;
+    if (!g || typeof g.moveList !== 'string') return null;
+    const h = g.pgnHeaders || {};
+    const setup = h.FEN && String(h.FEN).split(' ')[0] !== START.split(' ')[0];
+    const chess = new Chess(setup ? h.FEN : START);
+    const sq = i => FILES[i % 8] + (Math.floor(i / 8) + 1);
+    const times = typeof g.moveTimestamps === 'string' ? g.moveTimestamps.split(',') : [];
+    const fp = (setup ? String(h.FEN) : START).split(' ');
+    let num = parseInt(fp[5], 10) || 1, white = fp[1] !== 'b', text = '';
+    for (let i = 0; i + 1 < g.moveList.length; i += 2) {
+      const a = TCN.indexOf(g.moveList[i]);
+      let b = TCN.indexOf(g.moveList[i + 1]), promotion;
+      if (a < 0 || a > 63 || b < 0) break;
+      if (b > 63) { // proměna pěšce: znak určuje figuru a směr
+        if (b > 75) break;
+        promotion = 'qnrb'[Math.floor((b - 64) / 3)];
+        b = a + (a < 16 ? -8 : 8) + (b - 64) % 3 - 1;
+      }
+      const mv = chess.move(promotion ? { from: sq(a), to: sq(b), promotion } : { from: sq(a), to: sq(b) });
+      if (!mv) break;
+      text += (white ? num + '. ' : (text ? '' : num + '... ')) + mv.san + ' ';
+      const ts = +times[i / 2];
+      if (times[i / 2] !== undefined && ts >= 0) { // zbývající čas v desetinách sekundy
+        const sec = Math.floor(ts / 10);
+        text += '{[%clk ' + Math.floor(sec / 3600) + ':' + String(Math.floor(sec % 3600 / 60)).padStart(2, '0') + ':' + String(sec % 60).padStart(2, '0') + ']} ';
+      }
+      if (!white) num++;
+      white = !white;
+    }
+    const tag = (k, v) => '[' + k + ' "' + String(v).replace(/[\\"]/g, "'") + '"]\n';
+    let out = tag('Event', h.Event || 'Chess.com') + tag('Site', 'Chess.com') + tag('Date', h.Date || '????.??.??') + tag('Round', '-') +
+      tag('White', h.White || '?') + tag('Black', h.Black || '?') + tag('Result', h.Result || '*');
+    ['WhiteElo', 'BlackElo', 'TimeControl', 'ECO', 'Termination'].forEach(k => { if (h[k] !== undefined && h[k] !== '') out += tag(k, h[k]); });
+    if (setup) out += tag('SetUp', '1') + tag('FEN', h.FEN);
+    return out + '\n' + text + (h.Result || '*') + '\n';
+  }
+
   // Věta do upozornění, když partii nešlo přečíst celou
   function errorText(e) {
     if (!e) return '';
@@ -507,5 +598,5 @@
 
   return { START, TAGS, DEFAULTS, newNode, freshState, isLazy, toAscii, buildPgn, normalizeFen, sanMove, fastMove,
     splitGames, tokenize, stubGame, parseMoves, materialize, gamePgn, countMoves, mainLength, errorText, parseFile,
-    parseClock, fmtClock, getClock, setClock, looksBinary };
+    parseClock, fmtClock, getClock, setClock, looksBinary, czToEn, mainMoves, linkInfo, chessComPgn };
 });

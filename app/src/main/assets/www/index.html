@@ -284,6 +284,15 @@ body.booting { pointer-events: none; }
 .pfoot { flex: none; display: flex; gap: 8px; padding: 10px 16px max(12px, env(safe-area-inset-bottom, 0px)); border-top: 1px solid var(--line); background: var(--bg); }
 .pfoot .btn { flex: 1; }
 .pfoot.rows { flex-direction: column; }
+.pfoot[hidden] { display: none; }
+.pfoot .btn.small { flex: none; }
+.sel-count { flex: 1; align-self: center; font-size: 14px; color: var(--muted); }
+.gtools { display: flex; gap: 8px; margin: 8px 0; }
+.gtools[hidden] { display: none; }
+.games { align-content: start; }
+.games .game.pick .no { width: 22px; height: 22px; min-width: 22px; border: 1.5px solid var(--muted); border-radius: 5px; display: grid; place-items: center; color: var(--accent-fg); font-family: var(--font-ui); font-size: 14px; }
+.games .game.pick.on .no { background: var(--accent); border-color: var(--accent); color: var(--accent-fg); }
+.games .game.pick.on { border-color: var(--accent); }
 .pfoot .prow { display: flex; gap: 8px; }
 .pfoot .btn.fix { flex: none; width: 52px; padding-left: 0; padding-right: 0; display: grid; place-items: center; }
 .phead .count { min-width: 24px; padding: 1px 7px; border-radius: 11px; background: var(--accent-soft); font-size: 13px; text-align: center; }
@@ -594,8 +603,10 @@ textarea.fen { min-height: 0; font-size: 14px; word-break: break-all; }
       <button class="mi" type="button" id="sendMail"><svg class="mi-ic" viewBox="0 0 24 24" width="22" height="22" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M21 3L10 14"/><path d="M21 3l-6.5 18-3.5-7-7-3.5z"/></svg><span class="mi-l">Odeslat</span></button>
       <button class="mi" type="button" id="copyPgn"><svg class="mi-ic" viewBox="0 0 24 24" width="22" height="22" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="8" y="8" width="12" height="12" rx="2"/><path d="M16 8V6a2 2 0 0 0-2-2H6a2 2 0 0 0-2 2v8a2 2 0 0 0 2 2h2"/></svg><span class="mi-l">Kopírovat PGN</span></button>
       <button class="mi" type="button" data-page="pgText"><svg class="mi-ic" viewBox="0 0 24 24" width="22" height="22" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M14 3H7a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2V8z"/><path d="M14 3v5h5M9 13h6M9 17h6"/></svg><span class="mi-l">PGN text</span><svg class="mi-chev" viewBox="0 0 24 24" width="18" height="18" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 6l6 6-6 6"/></svg></button>
+      <button class="mi" type="button" data-page="pgLink"><svg class="mi-ic" viewBox="0 0 24 24" width="22" height="22" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M10 14a4 4 0 0 0 5.7 0l3-3a4 4 0 0 0-5.7-5.7l-1 1"/><path d="M14 10a4 4 0 0 0-5.7 0l-3 3a4 4 0 0 0 5.7 5.7l1-1"/></svg><span class="mi-l">Stáhnout z odkazu</span><svg class="mi-chev" viewBox="0 0 24 24" width="18" height="18" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 6l6 6-6 6"/></svg></button>
       <div class="msep"></div>
       <button class="mi" type="button" data-page="pgImage"><svg class="mi-ic" viewBox="0 0 24 24" width="22" height="22" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="16" rx="2"/><circle cx="9" cy="10" r="2"/><path d="M21 16l-5-5-9 9"/></svg><span class="mi-l">Obrázek pozice</span><svg class="mi-chev" viewBox="0 0 24 24" width="18" height="18" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 6l6 6-6 6"/></svg></button>
+      <button class="mi" type="button" data-page="pgPrint"><svg class="mi-ic" viewBox="0 0 24 24" width="22" height="22" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M7 9V4h10v5"/><rect x="4" y="9" width="16" height="8" rx="2"/><path d="M7 14h10v6H7z"/></svg><span class="mi-l">Tisk a PDF</span><svg class="mi-chev" viewBox="0 0 24 24" width="18" height="18" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 6l6 6-6 6"/></svg></button>
       <button class="mi" type="button" data-page="pgFen"><svg class="mi-ic" viewBox="0 0 24 24" width="22" height="22" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="4" y="4" width="16" height="16" rx="1.5"/><path d="M4 12h16M12 4v16"/><path d="M4 8h4v4H4zM12 12h4v4h-4zM8 4v4M16 8h4v4M8 16h4v4"/></svg><span class="mi-l">Nová partie z pozice</span><svg class="mi-chev" viewBox="0 0 24 24" width="18" height="18" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 6l6 6-6 6"/></svg></button>
       <button class="mi danger" type="button" id="newGame"><svg class="mi-ic" viewBox="0 0 24 24" width="22" height="22" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M14 3H7a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2V8z"/><path d="M14 3v5h5M12 11v6M9 14h6"/></svg><span class="mi-l">Nový soubor</span></button>
       <div class="msep"></div>
@@ -615,11 +626,28 @@ textarea.fen { min-height: 0; font-size: 14px; word-break: break-all; }
     </div>
     <div class="pbody">
         <input type="search" id="gameSearch" class="gsearch" placeholder="Hledat hráče, turnaj nebo kolo" autocomplete="off" hidden>
+        <div class="gtools" id="gameTools" hidden>
+          <button class="btn small" id="gSelect" type="button">Vybrat</button>
+          <button class="btn small" id="gSort" type="button">Seřadit</button>
+          <button class="btn small" id="gDup" type="button">Duplicity</button>
+        </div>
         <ol class="games" id="gamesList"></ol>
         <p class="note" id="gamesEmpty" hidden>Žádná partie neodpovídá hledání.</p>
 
     </div>
-    <div class="pfoot rows">
+    <div class="pfoot rows" id="selFoot" hidden>
+      <div class="prow">
+        <span class="sel-count" id="selCount"></span>
+        <button class="btn small" id="selAll" type="button">Vše</button>
+        <button class="btn small" id="selNone" type="button">Nic</button>
+      </div>
+      <div class="prow">
+        <button class="btn" id="selSave" type="button">Uložit</button>
+        <button class="btn danger" id="selDel" type="button">Smazat</button>
+        <button class="btn primary" id="selDone" type="button">Hotovo</button>
+      </div>
+    </div>
+    <div class="pfoot rows" id="gamesFoot">
       <div class="prow">
         <button class="btn primary" id="addGame" type="button">Přidat partii</button>
         <button class="btn" id="addFile" type="button">Přidat ze souboru</button>
@@ -657,6 +685,36 @@ textarea.fen { min-height: 0; font-size: 14px; word-break: break-all; }
     <div class="pfoot">
       <button class="btn primary" id="diagShare" type="button">Sdílet</button>
       <button class="btn" id="diagSave" type="button">Uložit</button>
+    </div>
+  </section>
+  <section class="dpage" id="pgPrint" hidden>
+    <div class="phead">
+      <button class="icon-btn plain" type="button" data-back aria-label="Zpět"><svg viewBox="0 0 24 24" width="22" height="22" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M15 6l-6 6 6 6"/></svg></button>
+      <h2>Tisk a PDF</h2>
+    </div>
+    <div class="pbody">
+        <p class="note">Partie se zápisem tahů, variantami, komentáři a diagramy. V okně tisku vybereš tiskárnu, nebo Uložit jako PDF.</p>
+        <label class="srow"><span class="st"><b>Diagramy</b></span>
+          <select id="printEvery"><option value="0">žádné</option><option value="5">po 5 tazích</option><option value="10" selected>po 10 tazích</option><option value="15">po 15 tazích</option><option value="20">po 20 tazích</option></select></label>
+        <label class="srow"><span class="st"><b>Diagram konečné pozice</b></span><input type="checkbox" class="tgl" id="printEnd" checked></label>
+        <p class="msg" id="printMsg" role="status"></p>
+    </div>
+    <div class="pfoot">
+      <button class="btn primary" id="printGo" type="button">Vytisknout nebo uložit PDF</button>
+    </div>
+  </section>
+  <section class="dpage" id="pgLink" hidden>
+    <div class="phead">
+      <button class="icon-btn plain" type="button" data-back aria-label="Zpět"><svg viewBox="0 0 24 24" width="22" height="22" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M15 6l-6 6 6 6"/></svg></button>
+      <h2>Stáhnout z odkazu</h2>
+    </div>
+    <div class="pbody">
+        <p class="note">Vlož odkaz na partii nebo studii z Lichessu, nebo na partii z Chess.com. Stažení potřebuje připojení k internetu, jinak aplikace internet nepoužívá.</p>
+        <label class="field">Odkaz na partii<input id="linkIn" type="url" inputmode="url" autocomplete="off" autocapitalize="off" placeholder="např. https://lichess.org/q7ZvsdUF"></label>
+        <p class="msg" id="linkMsg" role="status"></p>
+    </div>
+    <div class="pfoot">
+      <button class="btn primary" id="linkGo" type="button">Stáhnout</button>
     </div>
   </section>
   <section class="dpage" id="pgFen" hidden>
@@ -737,7 +795,18 @@ textarea.fen { min-height: 0; font-size: 14px; word-break: break-all; }
           <label class="srow"><span class="st"><b>Ikona rychlého odeslání</b><small>Obálka v horní liště.</small></span><input type="checkbox" class="tgl" id="optSend"></label>
         </div>
         <div class="sgroup">
+          <h3>Záloha</h3>
+          <div class="srow col"><span class="st"><b>Záloha partií a nastavení</b><small>Jeden soubor se všemi partiemi otevřeného souboru a s nastavením aplikace. Hodí se před odinstalováním nebo při přechodu na jiný telefon.</small></span>
+            <div class="actions">
+              <button class="btn" id="backupSave" type="button">Zálohovat vše</button>
+              <button class="btn" id="backupLoad" type="button">Obnovit ze zálohy</button>
+            </div>
+          </div>
+        </div>
+        <div class="sgroup">
           <h3>Vzhled</h3>
+          <label class="srow"><span class="st"><b>Světlý nebo tmavý vzhled</b></span>
+            <select id="optTheme"><option value="auto">podle telefonu</option><option value="light">světlý</option><option value="dark">tmavý</option></select></label>
           <label class="srow"><span class="st"><b>Pás tahů pod šachovnicí</b><small>Tahy aktuální linie v jednom řádku.</small></span><input type="checkbox" class="tgl" id="optStrip"></label>
           <label class="srow"><span class="st"><b>Souřadnice</b></span>
             <select id="optCoords"><option value="s">malé</option><option value="l">velké</option><option value="n">skryté</option></select></label>
@@ -759,7 +828,7 @@ textarea.fen { min-height: 0; font-size: 14px; word-break: break-all; }
     </div>
     <div class="pbody prose">
 
-        <p><strong>PGN editor</strong> <span class="ver-badge">verze 0.23</span></p>
+        <p><strong>PGN editor</strong> <span class="ver-badge">verze 0.24</span></p>
         <p>Jednoduchý editor pro zápis a úpravu šachových partií ve formátu PGN, určený hlavně pro telefon s Androidem. Aplikaci programuje Claude (umělá inteligence od společnosti Anthropic) ve spolupráci s Michalem Slivou, který určuje, co má aplikace umět a jak má vypadat.</p>
         <h3>Co aplikace umí</h3>
         <ul>
@@ -782,7 +851,11 @@ textarea.fen { min-height: 0; font-size: 14px; word-break: break-all; }
           <li>Volitelně šachový motor Stockfish: rozbor pozice s hodnocením, nejlepší pokračování s vložením do zápisu a kontrola celé partie. Funguje bez internetu.</li>
           <li>Nová partie z libovolné pozice: rozestavením figur na šachovnici, nebo vložením FEN. FEN zobrazené pozice jde zkopírovat.</li>
           <li>Odeslání partie přes sdílení Androidu, nebo rovnou e-mailem na adresu z Nastavení. PGN je v textu i jako příloha. V Nastavení lze zapnout ikonu pro rychlé odeslání v horní liště.</li>
-          <li>Funguje bez připojení k internetu.</li>
+          <li>Funguje bez připojení k internetu. Internet používá jen funkce Stáhnout z odkazu (partie z Lichessu a Chess.com).</li>
+          <li>Tisk partie nebo uložení do PDF se zápisem, variantami, komentáři a diagramy.</li>
+          <li>Záloha všech partií a nastavení do jednoho souboru a obnova z něj (v Nastavení).</li>
+          <li>V seznamu partií jde vybrat víc partií najednou a uložit je do samostatného souboru nebo smazat, seřadit partie a najít duplicity.</li>
+          <li>Načte i zápis v české notaci (J, S, V, D).</li>
           <li>Potvrzení před smazáním nebo přepsáním partie.</li>
           <li>Volitelně (zapíná se v Nastavení): tlačítko ↶ pro vrácení posledních akcí a komentáře k tahům tlačítkem ✎.</li>
           <li>Rozpracovaný soubor se pamatuje i po zavření aplikace. Kdyby se ho nepodařilo uložit do paměti telefonu, aplikace to oznámí.</li>
@@ -817,6 +890,21 @@ textarea.fen { min-height: 0; font-size: 14px; word-break: break-all; }
       <h2>Verze a změny</h2>
     </div>
     <div class="pbody log">
+        <section>
+          <div class="head"><span class="ver-badge">0.24</span><span class="date">14. 11. 2026</span></div>
+          <ul>
+            <li>Listování partií a zadávání tahů je zhruba desetkrát rychlejší, hlavně u dlouhých partií. Aplikace si pamatuje pozici po každém tahu a nepřehrává partii pořád od začátku.</li>
+            <li>Seznam partií se u velkých souborů posouvá plynule, kreslí se jen viditelná část.</li>
+            <li>Seznam partií: tlačítko Vybrat pro označení více partií, které jde uložit do samostatného souboru nebo smazat. Seřadit podle kola, data nebo bílého hráče. Duplicity najde partie se stejnými hráči a tahy.</li>
+            <li>Tisk a PDF (menu): partie se zápisem, variantami, komentáři a diagramy po zvoleném počtu tahů. Jde vytisknout i celý soubor do 100 partií.</li>
+            <li>Stáhnout z odkazu (menu): partie nebo studie z Lichessu a partie z Chess.com. Odkaz jde do aplikace i nasdílet z prohlížeče. Je to jediná funkce, která potřebuje internet.</li>
+            <li>Záloha (Nastavení): Zálohovat vše uloží partie i nastavení do jednoho souboru, Obnovit ze zálohy je vrátí. Hodí se před odinstalováním nebo při přechodu na jiný telefon.</li>
+            <li>Načte se i zápis v české notaci (Jf3, Sc4, Vd1, Dd5, braní dvojtečkou). Do souboru se dál ukládá anglicky.</li>
+            <li>Světlý nebo tmavý vzhled jde zvolit v Nastavení nezávisle na telefonu.</li>
+            <li>Příprava na novější Android (15 a 16): obsah se správně odsazuje od systémových lišt a klávesnice, funguje nové gesto Zpět.</li>
+            <li>Při každém sestavení se aplikace nově zkouší i na emulátoru Androidu. Starý podpisový klíč je z repozitáře pryč.</li>
+          </ul>
+        </section>
         <section>
           <div class="head"><span class="ver-badge">0.23</span><span class="date">14. 11. 2026</span></div>
           <ul>
@@ -1193,7 +1281,7 @@ textarea.fen { min-height: 0; font-size: 14px; word-break: break-all; }
     prefill: false, preEvent: true, preSite: true, preRound: true, preDate: 'prev',
     engine: false, engLines: 1, engDepth: 20, arrow: true,
     strip: true, coords: 's', haptic: false, players: true, mic: false, micCont: true,
-    moreTags: false, opening: false, graph: true, clock: false };
+    moreTags: false, opening: false, graph: true, clock: false, theme: 'auto' };
   try { const o = JSON.parse(localStorage.getItem('pgn-opts') || 'null'); if (o) opts = Object.assign(opts, o); } catch (e) {}
 
   // Krok zpět si pamatuje jen kopii právě upravované partie, ostatní partie souboru se sdílejí.
@@ -1290,14 +1378,25 @@ textarea.fen { min-height: 0; font-size: 14px; word-break: break-all; }
   }
 
   /* ---------- Pozice ---------- */
+  // Pozice po každém tahu se pamatuje (uzel -> FEN), takže se partie při každém kroku nepřehrává
+  // od začátku. Dřív to zabralo většinu času každého klepnutí.
+  const fenAfter = new WeakMap();
   function gameAt(ply) {
+    let k = ply;
+    while (k > 0 && !fenAfter.has(LINE[k])) k--;
+    const g = new Chess(k ? fenAfter.get(LINE[k]) : state.startFen);
+    for (let i = k; i < ply; i++) { PGN.sanMove(g, state.moves[i]); fenAfter.set(LINE[i + 1], g.fen()); }
+    return g;
+  }
+  // Partie přehraná od začátku: trojí opakování pozná jen z celé historie tahů
+  function gameFull(ply) {
     const g = new Chess(state.startFen);
-    for (let i = 0; i < ply; i++) g.move(state.moves[i]);
+    for (let i = 0; i < ply; i++) PGN.sanMove(g, state.moves[i]);
     return g;
   }
   function lastMoveAt(ply) {
     if (ply === 0) return null;
-    return gameAt(ply - 1).move(state.moves[ply - 1]);
+    return PGN.sanMove(gameAt(ply - 1), state.moves[ply - 1]);
   }
   function startInfo() {
     const parts = state.startFen.split(' ');
@@ -1307,9 +1406,9 @@ textarea.fen { min-height: 0; font-size: 14px; word-break: break-all; }
   /* ---------- Šachovnice ---------- */
   function renderBoard() {
     if (editor) { renderEditorBoard(); return; }
-    if ($('fenCur')) $('fenCur').value = gameAt(state.ply).fen();
-    if (typeof renderPlayers === 'function') renderPlayers();
     const g = gameAt(state.ply);
+    if ($('fenCur')) $('fenCur').value = g.fen();
+    if (typeof renderPlayers === 'function') renderPlayers();
     const last = lastMoveAt(state.ply);
     const board = g.board();
     const targets = selected ? g.moves({ square: selected, verbose: true }) : [];
@@ -1432,7 +1531,7 @@ textarea.fen { min-height: 0; font-size: 14px; word-break: break-all; }
     state.path = state.path.slice(0, k).concat(idx);
     state.ply = k + 1;
     rebuildLine();
-    const ending = (isMainLine(state.ply) && state.ply === state.moves.length) ? gameEnd(g) : null;
+    const ending = (isMainLine(state.ply) && state.ply === state.moves.length) ? gameEnd(gameFull(state.ply)) : null;
     renderAll();
     if (ending) applyEnding(ending);
   }
@@ -1473,11 +1572,13 @@ textarea.fen { min-height: 0; font-size: 14px; word-break: break-all; }
   function nagText(n) { return (n || []).map(x => NAG_SYM[x] || '').join(''); }
   // Značky pro programy ([%clk], [%eval], [%cal]) v komentáři zůstávají, jen se nezobrazují
   function shownComment(c) { return (c || '').replace(/\[%[^\]]*\]/g, '').replace(/\s+/g, ' ').trim(); }
+  $('pMoves').addEventListener('toggle', () => { if ($('pMoves').open && state) renderMoves(); });
   function goPath(path) {
     state.path = path.slice(); state.ply = path.length; selected = null;
     rebuildLine(); renderAll();
   }
   function renderMoves() {
+    if (!$('pMoves').open) return; // zavřený panel se nekreslí, dokreslí se při otevření
     const box = $('moves');
     box.innerHTML = '';
     const curNode = LINE[state.ply];
@@ -1665,7 +1766,7 @@ textarea.fen { min-height: 0; font-size: 14px; word-break: break-all; }
       onTagChange();
     });
   });
-  function onTagChange() { FILE.dirty = true; renderMoves(); renderSums(); persist(); syncText(); renderSend(); renderGames(); }
+  function onTagChange() { FILE.dirty = true; hayCache.delete(state); renderMoves(); renderSums(); persist(); syncText(); renderSend(); renderGames(); }
   SIMPLE.forEach(t => {
     $('t' + t).addEventListener('input', e => {
       state.headers[t] = e.target.value.trim() || DEFAULTS[t];
@@ -1693,8 +1794,8 @@ textarea.fen { min-height: 0; font-size: 14px; word-break: break-all; }
   const outCache = new WeakMap(); // hotový text neotevřených partií, aby se při dalším ukládání nečetly znovu
   // Text celého souboru. Neotevřené partie se čtou až tady, u velkého souboru po částech s ukazatelem průběhu.
   // bad je počet partií, které nešly přečíst celé (nepřečtená část je v komentáři, nic se neztrácí).
-  async function filePgn() {
-    const games = exportGames(), parts = [];
+  async function filePgn(list) {
+    const games = list || exportGames(), parts = [];
     let bad = 0, t0 = Date.now(), shown = false;
     for (let i = 0; i < games.length; i++) {
       const g = games[i];
@@ -1760,7 +1861,8 @@ textarea.fen { min-height: 0; font-size: 14px; word-break: break-all; }
     let msg = label + (n > 1 ? ' (' + n + ' ' + plural(n, 'partie', 'partie', 'partií') + ', seznam najdeš v menu).' : '.');
     showMsg(msg, false);
   }
-  $('openFile').addEventListener('click', async () => { if (await confirmCloseFile('Otevřít jiný soubor?', 'Otevřít')) { pickAppend = false; $('fileInput').click(); } });
+  $('openFile').addEventListener('click', async () => { if (await confirmCloseFile('Otevřít jiný soubor?', 'Otevřít')) { pickMode = ''; $('fileInput').click(); } });
+  let pickMode = ''; // co se má stát s vybraným souborem: '' otevřít, 'append' přidat partie, 'restore' obnovit zálohu
   // Aplikace je dělaná pro zápis a úpravu jednotlivých partií a menších souborů.
   const MAX_FILE_MB = 20;   // větší soubor se vůbec nečte, telefonu by došla paměť
   const BIG_GAMES = 1000;   // od tolika partií se před otevřením upozorní na pomalejší práci
@@ -1786,7 +1888,7 @@ textarea.fen { min-height: 0; font-size: 14px; word-break: break-all; }
     const f = e.target.files && e.target.files[0];
     // adresa právě vybraného souboru, aby šlo ukládat zpět do něj
     const uri = ANDROID && ANDROID.takeOpenedUri ? ANDROID.takeOpenedUri() : '';
-    const append = pickAppend; pickAppend = false;
+    const mode = pickMode; pickMode = '';
     e.target.value = '';
     if (!f) return;
     if (f.size > MAX_FILE_MB * 1024 * 1024) {
@@ -1795,9 +1897,13 @@ textarea.fen { min-height: 0; font-size: 14px; word-break: break-all; }
     }
     const reader = new FileReader();
     reader.onload = async () => {
-      const r = await readPgn(decodeBytes(reader.result), f.name);
+      const text = decodeBytes(reader.result);
+      const bk = parseBackup(text);
+      if (bk) { restoreBackup(bk); return; }
+      if (mode === 'restore') { fileError(f.name, 'Není to záloha PGN editoru. Zálohu vytvoříš v Nastavení tlačítkem Zálohovat vše.'); return; }
+      const r = await readPgn(text, f.name);
       if (!r) return;
-      if (append) { appendGames(r, f.name); return; }
+      if (mode === 'append') { appendGames(r, f.name); return; }
       if (!(await confirmBig(r.games.length))) return;
       loadFile('', f.name, uri, r);
       afterLoad(r, 'Otevřeno: ' + f.name);
@@ -1808,6 +1914,9 @@ textarea.fen { min-height: 0; font-size: 14px; word-break: break-all; }
   // Soubor otevřený z jiné aplikace (Gmail, Správce souborů, sdílení)
   window.androidOpenText = async (text, name, uri) => {
     await ready;
+    const bk = parseBackup(text);
+    if (bk) { restoreBackup(bk); return; }
+    if (PGN.linkInfo(text)) { importLink(text); return; } // odkaz nasdílený z prohlížeče
     const r = await readPgn(text, name);
     if (!r) return;
     if (!(await confirmCloseFile('Otevřít ' + (name || 'soubor') + '?', 'Otevřít'))) return;
@@ -1865,22 +1974,26 @@ textarea.fen { min-height: 0; font-size: 14px; word-break: break-all; }
     else if (name) showMsg('Uložit se nepodařilo: ' + name, true);
     else showMsg('Ukládání zrušeno.', false);
   };
-  async function saveAs() {
-    const { pgn, bad } = await filePgn();
-    const name = fileName(true);
-    saving = { gen: FILE.gen, bad };
-    if (ANDROID) { ANDROID.saveFile(name, pgn); return; }
+  // Uloží text do nového souboru. own = jde o otevřený soubor (po uložení se stane uloženým),
+  // jinak jde o výběr partií nebo zálohu a otevřený soubor se nemění.
+  async function saveOut(name, text, bad, own) {
+    saving = { gen: own ? FILE.gen : -1, bad };
+    if (ANDROID) { ANDROID.saveFile(name, text); return; }
     if (!downloads) { showMsg('Ukládání souboru tady není dostupné. Použij Kopírovat PGN a vlož text do souboru .pgn.', true); return; }
     try {
-      await downloads.save({ filename: name, data: pgn });
-      if (FILE.gen === saving.gen) markSaved();
-      showMsg('Uloženo jako ' + name + '. Koncovku .txt můžeš smazat, obsah je normální PGN.' + badNote(bad), false);
+      await downloads.save({ filename: name, data: text });
+      if (own && FILE.gen === saving.gen) markSaved();
+      showMsg('Uloženo jako ' + name + '.' + (/\.txt$/.test(name) ? ' Koncovku .txt můžeš smazat, obsah je normální PGN.' : '') + badNote(bad), false);
     } catch (err) {
       const code = err && err.code;
       if (code === 'declined') showMsg('Ukládání zrušeno.', false);
       else if (code === 'rate_limited') showMsg('Chvilku počkej a zkus to znovu.', true);
       else showMsg('Uložit se nepodařilo. Použij Kopírovat PGN.', true);
     }
+  }
+  async function saveAs() {
+    const { pgn, bad } = await filePgn();
+    saveOut(fileName(true), pgn, bad, true);
   }
   $('saveAs').addEventListener('click', saveAs);
   $('saveFile').addEventListener('click', async () => {
@@ -1914,6 +2027,185 @@ textarea.fen { min-height: 0; font-size: 14px; word-break: break-all; }
     };
     copyText(pgn, 'PGN zkopírováno do schránky.', showMsg, fallback);
   });
+
+  /* ---------- Partie z odkazu (Lichess, Chess.com) ---------- */
+  // V Androidu stahuje obal aplikace (MainActivity.httpGet, jen povolené servery), jinde prohlížeč.
+  const httpWait = new Map();
+  let httpSeq = 0;
+  window.onHttp = (id, status, body) => { const w = httpWait.get(id); if (w) { httpWait.delete(id); w({ status, body }); } };
+  function httpGet(url) {
+    if (ANDROID && ANDROID.httpGet) return new Promise(res => { const id = ++httpSeq; httpWait.set(id, res); ANDROID.httpGet(id, url); });
+    return fetch(url, { headers: { Accept: 'application/x-chess-pgn, application/json' } })
+      .then(async r => ({ status: r.status, body: await r.text() }), () => ({ status: 0, body: '' }));
+  }
+  function linkMsg(text, isErr) { const m = $('linkMsg'); m.textContent = text; m.className = 'msg' + (isErr ? ' err' : ''); if (text && !drawerOpen()) toast(text, isErr ? 'err' : ''); }
+  async function importLink(text) {
+    const info = PGN.linkInfo(text);
+    if (!info) { linkMsg('Tomuhle odkazu nerozumím. Vlož odkaz na partii nebo studii z Lichessu, nebo na partii z Chess.com.', true); return; }
+    linkMsg('', false);
+    busy('Stahuji partii…');
+    const r = await httpGet(info.url);
+    busy('');
+    const fail = why => { if (drawerOpen()) setDrawer(false); showInfo('Partii se nepodařilo stáhnout', why); };
+    if (r.status !== 200 || !r.body) {
+      fail(r.status === 0 ? 'Zkontroluj připojení k internetu a zkus to znovu.' : r.status === 404 ? 'Partie na téhle adrese není, nebo není veřejná.' : r.status === 429 ? 'Server odmítl příliš mnoho dotazů, zkus to za chvíli.' : 'Server odpověděl chybou ' + r.status + '.');
+      return;
+    }
+    let pgn = r.body;
+    if (info.site === 'chesscom') {
+      try { pgn = PGN.chessComPgn(JSON.parse(r.body)); } catch (e) { pgn = null; }
+      if (!pgn) { fail('Chess.com poslal data, kterým aplikace nerozumí.'); return; }
+    }
+    const p = await readPgn(pgn, '');
+    if (!p) return;
+    const n = p.games.length;
+    if (!isFileEmpty()) {
+      const i = await askChoice('Kam se staženou partií?', 'Staženo: ' + n + ' ' + plural(n, 'partie', 'partie', 'partií') + '.', ['Přidat do otevřeného souboru', 'Otevřít jako nový soubor']);
+      if (i < 0) return;
+      if (i === 0) { await appendGames(p, '', ' z odkazu'); $('linkIn').value = ''; if (drawerOpen()) setDrawer(false); return; }
+      if (!(await confirmCloseFile('Otevřít staženou partii?', 'Otevřít'))) return;
+    }
+    if (!(await confirmBig(n))) return;
+    loadFile('', '', '', p);
+    afterLoad(p, 'Staženo z odkazu');
+    $('linkIn').value = '';
+  }
+  $('linkGo').addEventListener('click', () => importLink($('linkIn').value));
+  $('linkIn').addEventListener('keydown', e => { if (e.key === 'Enter') { e.preventDefault(); importLink($('linkIn').value); } });
+
+  /* ---------- Tisk a PDF ---------- */
+  // Sestaví samostatnou stránku s partií (hlavička, tahy, varianty, komentáře, diagramy) a pošle ji
+  // do tisku. V Androidu tiskne obal aplikace (MainActivity.printHtml), jinde prohlížeč.
+  const escH = t => String(t).replace(/[&<>"]/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]));
+  async function boardImage(chess) { // černobílý diagram pro tisk
+    const S = 60, M = 22, B = S * 8;
+    const cv = document.createElement('canvas'); cv.width = B + M + 4; cv.height = B + M + 4;
+    const c = cv.getContext('2d');
+    c.fillStyle = '#fff'; c.fillRect(0, 0, cv.width, cv.height);
+    const board = chess.board();
+    for (let r = 0; r < 8; r++) for (let f = 0; f < 8; f++) {
+      c.fillStyle = (r + f) % 2 === 0 ? '#ffffff' : '#c4c4c4';
+      c.fillRect(M + f * S, 2 + r * S, S, S);
+      const p = board[r][f];
+      if (p) { const img = await pieceImage(p.color + p.type); if (img) c.drawImage(img, M + f * S + 2, 4 + r * S, S - 4, S - 4); }
+    }
+    c.strokeStyle = '#000'; c.lineWidth = 2; c.strokeRect(M, 2, B, B);
+    c.fillStyle = '#000'; c.font = '15px sans-serif'; c.textAlign = 'center'; c.textBaseline = 'middle';
+    for (let i = 0; i < 8; i++) { c.fillText('abcdefgh'[i], M + i * S + S / 2, B + 2 + M / 2); c.fillText(String(8 - i), M / 2, 2 + i * S + S / 2); }
+    return cv.toDataURL('image/png');
+  }
+  async function printGameHtml(g, every, end) {
+    const fp = g.startFen.split(' '), sTurn = fp[1] || 'w', sNum = parseInt(fp[5], 10) || 1;
+    const num = i => sNum + Math.floor((i + (sTurn === 'b' ? 1 : 0)) / 2), white = i => sTurn === 'w' ? i % 2 === 0 : i % 2 === 1;
+    const cm = node => { const t = shownComment(node.c); return t ? ' <i>' + escH(t) + '</i>' : ''; };
+    const mv = (node, i, needNum, main) => (white(i) ? num(i) + '.\u00a0' : needNum ? num(i) + '...\u00a0' : '') + (main ? '<b>' : '') + escH(show(node.s) + nagText(node.n)) + (main ? '</b>' : '') + cm(node);
+    const variation = (first, i) => { // varianta začínající tahem first (půltah i)
+      let out = mv(first, i, true, false), need = !!shownComment(first.c), node = first;
+      while (node.ch.length) {
+        i++;
+        out += ' ' + mv(node.ch[0], i, need, false);
+        need = !!shownComment(node.ch[0].c);
+        for (let v = 1; v < node.ch.length; v++) { out += ' (' + variation(node.ch[v], i) + ')'; need = true; }
+        node = node.ch[0];
+      }
+      return out;
+    };
+    const h = g.headers, nm = t => { const p = splitName(h[t]); return [p[1], p[0]].filter(Boolean).join(' ') || (t === 'White' ? 'Bílý' : 'Černý'); };
+    const meta = [];
+    if (h.Event !== '?') meta.push(h.Event);
+    if (h.Round !== '?') meta.push(h.Round + '. kolo');
+    if (h.Site !== '?') meta.push(h.Site);
+    if (fmtDate(h.Date)) meta.push(fmtDate(h.Date));
+    if (g.extra && g.extra.ECO) meta.push(g.extra.ECO + (g.extra.Opening ? ' ' + g.extra.Opening : ''));
+    const elo = t => g.extra && g.extra[t + 'Elo'] ? ' (' + escH(g.extra[t + 'Elo']) + ')' : '';
+    let html = '<section class="game"><h1>' + escH(nm('White')) + elo('White') + ' – ' + escH(nm('Black')) + elo('Black') + (h.Result !== '*' ? ' <span>' + escH(h.Result.replace('1/2-1/2', '½-½')) + '</span>' : '') + '</h1>' +
+      (meta.length ? '<p class="meta">' + escH(meta.join(', ')) + '</p>' : '');
+    const chess = new Chess(g.startFen);
+    let run = shownComment(g.root.c) ? '<i>' + escH(shownComment(g.root.c)) + '</i> ' : '';
+    const diagram = async caption => { html += '<figure><img src="' + await boardImage(chess) + '" alt=""><figcaption>' + escH(caption) + '</figcaption></figure>'; };
+    const flush = () => { if (run.trim()) html += '<p class="moves">' + run + '</p>'; run = ''; };
+    if (g.startFen !== START) { await diagram('Výchozí pozice, na tahu je ' + (sTurn === 'w' ? 'bílý' : 'černý')); }
+    let node = g.root, i = 0, need = true, last = '';
+    while (node.ch.length) {
+      const m = node.ch[0];
+      run += mv(m, i, need, true) + ' ';
+      need = !!shownComment(m.c);
+      for (let v = 1; v < node.ch.length; v++) { run += '<span class="var">(' + variation(node.ch[v], i) + ')</span> '; need = true; }
+      if (!PGN.sanMove(chess, m.s)) break;
+      last = num(i) + (white(i) ? '. ' : '... ') + show(m.s);
+      node = m; i++;
+      // diagram po každých N celých tazích (po tahu černého), ne těsně před koncem partie
+      if (every && !white(i - 1) && (num(i - 1) - sNum + 1) % every === 0 && node.ch.length) { flush(); await diagram('Pozice po tahu ' + last); need = true; }
+    }
+    run += h.Result !== '*' ? '<b>' + escH(h.Result.replace('1/2-1/2', '½-½')) + '</b>' : '';
+    flush();
+    if (end && i > 0) await diagram('Konečná pozice po tahu ' + last);
+    return html + '</section>';
+  }
+  const PRINT_CSS = '@page{margin:16mm 15mm}body{font:11pt/1.5 sans-serif;color:#000;margin:0}' +
+    'h1{font-size:15pt;margin:0 0 2pt}h1 span{font-weight:normal;margin-left:6pt}.meta{color:#333;font-size:10pt;margin:0 0 8pt}' +
+    '.moves{margin:0 0 6pt;text-align:left}.var{color:#333}i{color:#222}' +
+    'figure{width:62mm;margin:4pt auto 8pt;text-align:center;page-break-inside:avoid;break-inside:avoid}figure img{width:100%;display:block}figcaption{font-size:9pt;color:#333;margin-top:2pt}' +
+    '.game{page-break-after:always;break-after:page}.game:last-child{page-break-after:auto;break-after:auto}';
+  $('printGo').addEventListener('click', async () => {
+    const msg = (t, err) => { const m = $('printMsg'); m.textContent = t; m.className = 'msg' + (err ? ' err' : ''); };
+    const scope = await askScope('Co vytisknout?');
+    if (!scope) return;
+    const games = scope === 'all' ? exportGames() : [state];
+    if (games.length > 100) { msg('Tisk zvládne nejvýš 100 partií najednou, soubor jich má ' + games.length + '. Vyber v seznamu partií jen ty, které chceš, a ulož je do samostatného souboru.', true); return; }
+    msg('', false);
+    const every = +$('printEvery').value, end = $('printEnd').checked;
+    let body = '';
+    for (let k = 0; k < games.length; k++) {
+      busy('Připravuji tisk… ' + (k + 1) + ' z ' + games.length);
+      await new Promise(r => setTimeout(r, 0));
+      let g = games[k];
+      if (isLazy(g)) { const r = PGN.parseMoves(g.raw, g.extra); g = { headers: g.headers, extra: r.extra, root: r.root, startFen: r.startFen }; }
+      body += await printGameHtml(g, every, end);
+    }
+    busy('');
+    const title = games.length > 1 ? (FILE.name || 'Partie') : gameNames(state);
+    const html = '<!doctype html><html lang="cs"><head><meta charset="utf-8"><title>' + escH(title) + '</title><style>' + PRINT_CSS + '</style></head><body>' + body + '</body></html>';
+    if (ANDROID && ANDROID.printHtml) { ANDROID.printHtml(title, html); return; }
+    const fr = document.createElement('iframe');
+    fr.style.cssText = 'position:fixed;right:0;bottom:0;width:0;height:0;border:0';
+    fr.onload = () => { try { fr.contentWindow.focus(); fr.contentWindow.print(); } catch (e) { msg('Tisk tady není dostupný.', true); } setTimeout(() => fr.remove(), 60000); };
+    fr.srcdoc = html;
+    document.body.appendChild(fr);
+  });
+
+  /* ---------- Záloha ---------- */
+  // Záloha je jeden soubor se všemi partiemi otevřeného souboru a s nastavením aplikace.
+  // Hodí se před odinstalováním nebo při přechodu na jiný telefon.
+  const KEEP = k => /^pgn-/.test(k) && k !== STORE_KEY && k !== OLD_STORE_KEY;
+  $('backupSave').addEventListener('click', async () => {
+    const { pgn } = await filePgn();
+    const settings = {};
+    try { for (let i = 0; i < localStorage.length; i++) { const k = localStorage.key(i); if (KEEP(k)) settings[k] = localStorage.getItem(k); } } catch (e) {}
+    const data = { app: 'pgn-editor', zaloha: 1, date: todayStr(), file: { name: FILE.name, cur: Math.max(0, exportGames().indexOf(state)), pgn: isFileEmpty() ? '' : pgn }, settings };
+    saveOut('pgn-editor-zaloha-' + todayStr().replace(/\./g, '-') + '.json', JSON.stringify(data, null, 1), 0, false);
+  });
+  $('backupLoad').addEventListener('click', () => { pickMode = 'restore'; $('fileInput').click(); });
+  function parseBackup(text) {
+    if (!/^\s*\{/.test(text) || text.indexOf('"pgn-editor"') === -1) return null;
+    try { const d = JSON.parse(text); return d && d.app === 'pgn-editor' && d.file && typeof d.file.pgn === 'string' ? d : null; } catch (e) { return null; }
+  }
+  async function restoreBackup(bk) {
+    const r = bk.file.pgn.trim() ? PGN.parseFile(bk.file.pgn) : { games: [freshState()] };
+    if (r.error) { fileError('', 'Zálohu nejde přečíst. ' + r.error); return; }
+    const n = bk.file.pgn.trim() ? r.games.length : 0;
+    const ok = await askConfirm('Obnovit ze zálohy?', 'Záloha ze dne ' + (fmtDate(bk.date) || bk.date || '?') + ' obsahuje ' + n + ' ' + plural(n, 'partii', 'partie', 'partií') + ' a nastavení aplikace. Nahradí otevřený soubor i současné nastavení.', 'Obnovit');
+    if (!ok) return;
+    try {
+      Object.keys(bk.settings || {}).forEach(k => { if (KEEP(k) && typeof bk.settings[k] === 'string') localStorage.setItem(k, bk.settings[k]); });
+    } catch (e) {}
+    FILE = { games: r.games, cur: 0, name: bk.file.name || '', uri: '', dirty: n > 0, gen: ++genSeq, saveOk: false };
+    history = [];
+    useGame(bk.file.cur || 0);
+    fillTags(); renderAll();
+    busy('Obnovuji ze zálohy…');
+    persist(() => location.reload()); // nastavení se načte při novém startu stránky
+  }
 
   /* ---------- Partie v souboru ---------- */
   function todayStr() {
@@ -1949,48 +2241,156 @@ textarea.fen { min-height: 0; font-size: 14px; word-break: break-all; }
     return nm('White') + ' - ' + nm('Black');
   }
   // Seznam partií se vykresluje jen na své stránce v menu, aby velké soubory nezdržovaly zadávání tahů
+  // Text partie pro hledání (hráči, turnaj, kolo, místo, datum), u neměněných partií se pamatuje
+  const hayCache = new WeakMap();
+  function gameHay(g) {
+    let h = g === state ? null : hayCache.get(g);
+    if (!h) { h = toAscii([g.headers.White, g.headers.Black, g.headers.Event, g.headers.Round, g.headers.Site, g.headers.Date].join(' ')).toLowerCase(); hayCache.set(g, h); }
+    return h;
+  }
+  // Seznam kreslí jen řádky, které jsou právě vidět (a pár okolo), aby se i velký soubor posouval plynule.
+  const gl = { idx: [], rowH: 0, from: -1, to: -1 };
+  let sel = null; // režim výběru: množina vybraných partií, jinak null
+  function gameRow(i) {
+    const g = FILE.games[i];
+    const sub = [];
+    if (g.headers.Event !== '?') sub.push(g.headers.Event);
+    if (g.headers.Round !== '?') sub.push(g.headers.Round + '. kolo');
+    const n = mainLength(g);
+    sub.push(n ? Math.ceil(n / 2) + ' ' + plural(Math.ceil(n / 2), 'tah', 'tahy', 'tahů') : 'bez tahů');
+    const li = document.createElement('li');
+    const b = document.createElement('button');
+    b.type = 'button';
+    b.className = 'game' + (i === FILE.cur ? ' cur' : '') + (sel ? ' pick' : '') + (sel && sel.has(g) ? ' on' : '');
+    if (sel) b.setAttribute('aria-pressed', sel.has(g) ? 'true' : 'false');
+    const no = document.createElement('span'); no.className = 'no'; no.textContent = sel ? (sel.has(g) ? '✓' : '') : i + 1;
+    const t = document.createElement('span'); t.className = 't'; t.textContent = (sel ? (i + 1) + '. ' : '') + gameNames(g);
+    const r = document.createElement('span'); r.className = 'r'; r.textContent = g.headers.Result === '1/2-1/2' ? '½-½' : g.headers.Result;
+    const d = document.createElement('span'); d.className = 's'; d.textContent = sub.join(', ');
+    b.append(no, t, r, d);
+    b.addEventListener('click', () => {
+      if (sel) { if (sel.has(g)) sel.delete(g); else sel.add(g); gl.from = -1; drawGames(false); renderSel(); return; }
+      if (i !== FILE.cur) { useGame(i, state.flipped); fillTags(); renderAll(); }
+      setDrawer(false);
+    });
+    li.appendChild(b);
+    return li;
+  }
+  function drawGames(scrollToCur) {
+    const ol = $('gamesList'), box = ol.closest('.pbody'), n = gl.idx.length;
+    if (!n) { ol.innerHTML = ''; ol.style.minHeight = ol.style.paddingTop = ''; return; }
+    if (gl.from === -1) { // výška řádku se měří na prvním řádku
+      ol.style.paddingTop = ''; ol.innerHTML = '';
+      ol.appendChild(gameRow(gl.idx[0]));
+      gl.rowH = ol.firstChild.offsetHeight + 4;
+    }
+    ol.style.minHeight = (n * gl.rowH) + 'px';
+    const olTop = () => ol.getBoundingClientRect().top - box.getBoundingClientRect().top;
+    if (scrollToCur) {
+      const pos = gl.idx.indexOf(FILE.cur);
+      if (pos !== -1) box.scrollTop = Math.max(0, box.scrollTop + olTop() + pos * gl.rowH - box.clientHeight / 2 + gl.rowH / 2);
+    }
+    const top = -olTop();
+    const from = Math.max(0, Math.floor(top / gl.rowH) - 12), to = Math.min(n, Math.ceil((top + box.clientHeight) / gl.rowH) + 12);
+    if (from === gl.from && to === gl.to) return;
+    gl.from = from; gl.to = to;
+    ol.innerHTML = '';
+    ol.style.paddingTop = (from * gl.rowH) + 'px';
+    for (let k = from; k < to; k++) ol.appendChild(gameRow(gl.idx[k]));
+  }
   function renderGames(scrollToCur) {
-    if (curPage !== 'pgGames' || !drawerOpen() && !scrollToCur) { renderMenuInfo(); return; }
     renderMenuInfo();
-    const ol = $('gamesList');
+    if (curPage !== 'pgGames' || !drawerOpen() && !scrollToCur) return;
     const search = $('gameSearch');
     search.hidden = FILE.games.length < 8;
-    const q = search.hidden ? '' : toAscii(search.value).toLowerCase().trim();
-    ol.innerHTML = '';
-    let shown = 0;
-    FILE.games.forEach((g, i) => {
-      const sub = [];
-      if (g.headers.Event !== '?') sub.push(g.headers.Event);
-      if (g.headers.Round !== '?') sub.push(g.headers.Round + '. kolo');
-      const n = mainLength(g);
-      sub.push(n ? Math.ceil(n / 2) + ' ' + plural(Math.ceil(n / 2), 'tah', 'tahy', 'tahů') : 'bez tahů');
-      if (q) {
-        const hay = toAscii([g.headers.White, g.headers.Black, g.headers.Event, g.headers.Round, g.headers.Site, g.headers.Date].join(' ')).toLowerCase();
-        if (!q.split(/\s+/).every(w => hay.includes(w))) return;
-      }
-      shown++;
-      const li = document.createElement('li');
-      const b = document.createElement('button');
-      b.type = 'button';
-      b.className = 'game' + (i === FILE.cur ? ' cur' : '');
-      const no = document.createElement('span'); no.className = 'no'; no.textContent = i + 1;
-      const t = document.createElement('span'); t.className = 't'; t.textContent = gameNames(g);
-      const r = document.createElement('span'); r.className = 'r'; r.textContent = g.headers.Result === '1/2-1/2' ? '½-½' : g.headers.Result;
-      const d = document.createElement('span'); d.className = 's'; d.textContent = sub.join(', ');
-      b.append(no, t, r, d);
-      b.addEventListener('click', () => {
-        if (i !== FILE.cur) { useGame(i, state.flipped); fillTags(); renderAll(); }
-        setDrawer(false);
-      });
-      li.appendChild(b);
-      ol.appendChild(li);
-    });
-    $('gamesEmpty').hidden = shown > 0;
+    const words = search.hidden ? [] : toAscii(search.value).toLowerCase().trim().split(/\s+/).filter(Boolean);
+    gl.idx = [];
+    FILE.games.forEach((g, i) => { if (!words.length || words.every(w => gameHay(g).includes(w))) gl.idx.push(i); });
+    gl.from = gl.to = -1;
+    drawGames(scrollToCur);
+    $('gamesEmpty').hidden = gl.idx.length > 0;
+    $('gameTools').hidden = FILE.games.length < 2 || !!sel;
     $('delGame').disabled = FILE.games.length === 1 && isEmptyGame(state);
     $('gameUp').disabled = FILE.cur === 0;
     $('gameDown').disabled = FILE.cur >= FILE.games.length - 1;
-    if (scrollToCur) { const c = ol.querySelector('.game.cur'); if (c && c.scrollIntoView) c.scrollIntoView({ block: 'center' }); }
+    renderSel();
   }
+  (() => {
+    let raf = 0;
+    $('gamesList').closest('.pbody').addEventListener('scroll', () => {
+      if (raf || curPage !== 'pgGames') return;
+      raf = requestAnimationFrame(() => { raf = 0; drawGames(false); });
+    }, { passive: true });
+  })();
+
+  /* ---------- Výběr více partií, řazení a duplicity ---------- */
+  function renderSel() {
+    $('gamesFoot').hidden = !!sel;
+    $('selFoot').hidden = !sel;
+    if (!sel) return;
+    // vybrané partie, které už v souboru nejsou (třeba po kroku zpět), z výběru vypadnou
+    const live = new Set(FILE.games);
+    sel.forEach(g => { if (!live.has(g)) sel.delete(g); });
+    const n = sel.size;
+    $('selCount').textContent = 'Vybráno: ' + n + ' z ' + FILE.games.length;
+    $('selSave').disabled = $('selDel').disabled = n === 0;
+  }
+  function setSel(on, games) { sel = on ? new Set(games || []) : null; renderGames(false); }
+  $('gSelect').addEventListener('click', () => setSel(true));
+  $('selDone').addEventListener('click', () => setSel(false));
+  $('selAll').addEventListener('click', () => { gl.idx.forEach(i => sel.add(FILE.games[i])); renderGames(false); });
+  $('selNone').addEventListener('click', () => { sel.clear(); renderGames(false); });
+  $('selSave').addEventListener('click', async () => {
+    const games = FILE.games.filter(g => sel.has(g));
+    if (!games.length) return;
+    const { pgn, bad } = await filePgn(games);
+    saveOut((cleanName(FILE.name) || 'partie') + '-vyber' + (ANDROID ? '.pgn' : '.pgn.txt'), pgn, bad, false);
+  });
+  $('selDel').addEventListener('click', async () => {
+    const n = sel.size;
+    const ok = await askConfirm('Smazat vybrané partie?', 'Ze souboru se smaže ' + n + ' ' + plural(n, 'partie', 'partie', 'partií') + '.' + (opts.undo ? ' Omyl jde vrátit tlačítkem ↶.' : ''), 'Smazat');
+    if (!ok) return;
+    snapshot();
+    const cur = state, flipped = state.flipped, at = FILE.cur;
+    FILE.games = FILE.games.filter(g => !sel.has(g));
+    if (!FILE.games.length) FILE.games.push(freshState());
+    const i = FILE.games.indexOf(cur);
+    useGame(i !== -1 ? i : Math.min(at, FILE.games.length - 1), flipped);
+    sel = null;
+    fillTags(); renderAll(); renderGames(true);
+    toast('Smazáno ' + n + ' ' + plural(n, 'partie', 'partie', 'partií') + '.');
+  });
+  $('gSort').addEventListener('click', async () => {
+    const i = await askChoice('Seřadit partie', 'Změní se pořadí partií v celém souboru.' + (opts.undo ? ' Jde vrátit tlačítkem ↶.' : ''), ['Podle kola', 'Podle data', 'Podle bílého hráče']);
+    if (i < 0) return;
+    const round = g => String(g.headers.Round || '').split('.').map(x => { const v = parseInt(x, 10); return isNaN(v) ? Infinity : v; });
+    const date = g => String(g.headers.Date || '').replace(/\?/g, '~');
+    const cmpArr = (a, b) => { for (let k = 0; k < Math.max(a.length, b.length); k++) { const d = (a[k] === undefined ? -1 : a[k]) - (b[k] === undefined ? -1 : b[k]); if (d) return isNaN(d) ? 0 : d; } return 0; };
+    const cmp = [
+      (a, b) => cmpArr(round(a), round(b)),
+      (a, b) => date(a) < date(b) ? -1 : date(a) > date(b) ? 1 : cmpArr(round(a), round(b)),
+      (a, b) => toAscii(a.headers.White).toLowerCase().localeCompare(toAscii(b.headers.White).toLowerCase())
+    ][i];
+    snapshot();
+    const cur = state;
+    FILE.games = FILE.games.map((g, k) => ({ g, k })).sort((a, b) => cmp(a.g, b.g) || a.k - b.k).map(x => x.g);
+    FILE.cur = FILE.games.indexOf(cur);
+    renderAll(); renderGames(true);
+    toast('Partie jsou seřazené ' + ['podle kola.', 'podle data.', 'podle bílého hráče.'][i]);
+  });
+  // Duplicita: stejní hráči a stejné tahy hlavní linie jako u některé předchozí partie
+  $('gDup').addEventListener('click', () => {
+    const seen = new Set(), dups = [];
+    FILE.games.forEach(g => {
+      const mv = PGN.mainMoves(g);
+      if (!mv.length) return;
+      const key = toAscii(g.headers.White).toLowerCase() + '|' + toAscii(g.headers.Black).toLowerCase() + '|' + mv.join(' ');
+      if (seen.has(key)) dups.push(g); else seen.add(key);
+    });
+    if (!dups.length) { toast('V souboru nejsou žádné duplicity.'); return; }
+    setSel(true, dups);
+    showInfo('Nalezené duplicity', 'V souboru ' + plural(dups.length, 'je', 'jsou', 'je') + ' ' + dups.length + ' ' + plural(dups.length, 'partie', 'partie', 'partií') + ' se stejnými hráči a stejnými tahy jako některá předchozí. Jsou vybrané, můžeš je smazat nebo uložit do souboru.');
+  });
   $('gameSearch').addEventListener('input', () => renderGames(false));
   $('addGame').addEventListener('click', () => {
     addGame();
@@ -1998,9 +2398,8 @@ textarea.fen { min-height: 0; font-size: 14px; word-break: break-all; }
     toast('Nová partie č. ' + FILE.games.length + '.');
   });
   // Přidání partií z jiného souboru na konec otevřeného
-  let pickAppend = false;
-  $('addFile').addEventListener('click', () => { pickAppend = true; $('fileInput').click(); });
-  async function appendGames(r, name) {
+  $('addFile').addEventListener('click', () => { pickMode = 'append'; $('fileInput').click(); });
+  async function appendGames(r, name, from) {
     const total = FILE.games.length + r.games.length;
     if (total >= BIG_GAMES && FILE.games.length < BIG_GAMES && !(await confirmBig(total))) return;
     snapshot();
@@ -2012,7 +2411,7 @@ textarea.fen { min-height: 0; font-size: 14px; word-break: break-all; }
     if (opts.players) { const ns = new Set(); r.games.forEach(g => ['White', 'Black'].forEach(t => { const v = g.headers[t]; if (v && v !== '?') ns.add(v); })); players = [...ns].concat(players.filter(p => !ns.has(p))).slice(0, 1000); savePlayers(); }
     fillTags(); renderAll(); renderGames(true);
     const n = r.games.length;
-    toast('Přidáno ' + n + ' ' + plural(n, 'partie', 'partie', 'partií') + ' ze souboru ' + (name || '') + '.');
+    toast('Přidáno ' + n + ' ' + plural(n, 'partie', 'partie', 'partií') + (from || ' ze souboru ' + (name || '')) + '.');
   }
   // Změna pořadí: aktuální partie se prohodí se sousední
   function moveGame(dir) {
@@ -2851,6 +3250,8 @@ textarea.fen { min-height: 0; font-size: 14px; word-break: break-all; }
     $('optEngDepth').value = String(opts.engDepth);
     $('optGraph').checked = opts.graph;
     $('optClock').checked = opts.clock;
+    $('optTheme').value = opts.theme;
+    applyTheme();
     $('clockBtn').hidden = !opts.clock;
     $('optMoreTags').checked = opts.moreTags;
     $('optOpening').checked = opts.opening;
@@ -2859,6 +3260,12 @@ textarea.fen { min-height: 0; font-size: 14px; word-break: break-all; }
     if (state) { fillTags(); renderCounter(); }
     if (!opts.engine && engineOn) setEngineOn(false);
     if (!opts.engine && eng.worker && !eng.checking) engineQuit();
+  }
+  // Vzhled: podle telefonu, nebo napevno světlý či tmavý. Android podle toho obarví i systémové lišty.
+  function applyTheme() {
+    const t = opts.theme === 'light' || opts.theme === 'dark' ? opts.theme : 'auto';
+    if (t === 'auto') delete document.documentElement.dataset.theme; else document.documentElement.dataset.theme = t;
+    try { if (ANDROID && ANDROID.setTheme) ANDROID.setTheme(t); } catch (e) {}
   }
   function saveOpts() { try { localStorage.setItem('pgn-opts', JSON.stringify(opts)); } catch (e) {} }
   $('optUndo').addEventListener('change', e => { opts.undo = e.target.checked; saveOpts(); applyOpts(); });
@@ -2881,6 +3288,7 @@ textarea.fen { min-height: 0; font-size: 14px; word-break: break-all; }
   $('optEngLines').addEventListener('change', e => { opts.engLines = +e.target.value; saveOpts(); eng.liveFen = null; analyzeCurrent(); });
   $('optEngDepth').addEventListener('change', e => { opts.engDepth = +e.target.value; saveOpts(); eng.liveFen = null; analyzeCurrent(); });
   $('optGraph').addEventListener('change', e => { opts.graph = e.target.checked; saveOpts(); renderGraph(); });
+  $('optTheme').addEventListener('change', e => { opts.theme = e.target.value; saveOpts(); applyOpts(); });
   $('optClock').addEventListener('change', e => { opts.clock = e.target.checked; saveOpts(); applyOpts(); });
   $('optMoreTags').addEventListener('change', e => { opts.moreTags = e.target.checked; saveOpts(); applyOpts(); });
   $('optOpening').addEventListener('change', e => { opts.opening = e.target.checked; saveOpts(); applyOpts(); });
@@ -3656,11 +4064,13 @@ textarea.fen { min-height: 0; font-size: 14px; word-break: break-all; }
   }
   const gameRec = g => { const o = Object.assign({}, g); delete o.moves; return o; };
   const fileMeta = () => ({ n: FILE.games.length, cur: FILE.cur, name: FILE.name, uri: FILE.uri, dirty: FILE.dirty, saveOk: FILE.saveOk });
-  function persist() {
+  // done se zavolá, až je soubor bezpečně zapsaný
+  function persist(done) {
     if (!booted) return;
     if (!store.db) {
       try { localStorage.setItem(STORE_KEY, JSON.stringify(Object.assign(fileMeta(), { games: FILE.games }), (k, v) => k === 'moves' ? undefined : v)); store.failed = false; }
       catch (e) { storeFailed(); }
+      if (done) done();
       return;
     }
     try {
@@ -3676,6 +4086,7 @@ textarea.fen { min-height: 0; font-size: 14px; word-break: break-all; }
       tx.objectStore('meta').put(fileMeta(), 'file');
       store.shadow = games.slice();
       tx.oncomplete = () => {
+        if (done) done();
         if (store.failed) { store.failed = false; renderMenuInfo(); }
         if (store.migrate) { // data ze starší verze jsou bezpečně v databázi, staré úložiště se uvolní
           store.migrate = false;
