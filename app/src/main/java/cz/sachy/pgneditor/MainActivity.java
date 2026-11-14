@@ -67,6 +67,7 @@ public class MainActivity extends Activity {
     private static final String START_URL = BASE + "www/index.html";
     private static final String OLD_URL = "file:///android_asset/www/index.html";
 
+    private static final String TOO_BIG = "soubor je příliš velký";
     private static final int REQ_OPEN = 1;
     private static final int REQ_SAVE = 2;
     private static final int REQ_MIC = 3;
@@ -277,6 +278,7 @@ public class MainActivity extends Activity {
             if (uri == null) text = intent.getStringExtra(Intent.EXTRA_TEXT);
         } else return;
         String name = "";
+        boolean tooBig = false;
         // Ukládat zpět jde jen do souboru otevřeného s právem zápisu (Správce souborů), ne do přílohy e-mailu
         String uriText = "";
         if (Intent.ACTION_VIEW.equals(action) && uri != null && writable(uri, intent.getFlags())) {
@@ -291,10 +293,13 @@ public class MainActivity extends Activity {
             }
         } catch (Exception e) {
             text = null;
+            tooBig = TOO_BIG.equals(e.getMessage());
         }
         if (text == null || text.trim().isEmpty()) {
             pendingOpenText = null;
-            Toast.makeText(this, "Soubor se nepodařilo přečíst.", Toast.LENGTH_LONG).show();
+            Toast.makeText(this, tooBig
+                    ? "Soubor je příliš velký (nad 20 MB). PGN editor je dělaný pro jednotlivé partie a menší soubory."
+                    : "Soubor se nepodařilo přečíst.", Toast.LENGTH_LONG).show();
             return;
         }
         pendingOpenText = text;
@@ -319,7 +324,7 @@ public class MainActivity extends Activity {
             int n;
             while ((n = in.read(chunk)) != -1) {
                 buf.write(chunk, 0, n);
-                if (buf.size() > 20 * 1024 * 1024) throw new Exception("soubor je příliš velký");
+                if (buf.size() > 20 * 1024 * 1024) throw new Exception(TOO_BIG);
             }
             byte[] bytes = buf.toByteArray();
             try {
@@ -402,7 +407,8 @@ public class MainActivity extends Activity {
             getContentResolver().takePersistableUriPermission(uri, flags & rw);
             // Android dovolí držet jen omezený počet souborů, nejstarší se proto uvolňují
             List<UriPermission> held = getContentResolver().getPersistedUriPermissions();
-            while (held.size() > 30) {
+            // nejvýš 20 kroků, aby se aplikace nemohla zacyklit, kdyby Android přístup neuvolnil
+            for (int guard = 0; held.size() > 30 && guard < 20; guard++) {
                 UriPermission oldest = held.get(0);
                 for (UriPermission q : held) if (q.getPersistedTime() < oldest.getPersistedTime()) oldest = q;
                 getContentResolver().releasePersistableUriPermission(oldest.getUri(),

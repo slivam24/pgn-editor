@@ -164,6 +164,42 @@ const OLD = JSON.stringify({ games: [{ headers: { Event: 'Stary', Site: '?', Dat
     assert.match(await pgnOut(page), /1\. e4 \{\[%clk 1:25:00\]\} 1\.\.\. e5 \{\[%clk 1:28:00\]\}/);
   });
 
+  await step('soubor, který není PGN, se odmítne a rozpracovaný soubor zůstane', async page => {
+    const os = require('os');
+    const dir = fs.mkdtempSync(path.join(os.tmpdir(), 'pgn-test-'));
+    const img = path.join(dir, 'obrazek.png'), txt = path.join(dir, 'dopis.txt');
+    fs.writeFileSync(img, Buffer.concat([Buffer.from([0x89, 0x50, 0x4e, 0x47, 0x0d, 0x0a, 0x1a, 0x0a, 0, 0, 0, 0x0d]), Buffer.from('IHDR}{()x'), Buffer.alloc(300, 7)]));
+    fs.writeFileSync(txt, 'Dobrý den,\nposílám výsledky turnaje.\n');
+    await open(page);
+    for (const [file, why] of [[img, /Není to soubor PGN/], [txt, /žádné partie ve formátu PGN/]]) {
+      await (await page.$('#fileInput')).uploadFile(file);
+      await page.waitForFunction(() => !document.getElementById('modal').hidden, { timeout: 5000 });
+      assert.equal(await text(page, 'modalTitle'), 'Soubor nejde otevřít');
+      assert.match(await text(page, 'modalText'), why);
+      await click(page, 'modalOk');
+      assert.match(await text(page, 'counter'), /17 z 17/); // ukázková partie zůstala
+    }
+  });
+
+  await step('před otevřením velkého souboru přijde upozornění', async page => {
+    const os = require('os');
+    const file = path.join(fs.mkdtempSync(path.join(os.tmpdir(), 'pgn-test-')), 'velky.pgn');
+    let big = '';
+    for (let i = 0; i < 1200; i++) big += game(i, '1. e4 e5 1-0');
+    fs.writeFileSync(file, big);
+    await open(page);
+    await (await page.$('#fileInput')).uploadFile(file);
+    await page.waitForFunction(() => !document.getElementById('modal').hidden, { timeout: 10000 });
+    assert.equal(await text(page, 'modalTitle'), 'Velký soubor');
+    assert.match(await text(page, 'modalText'), /1200 partií.*menších souborů/);
+    await click(page, 'modalCancel');
+    assert.match(await text(page, 'fileInfo'), /^1 partie/); // zrušením se nic neotevře
+    await (await page.$('#fileInput')).uploadFile(file);
+    await page.waitForFunction(() => !document.getElementById('modal').hidden, { timeout: 10000 });
+    await click(page, 'modalOk');
+    await page.waitForFunction(() => /1200 partií/.test(document.getElementById('fileInfo').textContent), { timeout: 10000 });
+  });
+
   await step('nepovedené uložení do paměti telefonu se ohlásí', async page => {
     await open(page);
     await paste(page, game(1, '1. e4 e5 *'));

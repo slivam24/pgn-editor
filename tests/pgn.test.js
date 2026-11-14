@@ -217,3 +217,44 @@ test('čas na hodinách: ruční zápis, značka [%clk] a zachování komentář
   const again = PGN.parseFile(PGN.buildPgn(g)).games[0];
   assert.equal(PGN.getClock(again.root.ch[0].c), 5100);
 });
+
+test('osamocená závorka } a vnořený komentář aplikaci nezaseknou', () => {
+  // osamocená } se přeskočí
+  assert.deepEqual(mainLine(round('[Event "Z"]\n\n1. e4 } e5 2. Nf3 Nc6 *\n').g), ['e4', 'e5', 'Nf3', 'Nc6']);
+  // vnořený komentář: text za vnitřní } se nezahodí, zůstane v komentáři
+  const { g, out } = round('[Event "Z"]\n\n1. e4 e5 2. Nf3 {a {b} c} Nc6 *\n');
+  assert.deepEqual(mainLine(g), ['e4', 'e5', 'Nf3']);
+  assert.match(out, /2\. Nf3 \{a \(b .* c\) Nc6 \*\}/);
+});
+
+// Žádný vstup nesmí čtení zacyklit: náhodně poskládané kousky PGN se musí přečíst rychle
+test('náhodně poškozené soubory se přečtou bez zamrznutí', () => {
+  const parts = ['e4', ' ', '\n', '{', '}', '(', ')', ';', '%', '$1', '1.', '1...', '!', '?', '[', ']', '"', 'Nf3', 'O-O', '1-0', '*', '\r', '\t', 'x', '#', '+', '=', '0-0', 'a', '\\', '½-½', '[Event "x"]\n'];
+  let seed = 99;
+  const rnd = n => { seed = (seed * 1103515245 + 12345) & 0x7fffffff; return seed % n; };
+  for (let k = 0; k < 4000; k++) {
+    let s = '[Event "x"]\n\n';
+    for (let i = 0, l = rnd(60); i < l; i++) s += parts[rnd(parts.length)];
+    const t0 = Date.now();
+    const r = PGN.parseFile(s);
+    if (r.games) r.games.forEach(x => PGN.gamePgn(x));
+    assert.ok(Date.now() - t0 < 1000, 'pomalé čtení: ' + JSON.stringify(s));
+  }
+});
+
+test('soubor, který není PGN, se odmítne se srozumitelným důvodem', () => {
+  // jiný typ souboru: řídicí znaky jako v obrázku, PDF nebo archivu
+  const png = '‰PNG\r\n\u001a\n\u0000\u0000\u0000\rIHDR\u0000\u0000\u0004:\u0000\u0000\b\u009a\b\u0006\u0000\u0000\u0000}{()x';
+  assert.equal(PGN.parseFile(png).kind, 'binary');
+  assert.equal(PGN.parseFile('PK\u0003\u0004\u0014\u0000\u0000\u0000\b\u0000 [Event "x"]\n\n1. e4').kind, 'binary');
+  // obyčejný text bez partií
+  for (const t of ['Dobrý den,\nposílám výsledky turnaje.\n1. Novák 5 bodů', '<html><body><p>Partie</p></body></html>', '{"games":[{"white":"A"}]}', '# Nadpis\n\ntext']) {
+    const r = PGN.parseFile(t);
+    assert.equal(r.kind, 'text', t);
+    assert.match(r.error, /žádné partie ve formátu PGN/);
+  }
+  assert.equal(PGN.parseFile('  \n ').kind, 'empty');
+  // skutečný PGN s diakritikou a tabulátory binární není
+  assert.ok(!PGN.looksBinary('[Event "Přebor"]\n[White "Žluťoučký,\tKůň"]\n\n1. e4 *'));
+  assert.ok(!PGN.parseFile('[Event "Přebor"]\r\n[White "Žluťoučký"]\r\n\r\n1. e4 *\r\n').error);
+});

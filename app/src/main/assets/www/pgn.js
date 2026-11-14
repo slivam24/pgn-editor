@@ -249,9 +249,12 @@
       }
       if (ch === '%' && (i === 0 || src[i - 1] === '\n')) { const e = src.indexOf('\n', i); i = e === -1 ? src.length : e; continue; }
       if (ch === '(' || ch === ')') { out.push({ type: ch, pos: i }); i++; numPos = -1; continue; }
-      if (/\s/.test(ch)) { i++; continue; }
+      // Osamocená uzavírací závorka komentáře (bývá po vnořeném komentáři {a {b} c}) se přeskočí.
+      // Dřív se na ní čtení zacyklilo a aplikace zamrzla.
+      if (/\s/.test(ch) || ch === '}') { i++; continue; }
       let j = i;
       while (j < src.length && !/[\s{}();]/.test(src[j])) j++;
+      if (j === i) { i++; continue; } // pojistka: čtení se musí vždy posunout dál
       let w = src.slice(i, j);
       const pos = i;
       i = j;
@@ -473,22 +476,36 @@
       (e.at ? 'Tahy před ním se načetly, zbytek zápisu je jako text v komentáři u posledního načteného tahu.' : 'Zápis je jako text v komentáři na začátku partie.');
   }
 
-  // Přečte soubor: všechny partie jako neotevřené, první se zpracuje hned (a ověří se tím, že jde o PGN)
+  // Pozná soubor, který není text (obrázek, PDF, archiv, databáze ChessBase): v běžném textu
+  // nejsou řídicí znaky kromě tabulátoru a konce řádku.
+  function looksBinary(text) {
+    const n = Math.min(text.length, 4000);
+    let bad = 0;
+    for (let i = 0; i < n; i++) {
+      const c = text.charCodeAt(i);
+      if ((c < 32 && c !== 9 && c !== 10 && c !== 13) || c === 0xFFFD) bad++;
+    }
+    return bad > 0 && bad >= n * 0.01;
+  }
+  const NOT_PGN = 'Nejsou v něm žádné partie ve formátu PGN. Soubor PGN je obyčejný text s hlavičkou partie v hranatých závorkách a zápisem tahů.';
+  // Přečte soubor: všechny partie jako neotevřené, první se zpracuje hned (a ověří se tím, že jde o PGN).
+  // Chyba má kind: 'empty' (prázdný), 'binary' (není to text) nebo 'text' (text, ale ne PGN).
   function parseFile(text) {
-    text = String(text || '').replace(/^﻿/, '').replace(/\r\n?/g, '\n');
-    if (!text.trim()) return { error: 'Text je prázdný.' };
+    text = String(text || '').replace(/^\uFEFF/, '').replace(/\r\n?/g, '\n');
+    if (!text.trim()) return { error: 'Je prázdný.', kind: 'empty' };
+    if (looksBinary(text)) return { error: 'Není to soubor PGN, ale jiný typ souboru (například obrázek, PDF, archiv nebo databáze ChessBase).', kind: 'binary' };
     const raws = splitGames(text);
-    if (!raws.length) return { error: 'Tento text se nepodařilo přečíst jako PGN.' };
+    if (!raws.length) return { error: NOT_PGN, kind: 'text' };
     const games = raws.map(stubGame);
     const first = games[0];
     const firstError = materialize(first);
     if (!raws.some(r => r.tags.length) && !first.root.ch.length) {
-      return { error: 'Tento text se nepodařilo přečíst jako PGN.' + (firstError && firstError.san ? ' Tah ' + firstError.san + ' není v pozici platný.' : '') };
+      return { error: NOT_PGN, kind: 'text' };
     }
     return { games, firstError };
   }
 
   return { START, TAGS, DEFAULTS, newNode, freshState, isLazy, toAscii, buildPgn, normalizeFen, sanMove, fastMove,
     splitGames, tokenize, stubGame, parseMoves, materialize, gamePgn, countMoves, mainLength, errorText, parseFile,
-    parseClock, fmtClock, getClock, setClock };
+    parseClock, fmtClock, getClock, setClock, looksBinary };
 });
