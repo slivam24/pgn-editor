@@ -759,7 +759,7 @@ textarea.fen { min-height: 0; font-size: 14px; word-break: break-all; }
     </div>
     <div class="pbody prose">
 
-        <p><strong>PGN editor</strong> <span class="ver-badge">verze 0.22</span></p>
+        <p><strong>PGN editor</strong> <span class="ver-badge">verze 0.23</span></p>
         <p>Jednoduchý editor pro zápis a úpravu šachových partií ve formátu PGN, určený hlavně pro telefon s Androidem. Aplikaci programuje Claude (umělá inteligence od společnosti Anthropic) ve spolupráci s Michalem Slivou, který určuje, co má aplikace umět a jak má vypadat.</p>
         <h3>Co aplikace umí</h3>
         <ul>
@@ -800,6 +800,7 @@ textarea.fen { min-height: 0; font-size: 14px; word-break: break-all; }
         </ul>
         <h3>Známá omezení</h3>
         <ul>
+          <li>Aplikace je dělaná pro zápis a úpravu jednotlivých partií a menších souborů. Velkou databázi s tisíci partiemi otevře, ale seznam partií, hledání a ukládání jsou pak pomalé. Od 1 000 partií na to před otevřením upozorní, soubory nad 20 MB neotevře. Na velké databáze se hodí spíš ChessBase nebo podobný program.</li>
           <li>Aplikace se instaluje ze souboru APK mimo Obchod Play, takže se sama neaktualizuje. Novou verzi stačí nainstalovat přes starou, partie i nastavení zůstanou.</li>
         </ul>
       
@@ -816,6 +817,15 @@ textarea.fen { min-height: 0; font-size: 14px; word-break: break-all; }
       <h2>Verze a změny</h2>
     </div>
     <div class="pbody log">
+        <section>
+          <div class="head"><span class="ver-badge">0.23</span><span class="date">14. 11. 2026</span></div>
+          <ul>
+            <li>Soubor, který není PGN (obrázek, PDF, archiv, databáze ChessBase nebo obyčejný text bez partií), aplikace pozná a srozumitelně oznámí, že ho nejde otevřít. Rozpracovaný soubor přitom zůstane beze změny.</li>
+            <li>Upozornění před otevřením velkého souboru (od 1 000 partií): aplikace je dělaná pro jednotlivé partie a menší soubory a s velkou databází pracuje pomalu. Soubory nad 20 MB neotevře.</li>
+            <li>Při čtení souboru se ukáže hlášení Čtu soubor.</li>
+            <li>Otevře i soubory PGN uložené v kódování UTF-16.</li>
+          </ul>
+        </section>
         <section>
           <div class="head"><span class="ver-badge">0.22</span><span class="date">12. 11. 2026</span></div>
           <ul>
@@ -1708,6 +1718,10 @@ textarea.fen { min-height: 0; font-size: 14px; word-break: break-all; }
   }
 
   function decodeBytes(buf) {
+    const b = new Uint8Array(buf, 0, Math.min(2, buf.byteLength));
+    // text uložený jako UTF-16 (některé programy ve Windows)
+    if (b[0] === 0xFF && b[1] === 0xFE) { try { return new TextDecoder('utf-16le').decode(buf); } catch (e) {} }
+    if (b[0] === 0xFE && b[1] === 0xFF) { try { return new TextDecoder('utf-16be').decode(buf); } catch (e) {} }
     try { return new TextDecoder('utf-8', { fatal: true }).decode(buf); } catch (e) {}
     try { return new TextDecoder('windows-1250').decode(buf); } catch (e) {}
     return new TextDecoder('utf-8').decode(buf);
@@ -1727,8 +1741,9 @@ textarea.fen { min-height: 0; font-size: 14px; word-break: break-all; }
   const baseName = name => String(name || '').replace(/(\.pgn)?(\.txt)?$/i, '');
   // uri je adresa souboru v telefonu, pokud do něj jde ukládat zpět. Vložený text žádný soubor nemá,
   // proto se bere jako neuložený.
-  function loadFile(text, name, uri) {
-    const r = PGN.parseFile(text);
+  // parsed: už přečtený soubor (PGN.parseFile), aby se velký soubor nečetl dvakrát
+  function loadFile(text, name, uri, parsed) {
+    const r = parsed || PGN.parseFile(text);
     if (r.error) return r;
     if (!isFileEmpty()) snapshot();
     const flipped = state ? state.flipped : false;
@@ -1746,29 +1761,58 @@ textarea.fen { min-height: 0; font-size: 14px; word-break: break-all; }
     showMsg(msg, false);
   }
   $('openFile').addEventListener('click', async () => { if (await confirmCloseFile('Otevřít jiný soubor?', 'Otevřít')) { pickAppend = false; $('fileInput').click(); } });
+  // Aplikace je dělaná pro zápis a úpravu jednotlivých partií a menších souborů.
+  const MAX_FILE_MB = 20;   // větší soubor se vůbec nečte, telefonu by došla paměť
+  const BIG_GAMES = 1000;   // od tolika partií se před otevřením upozorní na pomalejší práci
+  function fileError(name, text) {
+    if (drawerOpen()) setDrawer(false);
+    return showInfo('Soubor nejde otevřít', (name ? 'Soubor ' + name + ': ' : '') + text);
+  }
+  // Přečte text souboru a ověří, že jde o PGN. Vrací přečtené partie, nebo null (s vysvětlením uživateli).
+  async function readPgn(text, name) {
+    busy('Čtu soubor…');
+    await new Promise(r => setTimeout(r, 30)); // aby se hlášení stihlo ukázat
+    let r;
+    try { r = PGN.parseFile(text); } catch (e) { r = { error: 'Při čtení nastala chyba (' + ((e && e.message) || 'neznámá') + ').' }; }
+    busy('');
+    if (r.error) { await fileError(name, r.error); return null; }
+    return r;
+  }
+  async function confirmBig(n) {
+    if (n < BIG_GAMES) return true;
+    return askConfirm('Velký soubor', 'Soubor má ' + n + ' ' + plural(n, 'partii', 'partie', 'partií') + '. PGN editor je dělaný pro zápis a úpravu jednotlivých partií a menších souborů. S takhle velkou databází bude seznam partií, hledání a ukládání pomalé. Na velké databáze se hodí spíš ChessBase nebo podobný program.', 'Přesto otevřít');
+  }
   $('fileInput').addEventListener('change', e => {
     const f = e.target.files && e.target.files[0];
     // adresa právě vybraného souboru, aby šlo ukládat zpět do něj
     const uri = ANDROID && ANDROID.takeOpenedUri ? ANDROID.takeOpenedUri() : '';
     const append = pickAppend; pickAppend = false;
+    e.target.value = '';
     if (!f) return;
+    if (f.size > MAX_FILE_MB * 1024 * 1024) {
+      fileError(f.name, 'Je příliš velký (' + Math.round(f.size / 1024 / 1024) + ' MB). PGN editor otevře soubory do ' + MAX_FILE_MB + ' MB. Je dělaný pro jednotlivé partie a menší soubory, na velké databáze se hodí spíš ChessBase nebo podobný program.');
+      return;
+    }
     const reader = new FileReader();
-    reader.onload = () => {
-      if (append) { appendFile(decodeBytes(reader.result), f.name); return; }
-      const r = loadFile(decodeBytes(reader.result), f.name, uri);
-      if (r.error) { showMsg(r.error, true); return; }
+    reader.onload = async () => {
+      const r = await readPgn(decodeBytes(reader.result), f.name);
+      if (!r) return;
+      if (append) { appendGames(r, f.name); return; }
+      if (!(await confirmBig(r.games.length))) return;
+      loadFile('', f.name, uri, r);
       afterLoad(r, 'Otevřeno: ' + f.name);
     };
-    reader.onerror = () => showMsg('Soubor se nepodařilo přečíst.', true);
+    reader.onerror = () => fileError(f.name, 'Nepodařilo se ho přečíst.');
     reader.readAsArrayBuffer(f);
-    e.target.value = '';
   });
   // Soubor otevřený z jiné aplikace (Gmail, Správce souborů, sdílení)
   window.androidOpenText = async (text, name, uri) => {
     await ready;
+    const r = await readPgn(text, name);
+    if (!r) return;
     if (!(await confirmCloseFile('Otevřít ' + (name || 'soubor') + '?', 'Otevřít'))) return;
-    const r = loadFile(text, name, uri);
-    if (r.error) { showMsg(r.error, true); return; }
+    if (!(await confirmBig(r.games.length))) return;
+    loadFile('', name, uri, r);
     afterLoad(r, 'Otevřeno: ' + (name || 'soubor'));
   };
 
@@ -1777,7 +1821,7 @@ textarea.fen { min-height: 0; font-size: 14px; word-break: break-all; }
     if (text.trim() === buildPgn().trim()) { showMsg('V textu není nic nového k načtení.', false); return; }
     if (!(await confirmCloseFile('Načíst text jako nový soubor?', 'Načíst'))) return;
     const r = loadFile(text, '');
-    if (r.error) { showMsg(r.error, true); return; }
+    if (r.error) { showMsg(r.kind === 'empty' ? 'Text je prázdný.' : 'Text nejde načíst. ' + (r.kind === 'text' ? 'Nejsou v něm žádné partie ve formátu PGN.' : r.error), true); return; }
     afterLoad(r, 'Načteno z textu');
   });
 
@@ -1956,9 +2000,9 @@ textarea.fen { min-height: 0; font-size: 14px; word-break: break-all; }
   // Přidání partií z jiného souboru na konec otevřeného
   let pickAppend = false;
   $('addFile').addEventListener('click', () => { pickAppend = true; $('fileInput').click(); });
-  function appendFile(text, name) {
-    const r = PGN.parseFile(text);
-    if (r.error) { showMsg(r.error, true); return; }
+  async function appendGames(r, name) {
+    const total = FILE.games.length + r.games.length;
+    if (total >= BIG_GAMES && FILE.games.length < BIG_GAMES && !(await confirmBig(total))) return;
     snapshot();
     const flipped = state.flipped;
     const keep = FILE.games.filter(g => !isEmptyGame(g)); // prázdná nevyplněná partie se nahradí

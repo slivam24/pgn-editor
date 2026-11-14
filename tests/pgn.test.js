@@ -241,3 +241,20 @@ test('náhodně poškozené soubory se přečtou bez zamrznutí', () => {
     assert.ok(Date.now() - t0 < 1000, 'pomalé čtení: ' + JSON.stringify(s));
   }
 });
+
+test('soubor, který není PGN, se odmítne se srozumitelným důvodem', () => {
+  // jiný typ souboru: řídicí znaky jako v obrázku, PDF nebo archivu
+  const png = '‰PNG\r\n\u001a\n\u0000\u0000\u0000\rIHDR\u0000\u0000\u0004:\u0000\u0000\b\u009a\b\u0006\u0000\u0000\u0000}{()x';
+  assert.equal(PGN.parseFile(png).kind, 'binary');
+  assert.equal(PGN.parseFile('PK\u0003\u0004\u0014\u0000\u0000\u0000\b\u0000 [Event "x"]\n\n1. e4').kind, 'binary');
+  // obyčejný text bez partií
+  for (const t of ['Dobrý den,\nposílám výsledky turnaje.\n1. Novák 5 bodů', '<html><body><p>Partie</p></body></html>', '{"games":[{"white":"A"}]}', '# Nadpis\n\ntext']) {
+    const r = PGN.parseFile(t);
+    assert.equal(r.kind, 'text', t);
+    assert.match(r.error, /žádné partie ve formátu PGN/);
+  }
+  assert.equal(PGN.parseFile('  \n ').kind, 'empty');
+  // skutečný PGN s diakritikou a tabulátory binární není
+  assert.ok(!PGN.looksBinary('[Event "Přebor"]\n[White "Žluťoučký,\tKůň"]\n\n1. e4 *'));
+  assert.ok(!PGN.parseFile('[Event "Přebor"]\r\n[White "Žluťoučký"]\r\n\r\n1. e4 *\r\n').error);
+});
