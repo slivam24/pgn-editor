@@ -1,31 +1,28 @@
 # PGN editor pro Android
 
-Aplikace je stejná webová stránka jako dosud (`app/src/main/assets/www/index.html`), jen zabalená do Android aplikace. Funguje bez internetu, ukládá rovnou soubory `.pgn` a e-mail posílá přes poštovní aplikaci v telefonu i s přílohou.
+Aplikace pro zápis a úpravu šachových partií ve formátu PGN. Je to webová stránka (`app/src/main/assets/www/index.html`) zabalená do aplikace pro Android. Funguje bez internetu, ukládá soubory `.pgn` a partii umí poslat e-mailem i s přílohou.
 
-## Jak z toho dostat soubor APK přes GitHub (bez instalace čehokoli do počítače)
+## Kde vzít aplikaci
 
-1. Založ si zdarma účet na [github.com](https://github.com).
-2. Vpravo nahoře klikni na **+** a **New repository**. Název třeba `pgn-editor`, zvol **Private** a klikni na **Create repository**.
-3. Na stránce nového repozitáře klikni na odkaz **uploading an existing file**.
-4. Rozbal tenhle zip v počítači a do okna prohlížeče přetáhni **obsah** složky `pgn-editor-android` (složky `.github`, `app`, `gradle` a ostatní soubory, ne složku samotnou). Dole klikni na **Commit changes**.
-5. Otevři záložku **Actions**. Sestavení se spustí samo a trvá zhruba 3 až 5 minut. Zelená fajfka znamená hotovo.
-6. Na hlavní stránce repozitáře vpravo najdeš **Releases**. V nejnovějším vydání je soubor `pgn-editor-0.9.apk`.
-7. Otevři tu stránku v telefonu (přihlášený na GitHub), APK stáhni a otevři. Android se zeptá, jestli smí prohlížeč instalovat aplikace, povol to. Pokud se ozve Play Protect, zvol **Přesto nainstalovat**, aplikace není z Obchodu Play, proto to hlásí.
+V [Releases](https://github.com/slivam24/pgn-editor/releases) je u každého vydání soubor `pgn-editor-X.Y.apk`. Otevři stránku v telefonu, soubor stáhni a nainstaluj. Android se zeptá, jestli smí prohlížeč instalovat aplikace, povol to. Pokud se ozve Play Protect, zvol **Přesto nainstalovat**: aplikace není z Obchodu Play, proto to hlásí.
 
-## Nová verze
+Novou verzi stačí nainstalovat přes starou, partie i nastavení zůstanou. Pro jistotu jde v Nastavení udělat zálohu všech partií a nastavení do jednoho souboru.
 
-1. Uprav soubory (hlavně `app/src/main/assets/www/index.html`).
-2. V `app/build.gradle` zvyš `versionCode` o 1 a změň `versionName`. Stejné číslo verze patří i do panelů O aplikaci a Verze a změny.
-3. Nahraj změněné soubory do repozitáře stejně jako v kroku 4. GitHub postaví nové APK samo.
-4. Nové APK nainstaluj přes staré. Partie i nastavení zůstanou.
+## Jak vzniká nová verze
+
+1. Změny se dělají na vedlejší větvi. Každé odeslání na GitHub spustí sestavení (záložka **Actions**).
+2. Sestavení nejdřív pustí testy, pak vytvoří APK a zveřejní ho v Releases. Vedle toho se aplikace zkouší na emulátoru Androidu.
+3. Když všechno projde, větev se sloučí do `main` a vznikne běžné vydání.
+
+Při změně verze se číslo mění na třech místech: `versionCode` a `versionName` v `app/build.gradle`, v panelu O aplikaci a ve Verze a změny. Test hlídá, že se shodují.
 
 ## Testy
 
-Při každém sestavení na GitHubu se nejdřív spustí testy. Když neprojdou, APK se nevytvoří a v záložce **Actions** je vidět, který test selhal.
+Při každém sestavení na GitHubu běží tři sady zkoušek. Když první dvě neprojdou, APK se nevytvoří.
 
-- `tests/pgn.test.js` zkouší čtení a zápis PGN: varianty, komentáře, chybné partie, FEN, názvy zahájení.
-- `tests/verze.test.js` hlídá, že je číslo verze stejné v `app/build.gradle`, v O aplikaci i ve Verze a změny.
-- `tests/prohlizec.js` otevře aplikaci v prohlížeči Chrome a zkouší ukládání rozpracovaného souboru do paměti telefonu, velký soubor a přechod ze starší verze.
+- `tests/pgn.test.js` zkouší čtení a zápis PGN: varianty, komentáře, chybné partie, FEN, českou notaci, názvy zahájení, odkazy na partie. `tests/verze.test.js` hlídá shodu čísla verze.
+- `tests/prohlizec.js` otevře aplikaci v prohlížeči Chrome a zkouší ukládání do paměti telefonu, velké soubory, seznam partií, zálohu, tisk a další funkce.
+- `app/src/androidTest/` jsou zkoušky na emulátoru Androidu: start aplikace ve skutečném WebView, otevření souboru z jiné aplikace, uložení zpět do souboru a uložení partie přes restart. Běží jako samostatná úloha `android`, takže APK vznikne, i kdyby emulátor na GitHubu zrovna nenaběhl. Snímek obrazovky z emulátoru se ukládá do vydání `nahled`.
 
 Ruční spuštění v počítači s nainstalovaným Node.js:
 
@@ -35,17 +32,13 @@ node --test tests/pgn.test.js tests/verze.test.js
 
 ## Vydání a zkušební sestavení
 
-Sestavení z hlavní větve `main` je běžné vydání. Sestavení z jakékoli jiné větve se v **Releases** označí jako zkušební (Pre-release) a zůstává jich posledních pět, starší se mažou samy.
+Sestavení z hlavní větve `main` je běžné vydání. Sestavení z jakékoli jiné větve se v **Releases** označí jako zkušební (Pre-release) a zůstává jich posledních pět, starší se mažou samy. U každého vydání je i soubor `.aab`, což je balíček pro Google Play (podklady pro Play jsou ve složce `play/`).
 
 ## Podpisový klíč
 
 Aplikaci podepisuje klíč. Díky stejnému klíči jde každá další verze nainstalovat přes předchozí bez ztráty partií a nastavení.
 
-**Pozor:** klíč `app/pgn-editor.keystore` i jeho heslo (v `app/build.gradle`) jsou součástí repozitáře a repozitář je veřejný. Kdokoli si je tedy může stáhnout a podepsat jimi vlastní APK, které se bude tvářit jako aktualizace PGN editoru. Dokud aplikaci instaluješ jen z vlastních Releases, nic se neděje. Pokud ji ale budeš šířit dál nebo ji dáš na Google Play, je potřeba nový klíč, který v repozitáři není.
-
-### Přechod na tajný klíč
-
-Sestavení je na to připravené. Když v repozitáři na GitHubu existují tajné hodnoty (**Settings > Secrets and variables > Actions > New repository secret**), použijí se místo klíče z repozitáře:
+Klíč není v repozitáři. Sestavení na GitHubu ho bere z tajných hodnot repozitáře (**Settings > Secrets and variables > Actions**):
 
 | Název | Obsah |
 |---|---|
@@ -53,9 +46,11 @@ Sestavení je na to připravené. Když v repozitáři na GitHubu existují tajn
 | `KEYSTORE_PASSWORD` | heslo ke klíči |
 | `KEY_ALIAS` | název klíče v souboru |
 
-U každého vydání v Releases je napsáno, kterým klíčem je podepsané. Nový klíč připravený v listopadu 2026 má otisk SHA-256 `D0:D0:5F:D3:29:32:A2:83:D1:4A:27:36:1B:28:35:D7:25:F7:0E:21:5C:59:C6:5C:34:7F:D9:D1:38:77:25:5B`.
+Bez nich sestavení na GitHubu skončí chybou. Klíč a heslo měj uložené i mimo GitHub: kdyby se ztratily, další verze by nešla nainstalovat přes starou. Otisk klíče SHA-256 je `D0:D0:5F:D3:29:32:A2:83:D1:4A:27:36:1B:28:35:D7:25:F7:0E:21:5C:59:C6:5C:34:7F:D9:D1:38:77:25:5B`.
 
-Nový klíč znamená jednorázově aplikaci odinstalovat a nainstalovat znovu, protože Android nedovolí přeinstalovat aplikaci podepsanou jiným klíčem. Před tím si partie ulož do souboru. Starý klíč pak může z repozitáře pryč.
+Do verze 0.23 byl v repozitáři starší klíč (veřejně čitelný). Aplikace podepsaná starým klíčem se musí před instalací nové verze jednou odinstalovat.
+
+Při sestavení v počítači (Android Studio, **Build > Generate App Bundles or APKs**) se bez klíče použije zkušební klíč Androidu. Takové APK jde nainstalovat, ale ne přes vydanou verzi.
 
 ## Co je kde
 
@@ -66,9 +61,12 @@ Nový klíč znamená jednorázově aplikaci odinstalovat a nainstalovat znovu, 
 | `app/src/main/assets/www/eco.js` | tabulka zahájení (kód ECO a název), vytváří ji `tools/eco.js` |
 | `app/src/main/assets/www/chess.js` | pravidla šachu (chess.js 0.10.3) |
 | `app/src/main/assets/www/fonts/` | písma IBM Plex |
-| `app/src/main/java/.../MainActivity.java` | obal: otevírání a ukládání souborů, schránka, e-mail, tlačítko Zpět |
-| `tests/` | automatické testy, běží při každém sestavení |
-| `app/build.gradle` | číslo verze, podpis |
+| `app/src/main/java/.../MainActivity.java` | obal: otevírání a ukládání souborů, schránka, e-mail, tisk, stahování z odkazu, tlačítko Zpět |
+| `tests/` | testy čtení PGN a zkoušky v prohlížeči |
+| `app/src/androidTest/` | zkoušky na emulátoru Androidu |
+| `tools/eco.js` | vytvoří tabulku zahájení z dat Lichessu |
+| `play/` | podklady pro Google Play (texty, ikona, snímky, zásady soukromí) |
+| `app/build.gradle` | číslo verze, podpis, cílová verze Androidu |
 | `.github/workflows/build.yml` | návod pro GitHub, jak APK sestavit |
 
 ## Licence
@@ -87,4 +85,3 @@ PGN editor je svobodný software pod licencí **GNU GPL verze 3** (soubor `LICEN
 
 Texty licencí jsou ve složce `app/src/main/assets/www/licence/` a v aplikaci v menu Licence. Zdrojový kód Stockfishe: https://github.com/official-stockfish/Stockfish, Stockfish.js: https://github.com/nmrugg/stockfish.js.
 
-Alternativa ke GitHubu: projekt jde otevřít v Android Studiu a sestavit přes **Build > Generate App Bundles or APKs > Build APK(s)**.

@@ -9,8 +9,10 @@ import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.UriPermission;
 import android.content.pm.PackageManager;
+import android.content.res.Configuration;
 import android.database.Cursor;
 import android.net.Uri;
+import android.os.Build;
 import android.os.Bundle;
 import android.os.VibrationEffect;
 import android.os.Vibrator;
@@ -18,6 +20,11 @@ import android.speech.RecognitionListener;
 import android.speech.RecognizerIntent;
 import android.speech.SpeechRecognizer;
 import android.util.Base64;
+import android.view.View;
+import android.view.WindowInsets;
+import android.view.WindowInsetsController;
+import android.print.PrintAttributes;
+import android.print.PrintManager;
 import android.provider.DocumentsContract;
 import android.provider.OpenableColumns;
 import android.webkit.JavascriptInterface;
@@ -28,7 +35,9 @@ import android.webkit.WebResourceResponse;
 import android.webkit.WebSettings;
 import android.webkit.WebView;
 import android.webkit.WebViewClient;
+import android.widget.FrameLayout;
 import android.widget.Toast;
+import android.window.OnBackInvokedDispatcher;
 
 import androidx.core.content.FileProvider;
 
@@ -42,12 +51,15 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
+import java.net.HttpURLConnection;
+import java.net.URL;
 import java.nio.ByteBuffer;
 import java.nio.charset.CharacterCodingException;
 import java.nio.charset.Charset;
 import java.nio.charset.CodingErrorAction;
 import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -72,7 +84,12 @@ public class MainActivity extends Activity {
     private static final int REQ_SAVE = 2;
     private static final int REQ_MIC = 3;
 
+    // Servery, ze kterých smí funkce Stáhnout z odkazu číst. Nic jiného aplikace z internetu nestahuje.
+    private static final List<String> HTTP_HOSTS = Arrays.asList("lichess.org", "www.chess.com", "api.chess.com");
+
     private WebView web;
+    private FrameLayout root;
+    private WebView printView; // stránka připravená k tisku, drží se do konce tisku
     private ValueCallback<Uri[]> fileCallback;
     private byte[] pendingSaveBytes;
     private SpeechRecognizer recognizer;
@@ -87,8 +104,25 @@ public class MainActivity extends Activity {
         super.onCreate(savedInstanceState);
 
         web = new WebView(this);
-        web.setBackgroundColor(getColor(R.color.bg));
-        setContentView(web);
+        root = new FrameLayout(this);
+        root.addView(web, new FrameLayout.LayoutParams(FrameLayout.LayoutParams.MATCH_PARENT, FrameLayout.LayoutParams.MATCH_PARENT));
+        setContentView(root);
+        applyTheme(getSharedPreferences("app", MODE_PRIVATE).getString("theme", "auto"));
+
+        // Novější Android kreslí aplikaci i pod systémové lišty a klávesnici. Obsah se proto odsadí
+        // o jejich velikost, aby nebyl schovaný pod stavovým řádkem ani pod klávesnicí.
+        if (Build.VERSION.SDK_INT >= 30) {
+            getWindow().setDecorFitsSystemWindows(false);
+            root.setOnApplyWindowInsetsListener((v, insets) -> {
+                android.graphics.Insets i = insets.getInsets(WindowInsets.Type.systemBars() | WindowInsets.Type.displayCutout() | WindowInsets.Type.ime());
+                v.setPadding(i.left, i.top, i.right, i.bottom);
+                return WindowInsets.CONSUMED;
+            });
+        }
+        // Tlačítko a gesto Zpět na novějším Androidu
+        if (Build.VERSION.SDK_INT >= 33) {
+            getOnBackInvokedDispatcher().registerOnBackInvokedCallback(OnBackInvokedDispatcher.PRIORITY_DEFAULT, this::handleBack);
+        }
 
         WebSettings s = web.getSettings();
         s.setJavaScriptEnabled(true);
@@ -342,9 +376,65 @@ public class MainActivity extends Activity {
     @Override
     @SuppressWarnings("deprecation")
     public void onBackPressed() {
+        handleBack();
+    }
+
+    private void handleBack() {
         web.evaluateJavascript("window.androidBack ? window.androidBack() : false", result -> {
             if (!"true".equals(result)) finish();
         });
+    }
+
+    /** Světlý nebo tmavý vzhled: pozadí okna a barva ikon v systémových lištách. mode je auto, light nebo dark. */
+    private void applyTheme(String mode) {
+        boolean night = (getResources().getConfiguration().uiMode & Configuration.UI_MODE_NIGHT_MASK) == Configuration.UI_MODE_NIGHT_YES;
+        boolean dark = "dark".equals(mode) || (!"light".equals(mode) && night);
+        int bg = dark ? 0xFF141A17 : 0xFFF3F5F2; // stejné barvy jako --bg ve stránce
+        root.setBackgroundColor(bg);
+        web.setBackgroundColor(bg);
+        getWindow().setStatusBarColor(bg);
+        getWindow().setNavigationBarColor(bg);
+        if (Build.VERSION.SDK_INT >= 30) {
+            WindowInsetsController c = getWindow().getInsetsController();
+            int light = WindowInsetsController.APPEARANCE_LIGHT_STATUS_BARS | WindowInsetsController.APPEARANCE_LIGHT_NAVIGATION_BARS;
+            if (c != null) c.setSystemBarsAppearance(dark ? 0 : light, light);
+        } else {
+            View d = getWindow().getDecorView();
+            int light = View.SYSTEM_UI_FLAG_LIGHT_STATUS_BAR | View.SYSTEM_UI_FLAG_LIGHT_NAVIGATION_BAR;
+            d.setSystemUiVisibility(dark ? (d.getSystemUiVisibility() & ~light) : (d.getSystemUiVisibility() | light));
+        }
+    }
+
+    /** Stáhne text z povoleného serveru (jen https). Vrací {stav, text}; stav 0 znamená, že se spojení nepovedlo. */
+    private Object[] download(String address) {
+        HttpURLConnection c = null;
+        try {
+            URL url = new URL(address);
+            if (!"https".equals(url.getProtocol()) || !HTTP_HOSTS.contains(url.getHost())) return new Object[]{0, ""};
+            c = (HttpURLConnection) url.openConnection();
+            c.setConnectTimeout(15000);
+            c.setReadTimeout(20000);
+            c.setRequestProperty("Accept", "application/x-chess-pgn, application/json");
+            c.setRequestProperty("User-Agent", "PGN-editor-Android");
+            int code = c.getResponseCode();
+            InputStream in = code >= 400 ? c.getErrorStream() : c.getInputStream();
+            ByteArrayOutputStream buf = new ByteArrayOutputStream();
+            if (in != null) {
+                try (InputStream i = in) {
+                    byte[] chunk = new byte[16384];
+                    int n;
+                    while ((n = i.read(chunk)) != -1) {
+                        buf.write(chunk, 0, n);
+                        if (buf.size() > 8 * 1024 * 1024) return new Object[]{0, ""};
+                    }
+                }
+            }
+            return new Object[]{code, new String(buf.toByteArray(), StandardCharsets.UTF_8)};
+        } catch (Exception e) {
+            return new Object[]{0, ""};
+        } finally {
+            if (c != null) c.disconnect();
+        }
     }
 
     @Override
@@ -450,6 +540,44 @@ public class MainActivity extends Activity {
             String d = p.getString("migrated_data", null);
             if (d != null) p.edit().remove("migrated_data").apply();
             return d;
+        }
+
+        /** Světlý nebo tmavý vzhled zvolený v Nastavení (auto, light, dark). Pamatuje se pro příští start. */
+        @JavascriptInterface
+        public void setTheme(String mode) {
+            getSharedPreferences("app", MODE_PRIVATE).edit().putString("theme", mode).apply();
+            runOnUiThread(() -> applyTheme(mode));
+        }
+
+        /** Stažení partie z odkazu. Výsledek přijde do window.onHttp(id, stav, text). */
+        @JavascriptInterface
+        public void httpGet(int id, String url) {
+            new Thread(() -> {
+                Object[] r = download(url);
+                runOnUiThread(() -> js("window.onHttp && window.onHttp(" + id + "," + r[0] + "," + JSONObject.quote((String) r[1]) + ")"));
+            }).start();
+        }
+
+        /** Tisk nebo uložení do PDF: stránka se načte do skrytého okna a předá tisku Androidu. */
+        @JavascriptInterface
+        public void printHtml(String title, String html) {
+            runOnUiThread(() -> {
+                WebView pv = new WebView(MainActivity.this);
+                printView = pv;
+                pv.setWebViewClient(new WebViewClient() {
+                    @Override
+                    public void onPageFinished(WebView view, String url) {
+                        try {
+                            String job = title == null || title.trim().isEmpty() ? "PGN editor" : title;
+                            PrintManager pm = (PrintManager) getSystemService(PRINT_SERVICE);
+                            pm.print(job, view.createPrintDocumentAdapter(job), new PrintAttributes.Builder().build());
+                        } catch (Exception e) {
+                            Toast.makeText(MainActivity.this, "Tisk se nepodařilo spustit.", Toast.LENGTH_LONG).show();
+                        }
+                    }
+                });
+                pv.loadDataWithBaseURL(null, html, "text/html", "UTF-8", null);
+            });
         }
 
         /** Adresa souboru právě vybraného přes Otevřít soubor (prázdná, když do něj nejde zapisovat). */

@@ -4,33 +4,37 @@ plugins {
 
 android {
     namespace 'cz.sachy.pgneditor'
-    compileSdk 34
+    compileSdk 36
 
     defaultConfig {
         applicationId 'cz.sachy.pgneditor'
         minSdk 26          // Android 8.0 a novější
-        targetSdk 34
+        targetSdk 36
         // S každou novou verzí zvýšit obě čísla (stejně jako v O aplikaci)
-        versionCode 23
-        versionName '0.23'
+        versionCode 24
+        versionName '0.24'
+        testInstrumentationRunner 'androidx.test.runner.AndroidJUnitRunner'
     }
 
-    // Stálý podpisový klíč, aby šlo novou verzi nainstalovat přes starou bez ztráty dat.
-    // Sestavení na GitHubu může klíč dostat z tajného úložiště (Secrets, viz README). Bez něj se
-    // použije klíč uložený v repozitáři, který je ale veřejně čitelný.
+    // Podpisový klíč není součástí repozitáře. Sestavení na GitHubu ho bere z tajného úložiště
+    // (Secrets, viz README). Bez něj se aplikace podepíše zkušebním klíčem Androidu: jde nainstalovat,
+    // ale ne přes vydanou verzi.
+    def keyFile = System.getenv('PGN_KEYSTORE_FILE')
     signingConfigs {
-        release {
-            storeFile file(System.getenv('PGN_KEYSTORE_FILE') ?: 'pgn-editor.keystore')
-            storePassword System.getenv('PGN_KEYSTORE_PASSWORD') ?: 'pgneditor'
-            keyAlias System.getenv('PGN_KEY_ALIAS') ?: 'pgn-editor'
-            keyPassword System.getenv('PGN_KEY_PASSWORD') ?: System.getenv('PGN_KEYSTORE_PASSWORD') ?: 'pgneditor'
+        if (keyFile) {
+            release {
+                storeFile file(keyFile)
+                storePassword System.getenv('PGN_KEYSTORE_PASSWORD')
+                keyAlias System.getenv('PGN_KEY_ALIAS') ?: 'pgn-editor'
+                keyPassword System.getenv('PGN_KEY_PASSWORD') ?: System.getenv('PGN_KEYSTORE_PASSWORD')
+            }
         }
     }
 
     buildTypes {
         release {
             minifyEnabled false
-            signingConfig signingConfigs.release
+            signingConfig keyFile ? signingConfigs.release : signingConfigs.debug
         }
     }
 
@@ -47,4 +51,8 @@ android {
 
 dependencies {
     implementation 'androidx.core:core:1.13.1'
+    // zkoušky na emulátoru Androidu (app/src/androidTest)
+    androidTestImplementation 'androidx.test:core:1.6.1'
+    androidTestImplementation 'androidx.test:runner:1.6.2'
+    androidTestImplementation 'androidx.test.ext:junit:1.2.1'
 }

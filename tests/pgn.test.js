@@ -258,3 +258,58 @@ test('soubor, který není PGN, se odmítne se srozumitelným důvodem', () => {
   assert.ok(!PGN.looksBinary('[Event "Přebor"]\n[White "Žluťoučký,\tKůň"]\n\n1. e4 *'));
   assert.ok(!PGN.parseFile('[Event "Přebor"]\r\n[White "Žluťoučký"]\r\n\r\n1. e4 *\r\n').error);
 });
+
+test('česká notace (J, S, V, D, braní dvojtečkou) se přečte a uloží anglicky', () => {
+  const { g, r } = round('[Event "CZ"]\n\n1. e4 e5 2. Jf3 Jc6 3. Sc4 Sc5 4. 0-0 Jf6 5. d3 d6 6. Sg5 h6 7. S:f6 D:f6 8. Jc3 0-0 9. Vb1 Vd8 *\n');
+  assert.equal(r.firstError, null);
+  assert.deepEqual(mainLine(g).slice(2, 6), ['Nf3', 'Nc6', 'Bc4', 'Bc5']);
+  assert.deepEqual(mainLine(g).slice(12), ['Bxf6', 'Qxf6', 'Nc3', 'O-O', 'Rb1', 'Rd8']);
+  // proměna pěšce v dámu a jezdce
+  const p = round('[Event "CZ"]\n[FEN "8/4P1k1/8/8/8/8/1p4K1/8 w - - 0 1"]\n\n1. e8=D b1J *\n');
+  assert.equal(p.r.firstError, null);
+  assert.deepEqual(mainLine(p.g), ['e8=Q', 'b1=N']);
+  assert.equal(PGN.czToEn('Jbd7'), 'Nbd7');
+  assert.equal(PGN.czToEn('d8=D+'), 'd8=Q+');
+  assert.equal(PGN.czToEn('Sd3'), 'Bd3');
+});
+
+test('tahy pro hledání duplicit jsou stejné u otevřené i neotevřené partie', () => {
+  const text = '[Event "A"]\n\n1. e4 e5 2. Nf3 *\n\n[Event "B"]\n\n1. e4! {koment} e5 (1... c5 2. Nf3) 2. Ng1f3+ *\n\n[Event "C"]\n\n1. d4 d5 2. 0-0 *\n';
+  const r = PGN.parseFile(text);
+  assert.ok(PGN.isLazy(r.games[1]));
+  assert.deepEqual(PGN.mainMoves(r.games[0]), ['e4', 'e5', 'Nf3']);
+  assert.deepEqual(PGN.mainMoves(r.games[1]), ['e4', 'e5', 'Ng1f3']); // nezvyklý zápis zůstává, nečte se celá partie
+  assert.deepEqual(PGN.mainMoves(r.games[2]), ['d4', 'd5', 'O-O']);
+});
+
+test('odkazy na partie: Lichess a Chess.com', () => {
+  const li = u => (PGN.linkInfo(u) || {}).url;
+  assert.equal(li('https://lichess.org/q7ZvsdUF'), 'https://lichess.org/game/export/q7ZvsdUF?clocks=true&evals=true');
+  assert.equal(li('lichess.org/q7ZvsdUF/black#12'), 'https://lichess.org/game/export/q7ZvsdUF?clocks=true&evals=true');
+  assert.equal(li('https://lichess.org/q7ZvsdUFabcd'), 'https://lichess.org/game/export/q7ZvsdUF?clocks=true&evals=true');
+  assert.equal(li('https://lichess.org/study/abcdefgh'), 'https://lichess.org/api/study/abcdefgh.pgn');
+  assert.equal(li('https://lichess.org/study/abcdefgh/ijklmnop'), 'https://lichess.org/api/study/abcdefgh/ijklmnop.pgn');
+  assert.equal(li('https://www.chess.com/game/live/692696567'), 'https://www.chess.com/callback/live/game/692696567');
+  assert.equal(li('https://www.chess.com/cs/game/daily/123?tab=review'), 'https://www.chess.com/callback/daily/game/123');
+  assert.equal(li('chess.com/analysis/game/live/55'), 'https://www.chess.com/callback/live/game/55');
+  for (const u of ['https://lichess.org/analysis', 'https://lichess.org/training/12345', 'https://example.com/q7ZvsdUF', '1. e4 e5', '', 'https://lichess.org/q7ZvsdUF a další text']) assert.equal(PGN.linkInfo(u), null, u);
+});
+
+test('partie z Chess.com: tahy v jejich kódování včetně proměny pěšce a časů', () => {
+  // skutečná partie (zkrácená hlavička), poslední tahy obsahují proměnu d8=Q+
+  const data = { game: { moveList: 'mCYQbsZJgv0KvKJBsm70Kv0CltCJmB!Tfm90Br8!eg6LkAJZtB5OvKZYcD0RAIRKDKY0mOXOKR0ZR949feTJrlZ7lA7MAKLxdvxLpFMVvLVladljKQJsQ0!?BJsdedjmLtm0JR0ZtJ96IQ6QJQZQRZ3VZ~?37t2UtJQTow32JBUMBT2TFMTMdR1LRO',
+    moveTimestamps: '600,600,597,598', pgnHeaders: { Event: 'Live Chess', Date: '2014.01.07', White: 'Bily', Black: 'Cerny', Result: '1-0', WhiteElo: 2411, TimeControl: '60' } } };
+  const pgn = PGN.chessComPgn(data);
+  const { g, r } = round(pgn);
+  assert.equal(r.firstError, null);
+  const moves = mainLine(g);
+  assert.equal(moves.length, 93);
+  assert.deepEqual(moves.slice(0, 8), ['e4', 'c6', 'Nc3', 'd5', 'Nf3', 'e5', 'Nxe5', 'd4']);
+  assert.ok(moves.includes('d8=Q+'));
+  assert.deepEqual(moves.slice(-3), ['Rd6', 'f5', 'Rxa6']);
+  assert.equal(g.headers.White, 'Bily');
+  assert.equal(g.extra.WhiteElo, '2411');
+  assert.equal(PGN.getClock(g.root.ch[0].c), 60);
+  assert.equal(PGN.chessComPgn({}), null);
+  assert.equal(PGN.chessComPgn({ game: { moveList: 'zzzz' } }).includes('[Result "*"]'), true); // nesmyslné tahy partii jen zkrátí
+});
