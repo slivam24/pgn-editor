@@ -9,6 +9,7 @@ import android.content.Intent;
 import android.net.Uri;
 import android.os.Build;
 import android.view.ViewGroup;
+import android.webkit.PermissionRequest;
 import android.webkit.WebView;
 
 import androidx.core.content.FileProvider;
@@ -184,17 +185,42 @@ public class AppTest {
         assertNotEquals("\"ok\"", js("return window.Android.saveToUri('content://neexistuje.pgneditor/x.pgn', 'a');"));
     }
 
-    /** Stránka smí použít fotoaparát (čtení QR kódu). Emulátor nemusí mít kameru, jde jen o povolení. */
+    /** Napodobená žádost stránky o fotoaparát: zapamatuje si, jestli ji aplikace povolila, nebo odmítla. */
+    private static class FakeRequest extends PermissionRequest {
+        final Uri origin;
+        final String[] resources;
+        final CountDownLatch answered = new CountDownLatch(1);
+        volatile String result = "";
+        FakeRequest(String origin, String... resources) { this.origin = Uri.parse(origin); this.resources = resources; }
+        @Override public Uri getOrigin() { return origin; }
+        @Override public String[] getResources() { return resources; }
+        @Override public void grant(String[] r) { result = "grant:" + String.join(",", r); answered.countDown(); }
+        @Override public void deny() { result = "deny"; answered.countDown(); }
+    }
+
+    private String askCamera(FakeRequest r) throws Exception {
+        scenario.onActivity(a -> {
+            WebView web = (WebView) ((ViewGroup) ((ViewGroup) a.findViewById(android.R.id.content)).getChildAt(0)).getChildAt(0);
+            web.getWebChromeClient().onPermissionRequest(r);
+        });
+        assertTrue("aplikace na žádost o fotoaparát neodpověděla", r.answered.await(10, TimeUnit.SECONDS));
+        return r.result;
+    }
+
+    /**
+     * Fotoaparát pro čtení QR kódů smí dostat jen stránka aplikace a jen obraz, nikdy mikrofon
+     * ani cizí stránka. (Skutečnou kameru emulátor na GitHubu spolehlivě nespustí, proto se zkouší
+     * rozhodování aplikace přímo.)
+     */
     @Test
-    public void pageMayUseCamera() throws Exception {
+    public void cameraOnlyForAppPage() throws Exception {
         scenario = ActivityScenario.launch(MainActivity.class);
         waitBooted();
-        js("window.__cam = 'čekám'; navigator.mediaDevices.getUserMedia({ video: true })"
-                + ".then(s => { s.getTracks().forEach(t => t.stop()); window.__cam = 'ok'; })"
-                + ".catch(e => { window.__cam = e.name; }); return 0;");
-        waitFor("odpověď fotoaparátu", "window.__cam !== 'čekám'");
-        String r = js("return window.__cam;");
-        assertTrue("fotoaparát odmítnut: " + r, !"\"NotAllowedError\"".equals(r) && !"\"SecurityError\"".equals(r));
+        assertEquals("grant:" + PermissionRequest.RESOURCE_VIDEO_CAPTURE,
+                askCamera(new FakeRequest("https://appassets.androidplatform.net/", PermissionRequest.RESOURCE_VIDEO_CAPTURE)));
+        assertEquals("deny", askCamera(new FakeRequest("https://example.com/", PermissionRequest.RESOURCE_VIDEO_CAPTURE)));
+        assertEquals("deny", askCamera(new FakeRequest("https://appassets.androidplatform.net/", PermissionRequest.RESOURCE_AUDIO_CAPTURE)));
+        assertEquals("\"function\"", js("return typeof (navigator.mediaDevices && navigator.mediaDevices.getUserMedia);"));
     }
 
     /** QR kód: knihovna se načte z aplikace a kód partie se vytvoří i ve WebView v telefonu. */
