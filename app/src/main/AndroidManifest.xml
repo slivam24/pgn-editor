@@ -3,6 +3,11 @@
 
     <!-- Internet jen pro funkci Stáhnout z odkazu (Lichess, Chess.com). Jinak aplikace funguje bez připojení. -->
     <uses-permission android:name="android.permission.INTERNET" />
+    <!-- Fotoaparát jen pro načtení QR kódu s partií (povolení se vyžádá až při prvním použití) -->
+    <uses-permission android:name="android.permission.CAMERA" />
+    <!-- Aplikace jde nainstalovat i do zařízení bez fotoaparátu, QR kód pak načte z obrázku -->
+    <uses-feature android:name="android.hardware.camera" android:required="false" />
+    <uses-feature android:name="android.hardware.camera.autofocus" android:required="false" />
     <!-- Hlasové zadávání tahů (volitelné, povolení se vyžádá až při prvním použití) -->
     <uses-permission android:name="android.permission.RECORD_AUDIO" />
     <!-- Krátká vibrace po tahu (volitelné) -->

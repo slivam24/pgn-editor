@@ -30,7 +30,7 @@ jobs:
 
       - name: Testy v prohlížeči
         run: |
-          cd tests && npm init -y >/dev/null && npm install --silent puppeteer-core@23 && cd ..
+          cd tests && npm init -y >/dev/null && npm install --silent puppeteer-core@23 jsqr@1.4.0 && cd ..
           node tests/prohlizec.js
 
       # Podpisový klíč je v tajném úložišti GitHubu (Settings, Secrets and variables, Actions), viz README.

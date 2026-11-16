@@ -61,6 +61,7 @@ Při sestavení v počítači (Android Studio, **Build > Generate App Bundles or
 | `app/src/main/assets/www/eco.js` | tabulka zahájení (kód ECO a název), vytváří ji `tools/eco.js` |
 | `app/src/main/assets/www/chess.js` | pravidla šachu (chess.js 0.10.3) |
 | `app/src/main/assets/www/fonts/` | písma IBM Plex |
+| `app/src/main/assets/www/qr/` | vytváření a čtení QR kódů (qrcode-generator, jsQR) |
 | `app/src/main/java/.../MainActivity.java` | obal: otevírání a ukládání souborů, schránka, e-mail, tisk, stahování z odkazu, tlačítko Zpět |
 | `tests/` | testy čtení PGN a zkoušky v prohlížeči |
 | `app/src/androidTest/` | zkoušky na emulátoru Androidu |
@@ -81,6 +82,8 @@ PGN editor je svobodný software pod licencí **GNU GPL verze 3** (soubor `LICEN
 | Figury cburnett (z projektu chessground) | Colin M. L. Burnett | GPL 3 |
 | Písma IBM Plex Sans a Mono | IBM Corp. | SIL OFL 1.1 |
 | Tabulka zahájení (chess-openings) | Lichess | CC0 |
+| QR Code Generator for JavaScript 1.4.4 | Kazuhiko Arase | MIT |
+| jsQR 1.4.0 | Cosmo Wolfe | Apache 2.0 |
 | AndroidX Core | The Android Open Source Project | Apache 2.0 |
 
 Texty licencí jsou ve složce `app/src/main/assets/www/licence/` a v aplikaci v menu Licence. Zdrojový kód Stockfishe: https://github.com/official-stockfish/Stockfish, Stockfish.js: https://github.com/nmrugg/stockfish.js.

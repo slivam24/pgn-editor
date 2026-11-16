@@ -15,9 +15,11 @@ import androidx.core.content.FileProvider;
 import androidx.test.core.app.ActivityScenario;
 import androidx.test.core.app.ApplicationProvider;
 import androidx.test.ext.junit.runners.AndroidJUnit4;
+import androidx.test.rule.GrantPermissionRule;
 
 import org.json.JSONObject;
 import org.junit.After;
+import org.junit.Rule;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 
@@ -38,6 +40,10 @@ import java.util.concurrent.atomic.AtomicReference;
 public class AppTest {
 
     private static final String GAME = "[Event \"Zkouska\"]\n[White \"Novak, Jan\"]\n[Black \"Dvorak, Petr\"]\n[Result \"*\"]\n\n1. e4 e5 *\n";
+
+    // Fotoaparát pro čtení QR kódů povolený předem, aby zkouška nečekala na okno s dotazem
+    @Rule
+    public GrantPermissionRule camera = GrantPermissionRule.grant(android.Manifest.permission.CAMERA);
 
     private final Context app = ApplicationProvider.getApplicationContext();
     private ActivityScenario<MainActivity> scenario;
@@ -176,6 +182,30 @@ public class AppTest {
         assertEquals("\"ok\"", js("return window.Android.saveToUri(" + JSONObject.quote(uriOf(f).toString()) + "," + JSONObject.quote(text) + ");"));
         assertEquals(text, new String(Files.readAllBytes(f.toPath()), StandardCharsets.UTF_8));
         assertNotEquals("\"ok\"", js("return window.Android.saveToUri('content://neexistuje.pgneditor/x.pgn', 'a');"));
+    }
+
+    /** Stránka smí použít fotoaparát (čtení QR kódu). Emulátor nemusí mít kameru, jde jen o povolení. */
+    @Test
+    public void pageMayUseCamera() throws Exception {
+        scenario = ActivityScenario.launch(MainActivity.class);
+        waitBooted();
+        js("window.__cam = 'čekám'; navigator.mediaDevices.getUserMedia({ video: true })"
+                + ".then(s => { s.getTracks().forEach(t => t.stop()); window.__cam = 'ok'; })"
+                + ".catch(e => { window.__cam = e.name; }); return 0;");
+        waitFor("odpověď fotoaparátu", "window.__cam !== 'čekám'");
+        String r = js("return window.__cam;");
+        assertTrue("fotoaparát odmítnut: " + r, !"\"NotAllowedError\"".equals(r) && !"\"SecurityError\"".equals(r));
+    }
+
+    /** QR kód: knihovna se načte z aplikace a kód partie se vytvoří i ve WebView v telefonu. */
+    @Test
+    public void makesQrCode() throws Exception {
+        scenario = ActivityScenario.launch(MainActivity.class);
+        waitBooted();
+        js("document.getElementById('menuBtn').click(); document.querySelector('[data-page=pgQr]').click(); return 0;");
+        waitFor("QR kód partie", "document.getElementById('qrImg').src.indexOf('data:image/png') === 0");
+        js("document.getElementById('qrPos').click(); return 0;");
+        waitFor("QR kód pozice", "/Pozice/.test(document.getElementById('qrNote').textContent)");
     }
 
     @Test

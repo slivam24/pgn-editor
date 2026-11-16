@@ -17,6 +17,10 @@ Jen když použiješ funkci Stáhnout z odkazu. Aplikace si pak vyžádá partii
 
 Mikrofon se používá jen při zapnutém hlasovém zadávání tahů. Řeč rozpoznává služba rozpoznávání řeči v telefonu (obvykle od společnosti Google) podle jejích vlastních zásad. Aplikace žádný zvuk neukládá a dostává jen rozpoznaný text.
 
+## Fotoaparát
+
+Fotoaparát se používá jen při načítání QR kódu s partií nebo pozicí. Obraz se zpracovává přímo v telefonu, nikam se neposílá ani neukládá.
+
 ## Odesílání partií
 
 Odeslání e-mailem nebo sdílení probíhá přes aplikaci, kterou si vybereš (například Gmail). PGN editor sám nic neodesílá.
