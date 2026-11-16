@@ -1,0 +1,582 @@
+{
+ "1v2": {
+  "a": 1,
+  "b": 2,
+  "limit": 5400,
+  "ms": 4,
+  "winner": "b",
+  "nodes": 21,
+  "exact": true
+ },
+ "1v3": {
+  "a": 1,
+  "b": 3,
+  "limit": 5400,
+  "ms": 0,
+  "winner": "b",
+  "nodes": 28,
+  "exact": true
+ },
+ "3v1": {
+  "a": 3,
+  "b": 1,
+  "limit": 5400,
+  "ms": 0,
+  "winner": "w",
+  "nodes": 19,
+  "exact": true
+ },
+ "2v3": {
+  "a": 2,
+  "b": 3,
+  "limit": 5400,
+  "ms": 4,
+  "winner": "b",
+  "nodes": 382,
+  "exact": true
+ },
+ "1v1": {
+  "a": 1,
+  "b": 1,
+  "limit": 5400,
+  "ms": 3,
+  "winner": "b",
+  "nodes": 6,
+  "exact": true
+ },
+ "1v4": {
+  "a": 1,
+  "b": 4,
+  "limit": 5400,
+  "ms": 1,
+  "winner": "b",
+  "nodes": 13,
+  "exact": true
+ },
+ "2v1": {
+  "a": 2,
+  "b": 1,
+  "limit": 5400,
+  "ms": 3,
+  "winner": "w",
+  "nodes": 14,
+  "exact": true
+ },
+ "4v1": {
+  "a": 4,
+  "b": 1,
+  "limit": 5400,
+  "ms": 1,
+  "winner": "w",
+  "nodes": 14,
+  "exact": true
+ },
+ "3v2": {
+  "a": 3,
+  "b": 2,
+  "limit": 5400,
+  "ms": 4,
+  "winner": "w",
+  "nodes": 251,
+  "exact": true
+ },
+ "2v2": {
+  "a": 2,
+  "b": 2,
+  "limit": 5400,
+  "ms": 5,
+  "winner": "b",
+  "nodes": 95,
+  "exact": true
+ },
+ "1v5": {
+  "a": 1,
+  "b": 5,
+  "limit": 5400,
+  "ms": 1,
+  "winner": "b",
+  "nodes": 13,
+  "exact": true
+ },
+ "4v2": {
+  "a": 4,
+  "b": 2,
+  "limit": 5400,
+  "ms": 9,
+  "winner": "w",
+  "nodes": 519,
+  "exact": true
+ },
+ "2v4": {
+  "a": 2,
+  "b": 4,
+  "limit": 5400,
+  "ms": 10,
+  "winner": "b",
+  "nodes": 790,
+  "exact": true
+ },
+ "5v1": {
+  "a": 5,
+  "b": 1,
+  "limit": 5400,
+  "ms": 0,
+  "winner": "w",
+  "nodes": 14,
+  "exact": true
+ },
+ "3v3": {
+  "a": 3,
+  "b": 3,
+  "limit": 5400,
+  "ms": 36,
+  "winner": "b",
+  "nodes": 2101,
+  "exact": true
+ },
+ "2v5": {
+  "a": 2,
+  "b": 5,
+  "limit": 5400,
+  "ms": 22,
+  "winner": "b",
+  "nodes": 1521,
+  "exact": true
+ },
+ "1v6": {
+  "a": 1,
+  "b": 6,
+  "limit": 5400,
+  "ms": 0,
+  "winner": "b",
+  "nodes": 13,
+  "exact": true
+ },
+ "6v1": {
+  "a": 6,
+  "b": 1,
+  "limit": 5400,
+  "ms": 0,
+  "winner": "w",
+  "nodes": 14,
+  "exact": true
+ },
+ "5v2": {
+  "a": 5,
+  "b": 2,
+  "limit": 5400,
+  "ms": 29,
+  "winner": "w",
+  "nodes": 1329,
+  "exact": true
+ },
+ "3v4": {
+  "a": 3,
+  "b": 4,
+  "limit": 5400,
+  "ms": 104,
+  "winner": "b",
+  "nodes": 10427,
+  "exact": true
+ },
+ "4v3": {
+  "a": 4,
+  "b": 3,
+  "limit": 5400,
+  "ms": 109,
+  "winner": "w",
+  "nodes": 6890,
+  "exact": true
+ },
+ "2v6": {
+  "a": 2,
+  "b": 6,
+  "limit": 5400,
+  "ms": 2,
+  "winner": "b",
+  "nodes": 139,
+  "exact": true
+ },
+ "6v2": {
+  "a": 6,
+  "b": 2,
+  "limit": 5400,
+  "ms": 1,
+  "winner": "w",
+  "nodes": 100,
+  "exact": true
+ },
+ "1v7": {
+  "a": 1,
+  "b": 7,
+  "limit": 5400,
+  "ms": 1,
+  "winner": "b",
+  "nodes": 13,
+  "exact": true
+ },
+ "7v1": {
+  "a": 7,
+  "b": 1,
+  "limit": 5400,
+  "ms": 0,
+  "winner": "w",
+  "nodes": 14,
+  "exact": true
+ },
+ "5v3": {
+  "a": 5,
+  "b": 3,
+  "limit": 5400,
+  "ms": 91,
+  "winner": "w",
+  "nodes": 15683,
+  "exact": true
+ },
+ "3v5": {
+  "a": 3,
+  "b": 5,
+  "limit": 5400,
+  "ms": 197,
+  "winner": "b",
+  "nodes": 20168,
+  "exact": true
+ },
+ "3v6": {
+  "a": 3,
+  "b": 6,
+  "limit": 5400,
+  "ms": 5,
+  "winner": "b",
+  "nodes": 740,
+  "exact": true
+ },
+ "6v3": {
+  "a": 6,
+  "b": 3,
+  "limit": 5400,
+  "ms": 2,
+  "winner": "w",
+  "nodes": 390,
+  "exact": true
+ },
+ "2v7": {
+  "a": 2,
+  "b": 7,
+  "limit": 5400,
+  "ms": 0,
+  "winner": "b",
+  "nodes": 139,
+  "exact": true
+ },
+ "7v2": {
+  "a": 7,
+  "b": 2,
+  "limit": 5400,
+  "ms": 0,
+  "winner": "w",
+  "nodes": 100,
+  "exact": true
+ },
+ "1v8": {
+  "a": 1,
+  "b": 8,
+  "limit": 5400,
+  "ms": 0,
+  "winner": "b",
+  "nodes": 13,
+  "exact": true
+ },
+ "8v1": {
+  "a": 8,
+  "b": 1,
+  "limit": 5400,
+  "ms": 0,
+  "winner": "w",
+  "nodes": 14,
+  "exact": true
+ },
+ "4v4": {
+  "a": 4,
+  "b": 4,
+  "limit": 5400,
+  "ms": 387,
+  "winner": "w",
+  "nodes": 62403,
+  "exact": true
+ },
+ "5v4": {
+  "a": 5,
+  "b": 4,
+  "limit": 5400,
+  "ms": 367,
+  "winner": "w",
+  "nodes": 135592,
+  "exact": true
+ },
+ "4v5": {
+  "a": 4,
+  "b": 5,
+  "limit": 5400,
+  "ms": 639,
+  "winner": "b",
+  "nodes": 222866,
+  "exact": true
+ },
+ "3v7": {
+  "a": 3,
+  "b": 7,
+  "limit": 5400,
+  "ms": 1,
+  "winner": "b",
+  "nodes": 740,
+  "exact": true
+ },
+ "7v3": {
+  "a": 7,
+  "b": 3,
+  "limit": 5400,
+  "ms": 0,
+  "winner": "w",
+  "nodes": 390,
+  "exact": true
+ },
+ "2v8": {
+  "a": 2,
+  "b": 8,
+  "limit": 5400,
+  "ms": 0,
+  "winner": "b",
+  "nodes": 139,
+  "exact": true
+ },
+ "8v2": {
+  "a": 8,
+  "b": 2,
+  "limit": 5400,
+  "ms": 0,
+  "winner": "w",
+  "nodes": 100,
+  "exact": true
+ },
+ "6v4": {
+  "a": 6,
+  "b": 4,
+  "limit": 5400,
+  "ms": 405,
+  "winner": "w",
+  "nodes": 400247,
+  "exact": true
+ },
+ "4v6": {
+  "a": 4,
+  "b": 6,
+  "limit": 5400,
+  "ms": 662,
+  "winner": "b",
+  "nodes": 468029,
+  "exact": true
+ },
+ "4v7": {
+  "a": 4,
+  "b": 7,
+  "limit": 5400,
+  "ms": 537,
+  "winner": "b",
+  "nodes": 941812,
+  "exact": true
+ },
+ "7v4": {
+  "a": 7,
+  "b": 4,
+  "limit": 5400,
+  "ms": 385,
+  "winner": "w",
+  "nodes": 846729,
+  "exact": true
+ },
+ "3v8": {
+  "a": 3,
+  "b": 8,
+  "limit": 5400,
+  "ms": 0,
+  "winner": "b",
+  "nodes": 740,
+  "exact": true
+ },
+ "8v3": {
+  "a": 8,
+  "b": 3,
+  "limit": 5400,
+  "ms": 0,
+  "winner": "w",
+  "nodes": 390,
+  "exact": true
+ },
+ "5v5": {
+  "a": 5,
+  "b": 5,
+  "limit": 5400,
+  "ms": 2251,
+  "winner": "b",
+  "nodes": 3034031,
+  "exact": true
+ },
+ "6v5": {
+  "a": 6,
+  "b": 5,
+  "limit": 5400,
+  "ms": 2495,
+  "winner": "w",
+  "nodes": 4118571,
+  "exact": true
+ },
+ "5v6": {
+  "a": 5,
+  "b": 6,
+  "limit": 5400,
+  "ms": 3502,
+  "winner": "b",
+  "nodes": 5116858,
+  "exact": true
+ },
+ "4v8": {
+  "a": 4,
+  "b": 8,
+  "limit": 5400,
+  "ms": 2,
+  "winner": "b",
+  "nodes": 2646,
+  "exact": true
+ },
+ "8v4": {
+  "a": 8,
+  "b": 4,
+  "limit": 5400,
+  "ms": 1,
+  "winner": "w",
+  "nodes": 1082,
+  "exact": true
+ },
+ "7v5": {
+  "a": 7,
+  "b": 5,
+  "limit": 5400,
+  "ms": 5033,
+  "winner": "w",
+  "nodes": 8154008,
+  "exact": true
+ },
+ "5v7": {
+  "a": 5,
+  "b": 7,
+  "limit": 5400,
+  "ms": 6514,
+  "winner": "b",
+  "nodes": 11088107,
+  "exact": true
+ },
+ "5v8": {
+  "a": 5,
+  "b": 8,
+  "limit": 5400,
+  "ms": 4,
+  "winner": "b",
+  "nodes": 7332,
+  "exact": true
+ },
+ "8v5": {
+  "a": 8,
+  "b": 5,
+  "limit": 5400,
+  "ms": 1,
+  "winner": "w",
+  "nodes": 2437,
+  "exact": true
+ },
+ "6v6": {
+  "a": 6,
+  "b": 6,
+  "limit": 5400,
+  "ms": 39419,
+  "winner": "w",
+  "nodes": 58619011,
+  "exact": true
+ },
+ "7v6": {
+  "a": 7,
+  "b": 6,
+  "limit": 5400,
+  "ms": 38310,
+  "winner": "w",
+  "nodes": 60225212,
+  "exact": true
+ },
+ "6v7": {
+  "a": 6,
+  "b": 7,
+  "limit": 5400,
+  "ms": 63756,
+  "winner": "b",
+  "nodes": 97567757,
+  "exact": true
+ },
+ "8v6": {
+  "a": 8,
+  "b": 6,
+  "limit": 5400,
+  "ms": 324210,
+  "winner": "w",
+  "nodes": 516063512,
+  "exact": true
+ },
+ "6v8": {
+  "a": 6,
+  "b": 8,
+  "limit": 5400,
+  "ms": 864554,
+  "winner": "b",
+  "nodes": 1419418275,
+  "exact": true
+ },
+ "7v7": {
+  "a": 7,
+  "b": 7,
+  "limit": 5400,
+  "ms": 5400000,
+  "exact": false,
+  "estimate": -2,
+  "estimateDepth": 14,
+  "estimateWinner": "b"
+ },
+ "7v8": {
+  "a": 7,
+  "b": 8,
+  "limit": 5400,
+  "ms": 5400001,
+  "exact": false,
+  "estimate": -30,
+  "estimateDepth": 14,
+  "estimateWinner": "b"
+ },
+ "8v7": {
+  "a": 8,
+  "b": 7,
+  "limit": 5400,
+  "ms": 5400001,
+  "exact": false,
+  "estimate": 42,
+  "estimateDepth": 13,
+  "estimateWinner": "w"
+ },
+ "8v8": {
+  "a": 8,
+  "b": 8,
+  "limit": 5400,
+  "ms": 5400001,
+  "exact": false,
+  "estimate": 18,
+  "estimateDepth": 13,
+  "estimateWinner": "w"
+ }
+}
