@@ -242,39 +242,42 @@ test('série: příklad 8-8, bílý, 7-8, bílý, 6-8, černý, 6-7', () => {
   assert.deepEqual([s0.white, s0.black, s0.wins.w, s0.history.length], [8, 8, 0, 0]);
 });
 
-test('série: kdo vyhraje kolo se třemi pěšci, vyhrál sérii', () => {
-  let s = P.newSeries({ white: 3, black: 5 });
+test('série: kdo vyhraje kolo se čtyřmi pěšci, vyhrál sérii', () => {
+  let s = P.newSeries({ white: 4, black: 6 });
   s = P.nextRound(s, 'b');
-  assert.deepEqual([s.white, s.black, s.winner], [3, 4, null], 'poražený si počet ponechá');
+  assert.deepEqual([s.white, s.black, s.winner], [4, 5, null], 'poražený si počet ponechá');
   s = P.nextRound(s, 'w');
   assert.equal(s.winner, 'w');
-  assert.deepEqual([s.white, s.black], [3, 4], 'po konci série se počty nemění');
+  assert.deepEqual([s.white, s.black], [4, 5], 'po konci série se počty nemění');
   assert.deepEqual(s.wins, { w: 1, b: 1 });
   assert.throws(() => P.nextRound(s, 'b'), /skončila/);
-  assert.equal(P.nextRound(P.newSeries({ white: 4, black: 3 }), 'b').winner, 'b');
+  assert.equal(P.nextRound(P.newSeries({ white: 5, black: 4 }), 'b').winner, 'b');
+  // se třemi pěšci se v sérii nehraje
+  assert.throws(() => P.newSeries({ white: 3 }), RangeError);
 });
 
 test('série: nejmenší počet jde změnit, chybné zadání se odmítne', () => {
-  assert.equal(P.newSeries().minPawns, 3);
+  assert.equal(P.MIN_PAWNS, 4);
+  assert.equal(P.newSeries().minPawns, 4);
   const s = P.nextRound(P.newSeries({ white: 2, black: 2, minPawns: 1 }), 'w');
   assert.deepEqual([s.white, s.winner], [1, null]);
   assert.equal(P.nextRound(s, 'w').winner, 'w');
-  assert.throws(() => P.newSeries({ white: 2 }), RangeError);
+  assert.equal(P.nextRound(P.newSeries({ white: 3, black: 3, minPawns: 3 }), 'b').winner, 'b');
   assert.throws(() => P.newSeries({ black: 9 }), RangeError);
   assert.throws(() => P.nextRound(P.newSeries(), 'x'), /w nebo b/);
 });
 
-test('série od 8-8 vždy skončí po 6 až 11 kolech', () => {
+test('série od 8-8 vždy skončí po 5 až 9 kolech', () => {
   let seed = 3;
   const rnd = () => { seed = (seed * 1103515245 + 12345) & 0x7fffffff; return (seed >>> 16) % 2; };
   for (let k = 0; k < 500; k++) {
     let s = P.newSeries();
     while (!s.winner) {
       s = P.nextRound(s, rnd() ? 'w' : 'b');
-      assert.ok(s.white >= 3 && s.black >= 3);
+      assert.ok(s.white >= 4 && s.black >= 4);
     }
     const rounds = s.round - 1;
-    assert.ok(rounds >= 6 && rounds <= 11, 'kol: ' + rounds);
-    assert.equal(s.wins[s.winner], 6, 'vítěz série vyhrál šest kol');
+    assert.ok(rounds >= 5 && rounds <= 9, 'kol: ' + rounds);
+    assert.equal(s.wins[s.winner], 5, 'vítěz série vyhrál pět kol');
   }
 });

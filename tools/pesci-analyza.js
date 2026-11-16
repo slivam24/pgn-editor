@@ -129,11 +129,11 @@ function report() {
   out('## Série kol při dokonalé hře obou stran');
   out();
   out('Série začíná 8-8 (bílý-černý), vítězi kola ubude pěšec, kdo vyhraje kolo s nejmenším počtem pěšců, vyhrál sérii.');
-  out('Bílý je hráč, černý počítač. Pro srovnání i varianta, kdy série končí výhrou se 4 pěšci.');
+  out('Bílý je hráč, černý počítač. Pravidlo tréninku: série končí výhrou se ' + P.MIN_PAWNS + ' pěšci. Pro srovnání i varianta se 3 pěšci.');
   if (unknown.length) out('Nevyřešené dvojice (' + unknownText + ') se berou ve všech ' + variants.length + ' možných výsledcích.');
   out();
-  for (const min of [3, 4]) {
-    out('### Série končí výhrou se ' + min + ' pěšci');
+  for (const min of [P.MIN_PAWNS, 3].filter((v, i, a) => a.indexOf(v) === i)) {
+    out('### Série končí výhrou se ' + min + ' pěšci' + (min === P.MIN_PAWNS ? ' (pravidlo tréninku)' : ''));
     out();
     // kdo vůbec může vyhrát kolo s nejmenším počtem
     const beatsW = [], beatsB = [];

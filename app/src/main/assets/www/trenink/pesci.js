@@ -8,8 +8,10 @@
  * Pořadí: poslední řada, pak žádný pěšec, pak pat. Bílý táhne první.
  *
  * Série kol: začíná se 8 proti 8. Vítězi kola se počet pěšců pro další kolo sníží o jednoho,
- * poražený si počet ponechá. Kdo vyhraje kolo s nejmenším povoleným počtem (minPawns, 3),
- * vyhrál celou sérii. Se dvěma pěšci se nehraje: 2 proti 2 vyhraje při dokonalé hře vždy černý.
+ * poražený si počet ponechá. Kdo vyhraje kolo s nejmenším povoleným počtem (minPawns, 4),
+ * vyhrál celou sérii. Proč 4: bílý se 4 pěšci vyhraje při dokonalé hře 4 proti 4, černý se 4 pěšci
+ * nevyhraje proti 4 a více bílým, takže hráč (bílý) má na konci série výhodu. Při konci se 3 pěšci
+ * by ji měl počítač (3 proti 3 vyhraje černý), viz tools/pesci-analyza.md.
  *
  * Pozice: { board: Int8Array(64) (1 bílý pěšec, -1 černý, 0 prázdné; index 0 = a1, 63 = h8),
  *           turn: 'w' | 'b', ep: pole pro braní mimochodem nebo -1, white, black: počty pěšců }.
@@ -26,7 +28,7 @@
   const W = 1, B = -1;
   // Při menším počtu pěšců se odebírají celé sloupce v tomto pořadí
   const REMOVE_ORDER = 'ahbgcfde';
-  const MIN_PAWNS = 3;
+  const MIN_PAWNS = 4;
 
   const idx = sq => FILES.indexOf(sq[0]) + (+sq[1] - 1) * 8;
   const name = i => FILES[i & 7] + ((i >> 3) + 1);

@@ -25,8 +25,19 @@ Nejdelší výpočty: 6 proti 8 14.4 min (1.4 mld. uzlů), 8 proti 6 5.4 min (51
 ## Série kol při dokonalé hře obou stran
 
 Série začíná 8-8 (bílý-černý), vítězi kola ubude pěšec, kdo vyhraje kolo s nejmenším počtem pěšců, vyhrál sérii.
-Bílý je hráč, černý počítač. Pro srovnání i varianta, kdy série končí výhrou se 4 pěšci.
+Bílý je hráč, černý počítač. Pravidlo tréninku: série končí výhrou se 4 pěšci. Pro srovnání i varianta se 3 pěšci.
 Nevyřešené dvojice (7 proti 7, 7 proti 8, 8 proti 7, 8 proti 8) se berou ve všech 16 možných výsledcích.
+
+### Série končí výhrou se 4 pěšci (pravidlo tréninku)
+
+Bílý se 4 pěšci vyhraje proti 4 černým, černý se 4 pěšci vyhraje proti žádnému povolenému počtu bílých.
+
+- 4 z 16 možností: 8-8 Č, 8-7 Č, 8-6 B, 7-6 B, 6-6 B, 5-6 Č, 5-5 Č, 5-4 B, 4-4 B → sérii vyhraje **bílý** po 9 kolech.
+- 2 z 16 možností: 8-8 Č, 8-7 B, 7-7 Č, 7-6 B, 6-6 B, 5-6 Č, 5-5 Č, 5-4 B, 4-4 B → sérii vyhraje **bílý** po 9 kolech.
+- 2 z 16 možností: 8-8 Č, 8-7 B, 7-7 B, 6-7 Č, 6-6 B, 5-6 Č, 5-5 Č, 5-4 B, 4-4 B → sérii vyhraje **bílý** po 9 kolech.
+- 2 z 16 možností: 8-8 B, 7-8 Č, 7-7 Č, 7-6 B, 6-6 B, 5-6 Č, 5-5 Č, 5-4 B, 4-4 B → sérii vyhraje **bílý** po 9 kolech.
+- 2 z 16 možností: 8-8 B, 7-8 Č, 7-7 B, 6-7 Č, 6-6 B, 5-6 Č, 5-5 Č, 5-4 B, 4-4 B → sérii vyhraje **bílý** po 9 kolech.
+- 4 z 16 možností: 8-8 B, 7-8 B, 6-8 Č, 6-7 Č, 6-6 B, 5-6 Č, 5-5 Č, 5-4 B, 4-4 B → sérii vyhraje **bílý** po 9 kolech.
 
 ### Série končí výhrou se 3 pěšci
 
@@ -38,17 +49,6 @@ Bílý se 3 pěšci vyhraje proti žádnému povolenému počtu černých, čern
 - 2 z 16 možností: 8-8 B, 7-8 Č, 7-7 Č, 7-6 B, 6-6 B, 5-6 Č, 5-5 Č, 5-4 B, 4-4 B, 3-4 Č, 3-3 Č → sérii vyhraje **černý** po 11 kolech.
 - 2 z 16 možností: 8-8 B, 7-8 Č, 7-7 B, 6-7 Č, 6-6 B, 5-6 Č, 5-5 Č, 5-4 B, 4-4 B, 3-4 Č, 3-3 Č → sérii vyhraje **černý** po 11 kolech.
 - 4 z 16 možností: 8-8 B, 7-8 B, 6-8 Č, 6-7 Č, 6-6 B, 5-6 Č, 5-5 Č, 5-4 B, 4-4 B, 3-4 Č, 3-3 Č → sérii vyhraje **černý** po 11 kolech.
-
-### Série končí výhrou se 4 pěšci
-
-Bílý se 4 pěšci vyhraje proti 4 černým, černý se 4 pěšci vyhraje proti žádnému povolenému počtu bílých.
-
-- 4 z 16 možností: 8-8 Č, 8-7 Č, 8-6 B, 7-6 B, 6-6 B, 5-6 Č, 5-5 Č, 5-4 B, 4-4 B → sérii vyhraje **bílý** po 9 kolech.
-- 2 z 16 možností: 8-8 Č, 8-7 B, 7-7 Č, 7-6 B, 6-6 B, 5-6 Č, 5-5 Č, 5-4 B, 4-4 B → sérii vyhraje **bílý** po 9 kolech.
-- 2 z 16 možností: 8-8 Č, 8-7 B, 7-7 B, 6-7 Č, 6-6 B, 5-6 Č, 5-5 Č, 5-4 B, 4-4 B → sérii vyhraje **bílý** po 9 kolech.
-- 2 z 16 možností: 8-8 B, 7-8 Č, 7-7 Č, 7-6 B, 6-6 B, 5-6 Č, 5-5 Č, 5-4 B, 4-4 B → sérii vyhraje **bílý** po 9 kolech.
-- 2 z 16 možností: 8-8 B, 7-8 Č, 7-7 B, 6-7 Č, 6-6 B, 5-6 Č, 5-5 Č, 5-4 B, 4-4 B → sérii vyhraje **bílý** po 9 kolech.
-- 4 z 16 možností: 8-8 B, 7-8 B, 6-8 Č, 6-7 Č, 6-6 B, 5-6 Č, 5-5 Č, 5-4 B, 4-4 B → sérii vyhraje **bílý** po 9 kolech.
 
 ## Série při nedokonalé hře (model)
 
