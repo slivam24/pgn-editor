@@ -21,7 +21,7 @@ Při změně verze se číslo mění na třech místech: `versionCode` a `versio
 Při každém sestavení na GitHubu běží tři sady zkoušek. Když první dvě neprojdou, APK se nevytvoří.
 
 - `tests/pgn.test.js` zkouší čtení a zápis PGN: varianty, komentáře, chybné partie, FEN, českou notaci, názvy zahájení, odkazy na partie. `tests/verze.test.js` hlídá shodu čísla verze. `tests/ulohy.test.js` zahraje všechny úlohy ze sbírky a hlídá, že jsou platné. `tests/figury.test.js` ověří, že každá úroveň tahů figur jde vyřešit a pohyb figur odpovídá pravidlům. `tests/pesci.test.js` zkouší pravidla tréninku pěšci proti pěšcům (tahy porovnává s chess.js, braní mimochodem, konec hry včetně patu) a sérii kol. `tests/pesci-engine.test.js` porovnává výsledky počítačového soupeře s prostým prohledáním všech tahů a hraje partie mezi úrovněmi obtížnosti (nejlehčí musí jít porazit).
-- `tests/prohlizec.js` otevře aplikaci v prohlížeči Chrome a zkouší ukládání do paměti telefonu, velké soubory, seznam partií, zálohu, tisk a další funkce.
+- `tests/prohlizec.js` otevře aplikaci v prohlížeči Chrome a zkouší ukládání do paměti telefonu, velké soubory, seznam partií, zálohu, tisk, trénink pěšci proti pěšcům a další funkce.
 - `app/src/androidTest/` jsou zkoušky na emulátoru Androidu: start aplikace ve skutečném WebView, otevření souboru z jiné aplikace, uložení zpět do souboru a uložení partie přes restart. Běží jako samostatná úloha `android`, takže APK vznikne, i kdyby emulátor na GitHubu zrovna nenaběhl. Snímek obrazovky z emulátoru se ukládá do vydání `nahled`.
 
 Ruční spuštění v počítači s nainstalovaným Node.js:

@@ -499,6 +499,66 @@ const OLD = JSON.stringify({ games: [{ headers: { Event: 'Stary', Site: '?', Dat
     assert.deepEqual(await page.evaluate(() => JSON.parse(localStorage.getItem('pgn-trenink')).n2), { n: 1, s3: 1 });
   });
 
+  await step('pěšci proti pěšcům: tahy, odpověď počítače, konec kola, uložení a konec série', async page => {
+    await open(page);
+    await click(page, 'menuBtn');
+    await page.$eval('[data-page=pgPawns]', e => e.click());
+    assert.match(await text(page, 'pwSeriesInfo'), /Kolo 1: ty 8\spěšců, počítač 8\spěšců/);
+    assert.equal(await text(page, 'pwPlay'), 'Hrát kolo 1');
+    await click(page, 'pwPlay');
+    assert.match(await text(page, 'puzTitle'), /Pěšci proti pěšcům · kolo 1/);
+    const pawnsOn = (page, c) => page.$$eval('#board .p-' + c + 'p', e => e.map(x => x.parentElement.dataset.sq).sort());
+    assert.equal((await pawnsOn(page, 'w')).length, 8);
+    assert.equal((await pawnsOn(page, 'b')).length, 8);
+    // výběr pěšce ukáže, kam může táhnout
+    await tap(page, 'e2');
+    assert.deepEqual(await page.$$eval('#board .sq .dot', e => e.map(x => x.parentElement.dataset.sq).sort()), ['e3', 'e4']);
+    await tap(page, 'e4');
+    await page.waitForFunction(() => pawnState().moves.length === 2 && /Jsi na tahu/.test(document.getElementById('pwMsg').textContent), { timeout: 15000 });
+    assert.equal(await page.evaluate(() => pawnState().engine), 'worker', 'počítač přemýšlí ve vlákně');
+    assert.match(await text(page, 'pwInfo'), /^Počítač: /);
+    assert.ok((await pawnsOn(page, 'w')).includes('e4'));
+    // obtížnost se uloží, rozehrané kolo vydrží znovunačtení
+    await page.$eval('#pawnBox .pw-level .btn[data-level="medium"]', e => e.click());
+    await open(page);
+    assert.equal(await page.evaluate(() => JSON.parse(localStorage.getItem('pgn-pesci')).level), 'medium');
+    await click(page, 'menuBtn');
+    await page.$eval('[data-page=pgPawns]', e => e.click());
+    assert.equal(await text(page, 'pwPlay'), 'Pokračovat v kole');
+    await click(page, 'pwPlay');
+    assert.ok((await pawnsOn(page, 'w')).includes('e4'));
+    assert.equal(await page.evaluate(() => pawnState().moves.length), 2);
+    // konec kola: bílý pěšec dojde na poslední řadu
+    await page.evaluate(() => { pawnState().pos = PESCI.fromSquares({ white: ['b7', 'e4'], black: ['h7', 'e5'], turn: 'w' }); });
+    await tap(page, 'b7'); await tap(page, 'b8');
+    assert.match(await text(page, 'pwMsg'), /Výhra/);
+    assert.match(await text(page, 'pwInfo'), /poslední řadu.*Příští kolo: ty 7\spěšců, počítač 8\spěšců/);
+    assert.equal(await text(page, 'pwRounds'), '1 : 0');
+    assert.equal(await text(page, 'pwNext'), 'Další kolo');
+    await click(page, 'pwNext');
+    assert.match(await text(page, 'puzTitle'), /kolo 2/);
+    assert.deepEqual(await pawnsOn(page, 'w'), ['b2', 'c2', 'd2', 'e2', 'f2', 'g2', 'h2'], 'chybí sloupec a');
+    // konec série: výhra kola se 4 pěšci
+    await page.evaluate(() => localStorage.setItem('pgn-pesci', JSON.stringify({ series: { white: 4, black: 8, round: 5, wins: { w: 4, b: 0 }, history: [], winner: null, minPawns: 4 }, level: 'easy', seriesWins: { w: 0, b: 0 }, moves: [] })));
+    await open(page);
+    await click(page, 'menuBtn');
+    await page.$eval('[data-page=pgPawns]', e => e.click());
+    await click(page, 'pwPlay');
+    assert.deepEqual(await pawnsOn(page, 'w'), ['c2', 'd2', 'e2', 'f2']);
+    await page.evaluate(() => { pawnState().pos = PESCI.fromSquares({ white: ['c7'], black: ['h7', 'a7'], turn: 'w' }); });
+    await tap(page, 'c7'); await tap(page, 'c8');
+    assert.match(await text(page, 'pwMsg'), /Série je tvoje/);
+    assert.equal(await text(page, 'pwNext'), 'Nová série');
+    assert.deepEqual(await page.evaluate(() => JSON.parse(localStorage.getItem('pgn-pesci')).seriesWins), { w: 1, b: 0 });
+    await click(page, 'pwNext');
+    assert.match(await text(page, 'puzTitle'), /kolo 1/);
+    assert.equal((await pawnsOn(page, 'w')).length, 8);
+    // Ukončit vrátí do menu na stránku tréninku
+    await click(page, 'pwEnd');
+    assert.ok(await page.$eval('#pgPawns', e => !e.hidden));
+    assert.ok(await page.evaluate(() => !document.body.classList.contains('pawns') && document.getElementById('pawnBox').hidden));
+  });
+
   await step('nepovedené uložení do paměti telefonu se ohlásí', async page => {
     await open(page);
     await paste(page, game(1, '1. e4 e5 *'));
