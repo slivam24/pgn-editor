@@ -66,7 +66,7 @@ Při sestavení v počítači (Android Studio, **Build > Generate App Bundles or
 | `tests/` | testy čtení PGN a zkoušky v prohlížeči |
 | `app/src/androidTest/` | zkoušky na emulátoru Androidu |
 | `tools/eco.js` | vytvoří tabulku zahájení z dat Lichessu |
-| `app/src/main/assets/www/vyuka/figury.js` | Výuka tahů figur: úrovně, pravidla pohybu a výpočet nejkratšího řešení |
+| `app/src/main/assets/www/vyuka/figury.js` | Výuka tahů figur: úrovně, pravidla pohybu, výpočet nejkratšího řešení a vymýšlení cvičení pro trénink |
 | `app/src/main/assets/www/vyuka/ulohy.txt` | sbírka úloh pro Výuku, vytváří ji `tools/ulohy.js` z databáze úloh Lichessu |
 | `play/` | podklady pro Google Play (texty, ikona, snímky, zásady soukromí) |
 | `app/build.gradle` | číslo verze, podpis, cílová verze Androidu |

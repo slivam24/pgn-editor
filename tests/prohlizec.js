@@ -451,14 +451,52 @@ const OLD = JSON.stringify({ games: [{ headers: { Event: 'Stary', Site: '?', Dat
     }
     await page.waitForFunction(() => /Hotovo|Vyřešeno/.test(document.getElementById('puzMsg').textContent), { timeout: 5000 });
     await click(page, 'puzAna');
-    await page.waitForFunction(() => /hloubka \d+/.test(document.getElementById('anaDepth').textContent), { timeout: 60000 });
-    if (mv.length > 4) {
-      await page.waitForFunction(() => /horší|stejně dobrý|k matu/.test(document.getElementById('anaCmp').textContent), { timeout: 60000 });
-      assert.match(await text(page, 'anaTried'), /Tvoje tahy/);
+    await page.waitForFunction(() => /[+−0-9]|mat/.test(document.getElementById('anaScore').textContent) && document.getElementById('anaBest').textContent, { timeout: 60000 });
+    assert.match(await text(page, 'anaScore'), /vyhráváš|stojíš|vyrovnané|prohráváš|^Mat|^Remíza/);
+    if (mv.length > 4) { // rozbor začne chybným tahem: porovnání s řešením z pohledu řešitele
+      await page.waitForFunction(() => !document.getElementById('anaCmp').hidden && /horší|stejně dobrý|k matu/.test(document.getElementById('cmpWhy').textContent), { timeout: 60000 });
+      assert.match(await text(page, 'cmpMyVal'), /^[+−]?\d|mat/);
     }
     const n = await page.$$eval('#anaLine .mv', e => e.length);
     await click(page, 'anaPv');
     assert.equal(await page.$$eval('#anaLine .mv', e => e.length), n + 1);
+  });
+
+  await step('tahy figur: trénink vymýšlí řešitelná cvičení', async page => {
+    await open(page);
+    await click(page, 'menuBtn');
+    await page.$eval('[data-page=pgDrill]', e => e.click());
+    await page.waitForFunction(() => document.querySelectorAll('#trPieces button').length === 6);
+    await page.$eval('#trPieces button[data-pc="n"]', e => e.click());
+    await page.$eval('.dr-diff .btn[data-diff="2"]', e => e.click());
+    await click(page, 'trStart');
+    assert.match(await text(page, 'puzTitle'), /Trénink · Jezdec · střední/);
+    // vyřešit nejkratší cestou spočítanou stejným prohledáním jako v aplikaci
+    const path = await page.evaluate(() => {
+      const F = window.FIGURY, lv = drillState().lv;
+      const S = lv.stars, B = Object.keys(lv.black), all = (1 << (S.length + B.length)) - 1;
+      const start = [F.idx(lv.start), all], prev = new Map([[start.join(':'), null]]);
+      let q = [start];
+      while (q.length) {
+        const nq = [];
+        for (const [sq, m] of q) {
+          const stars = S.filter((_, i) => m & (1 << i)), black = {}; B.forEach((b, i) => { if (m & (1 << (S.length + i))) black[b] = lv.black[b]; });
+          if (F.done(lv, sq, stars, black)) { const out = []; let k = sq + ':' + m; while (prev.get(k)) { out.unshift(F.name(+k.split(':')[0])); k = prev.get(k); } return out; }
+          for (const mv of F.moves(lv, sq, black)) { if (mv.unsafe) continue; let nm = m; const t = F.name(mv.to);
+            if (S.indexOf(t) !== -1) nm &= ~(1 << S.indexOf(t)); if (B.indexOf(t) !== -1) nm &= ~(1 << (S.length + B.indexOf(t)));
+            const key = mv.to + ':' + nm; if (!prev.has(key)) { prev.set(key, sq + ':' + m); nq.push([mv.to, nm]); } }
+        }
+        q = nq;
+      }
+      return null;
+    });
+    assert.ok(path && path.length >= 3, 'cesta ' + JSON.stringify(path));
+    for (const sq of path) await tap(page, sq);
+    assert.match(await text(page, 'drMsg'), /★★★/);
+    assert.equal(await text(page, 'drNext'), 'Další cvičení');
+    await click(page, 'drNext');
+    assert.match(await text(page, 'drInfo'), /Tahy: 0/);
+    assert.deepEqual(await page.evaluate(() => JSON.parse(localStorage.getItem('pgn-trenink')).n2), { n: 1, s3: 1 });
   });
 
   await step('nepovedené uložení do paměti telefonu se ohlásí', async page => {
