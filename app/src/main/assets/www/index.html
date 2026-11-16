@@ -220,21 +220,26 @@ body.puzzle .app > .col + .col { display: none !important; }
 .ana-line .mv { border: 0; background: none; color: var(--fg); font: inherit; padding: 2px 5px; border-radius: 4px; cursor: pointer; }
 .ana-line .mv.off { color: var(--warn); }
 .ana-line .mv.cur { background: var(--accent); color: var(--accent-fg); }
-.ana-line .start { color: var(--muted); font-family: var(--font-ui); font-size: 13px; }
-.ana-nav { display: flex; gap: 8px; }
-.ana-nav .btn:not(#anaSol) { flex: none; width: 52px; display: grid; place-items: center; padding: 0; }
+.ana-nav { display: flex; gap: 6px; }
+.ana-nav .btn:not(#anaSol) { flex: none; width: 48px; display: grid; place-items: center; padding: 0; }
 .ana-nav #anaSol { flex: 1; }
+.ana-cmp { display: grid; gap: 4px; border: 1px solid var(--line); border-radius: 8px; background: var(--surface); padding: 8px 10px; }
+.ana-cmp[hidden] { display: none; }
+.cmp-row { display: grid; grid-template-columns: 18px auto 1fr auto; align-items: baseline; gap: 8px; font-size: 15px; }
+.cmp-row b { font-family: var(--font-mono); font-weight: 600; }
+.cmp-mark { font-weight: 700; }
+.cmp-row.ok .cmp-mark { color: var(--accent); }
+.cmp-row.bad .cmp-mark { color: var(--warn); }
+.cmp-what { color: var(--muted); font-size: 13px; }
+.cmp-val { font-family: var(--font-mono); font-weight: 600; }
+.cmp-why { margin: 2px 0 0; font-size: 13.5px; color: var(--muted); }
+.cmp-why:empty { display: none; }
+.ana-eval { display: grid; grid-template-columns: auto 1fr; align-items: baseline; gap: 10px; text-align: left; border: 1px solid var(--line); border-radius: 8px; background: var(--surface); color: var(--fg); padding: 8px 10px; font: inherit; cursor: pointer; }
+.ana-score { font-size: 15px; font-weight: 600; white-space: nowrap; }
+.ana-best { font-family: var(--font-mono); font-size: 14px; color: var(--muted); overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
 .ana-tried { display: flex; flex-wrap: wrap; gap: 6px; align-items: center; font-size: 13.5px; color: var(--muted); }
 .ana-tried:empty { display: none; }
 .ana-tried .btn { font-family: var(--font-mono); }
-.ana-cmp { margin: 0; font-size: 14.5px; }
-.ana-cmp:empty { display: none; }
-.ana-eval { display: flex; align-items: baseline; gap: 10px; }
-.ana-score { font-size: 18px; font-weight: 600; font-family: var(--font-mono); }
-.ana-depth { font-size: 13px; color: var(--muted); }
-.ana-pv { text-align: left; border: 1px solid var(--line); border-radius: 8px; background: var(--surface); color: var(--fg); padding: 8px 10px; font: 14.5px var(--font-mono); cursor: pointer; }
-.ana-pv[hidden] { display: none; }
-.ana-help { margin: 0; }
 .puz-act2 { align-items: center; }
 .puz-act2 .spacer { flex: 1; }
 .sq.hint::before { content: ""; position: absolute; inset: 0; box-shadow: inset 0 0 0 4px var(--accent); background: rgba(47,107,79,.18); }
@@ -244,6 +249,14 @@ body.puzzle .app > .col + .col { display: none !important; }
 .flag { position: absolute; inset: 14%; pointer-events: none; border: 4px dashed rgba(47,107,79,.9); border-radius: 50%; }
 .sq.warn::before { content: ""; position: absolute; inset: 0; background: rgba(224,97,74,.55); }
 .dr-chapters { display: grid; gap: 10px; }
+.dr-sub { margin: 6px 0 -2px; font-size: 14px; color: var(--muted); text-transform: uppercase; letter-spacing: .06em; }
+.dr-train { gap: 10px; }
+.dr-pieces { display: grid; grid-template-columns: repeat(6, minmax(0, 1fr)); gap: 6px; }
+.dr-pieces button { position: relative; aspect-ratio: 1; border: 1px solid var(--line); border-radius: 8px; background: var(--bg); cursor: pointer; padding: 0; }
+.dr-pieces button .piece { inset: 10%; }
+.dr-pieces button[aria-pressed="true"] { border-color: var(--accent); box-shadow: inset 0 0 0 2px var(--accent); background: var(--accent-soft); }
+.dr-diff { display: flex; }
+.dr-diff .btn { flex: 1; min-width: 0; }
 .dr-ch { border: 1px solid var(--line); border-radius: 10px; background: var(--surface); padding: 10px 12px; display: grid; gap: 8px; }
 .dr-head { display: flex; align-items: center; gap: 10px; }
 .dr-head .piece { position: relative; display: block; width: 36px; height: 36px; flex: none; }
@@ -603,13 +616,18 @@ textarea.fen { min-height: 0; font-size: 14px; word-break: break-all; }
           <button class="btn" id="anaFirst" type="button" aria-label="Na začátek"><svg viewBox="0 0 24 24" width="22" height="22" aria-hidden="true" fill="currentColor"><rect x="5" y="5" width="2.5" height="14" rx="1"/><path d="M19 5.8v12.4a1 1 0 0 1-1.6.8L9.3 12.8a1 1 0 0 1 0-1.6l8.1-6.2a1 1 0 0 1 1.6.8z"/></svg></button>
           <button class="btn" id="anaPrev" type="button" aria-label="O tah zpět"><svg viewBox="0 0 24 24" width="22" height="22" aria-hidden="true" fill="currentColor"><path d="M16 5.8v12.4a1 1 0 0 1-1.6.8L6.3 12.8a1 1 0 0 1 0-1.6l8.1-6.2a1 1 0 0 1 1.6.8z"/></svg></button>
           <button class="btn" id="anaNext" type="button" aria-label="O tah vpřed"><svg viewBox="0 0 24 24" width="22" height="22" aria-hidden="true" fill="currentColor"><path d="M8 5.8v12.4a1 1 0 0 0 1.6.8l8.1-6.2a1 1 0 0 0 0-1.6L9.6 5a1 1 0 0 0-1.6.8z"/></svg></button>
-          <button class="btn" id="anaSol" type="button">Zpět na řešení</button>
+          <button class="btn" id="anaSol" type="button">Řešení</button>
         </div>
+        <div class="ana-cmp" id="anaCmp" role="status" hidden>
+          <div class="cmp-row ok"><span class="cmp-mark" aria-hidden="true">✓</span><b id="cmpSolMove"></b><span class="cmp-what">řešení</span><span class="cmp-val" id="cmpSolVal"></span></div>
+          <div class="cmp-row bad"><span class="cmp-mark" aria-hidden="true">✗</span><b id="cmpMyMove"></b><span class="cmp-what">tvůj tah</span><span class="cmp-val" id="cmpMyVal"></span></div>
+          <p class="cmp-why" id="cmpWhy"></p>
+        </div>
+        <button class="ana-eval" id="anaPv" type="button">
+          <span class="ana-score" id="anaScore">…</span>
+          <span class="ana-best" id="anaBest"></span>
+        </button>
         <div class="ana-tried" id="anaTried"></div>
-        <p class="ana-cmp" id="anaCmp" role="status"></p>
-        <div class="ana-eval"><span class="ana-score" id="anaScore">…</span><span class="ana-depth" id="anaDepth"></span></div>
-        <button class="ana-pv" id="anaPv" type="button" hidden></button>
-        <p class="note ana-help">Zahraj na šachovnici jakýkoli tah, třeba ten svůj, a Stockfish ukáže, jak je dobrý. Klepnutím na nejlepší pokračování ho zahraješ.</p>
       </div>
       <div class="actions puz-act">
         <button class="btn" id="puzHint" type="button">Nápověda</button>
@@ -819,6 +837,18 @@ textarea.fen { min-height: 0; font-size: 14px; word-break: break-all; }
     </div>
     <div class="pbody">
         <p class="note">Bílou figurou posbírej hvězdičky, seber černé figury nebo dojdi na cíl. Černé figury se nehýbou. Čím méně tahů, tím víc hvězd.</p>
+        <div class="dr-ch dr-train">
+          <div class="dr-head"><b>Trénink bez konce</b><small id="trStats"></small></div>
+          <p class="dr-rule">Aplikace pokaždé vymyslí nové cvičení pro vybranou figuru.</p>
+          <div class="dr-pieces" id="trPieces" role="group" aria-label="Figura"></div>
+          <div class="seg dr-diff" role="group" aria-label="Obtížnost">
+            <button class="btn" type="button" data-diff="1" aria-pressed="true">Lehké</button>
+            <button class="btn" type="button" data-diff="2" aria-pressed="false">Střední</button>
+            <button class="btn" type="button" data-diff="3" aria-pressed="false">Těžké</button>
+          </div>
+          <button class="btn primary" id="trStart" type="button">Začít trénink</button>
+        </div>
+        <h3 class="dr-sub">Úrovně</h3>
         <div class="dr-chapters" id="drChapters"></div>
     </div>
   </section>
@@ -1015,7 +1045,7 @@ textarea.fen { min-height: 0; font-size: 14px; word-break: break-all; }
     </div>
     <div class="pbody prose">
 
-        <p><strong>PGN editor</strong> <span class="ver-badge">verze 0.27</span></p>
+        <p><strong>PGN editor</strong> <span class="ver-badge">verze 0.28</span></p>
         <p>Jednoduchý editor pro zápis a úpravu šachových partií ve formátu PGN, určený hlavně pro telefon s Androidem. Aplikaci programuje Claude (umělá inteligence od společnosti Anthropic) ve spolupráci s Michalem Slivou, který určuje, co má aplikace umět a jak má vypadat.</p>
         <h3>Co aplikace umí</h3>
         <ul>
@@ -1080,6 +1110,13 @@ textarea.fen { min-height: 0; font-size: 14px; word-break: break-all; }
       <h2>Verze a změny</h2>
     </div>
     <div class="pbody log">
+        <section>
+          <div class="head"><span class="ver-badge">0.28</span><span class="date">16. 11. 2026</span></div>
+          <ul>
+            <li>Tahy figur: Trénink bez konce. Vybereš figuru a obtížnost (lehké, střední, těžké) a aplikace pokaždé vymyslí nové cvičení, které jde vyřešit. Hvězdy jako u úrovní, u každé figury a obtížnosti se počítají vyřešená cvičení.</li>
+            <li>Rozbor úlohy je jednodušší a vejde se pod šachovnici. Hodnocení je všude z tvého pohledu (plus znamená dobré pro tebe) se slovy jako stojíš lépe nebo prohráváš. Porovnání tahu s řešením je ve dvou řádcích se značkami ✓ a ✗, nejlepší pokračování Stockfishe se zahraje klepnutím.</li>
+          </ul>
+        </section>
         <section>
           <div class="head"><span class="ver-badge">0.27</span><span class="date">16. 11. 2026</span></div>
           <ul>
@@ -2331,7 +2368,34 @@ textarea.fen { min-height: 0; font-size: 14px; word-break: break-all; }
   try { drStars = JSON.parse(localStorage.getItem(DR_KEY) || '{}') || {}; } catch (e) {}
   const FG = window.FIGURY;
   const starText = n => '★'.repeat(n) + '☆'.repeat(3 - n);
+  // Trénink: vybraná figura a obtížnost, počty vyřešených cvičení
+  let tr = { piece: 'n', diff: 1 };
+  try { const o = JSON.parse(localStorage.getItem('pgn-trenink') || 'null'); if (o) tr = Object.assign(tr, o); } catch (e) {}
+  const saveTr = () => { try { localStorage.setItem('pgn-trenink', JSON.stringify(tr)); } catch (e) {} };
+  const PIECE_NAMES = { r: 'Věž', b: 'Střelec', q: 'Dáma', k: 'Král', n: 'Jezdec', p: 'Pěšec' };
+  function renderTrain() {
+    const box = $('trPieces');
+    if (!box.children.length) 'rbqknp'.split('').forEach(pc => {
+      const b = document.createElement('button'); b.type = 'button'; b.dataset.pc = pc; b.setAttribute('aria-label', PIECE_NAMES[pc]);
+      const s = document.createElement('span'); s.className = 'piece p-w' + pc; b.appendChild(s);
+      b.addEventListener('click', () => { tr.piece = pc; saveTr(); renderTrain(); });
+      box.appendChild(b);
+    });
+    box.querySelectorAll('button').forEach(b => b.setAttribute('aria-pressed', String(b.dataset.pc === tr.piece)));
+    document.querySelectorAll('.dr-diff .btn').forEach(b => b.setAttribute('aria-pressed', String(+b.dataset.diff === tr.diff)));
+    const st = tr[tr.piece + tr.diff];
+    $('trStats').textContent = st ? st.n + '× · ' + st.s3 + '× ★★★' : '';
+  }
+  document.querySelectorAll('.dr-diff .btn').forEach(b => b.addEventListener('click', () => { tr.diff = +b.dataset.diff; saveTr(); renderTrain(); }));
+  $('trStart').addEventListener('click', () => trainNext());
+  function trainNext() {
+    const lv = FG.generate(tr.piece, tr.diff);
+    if (!lv) { toast('Cvičení se nepodařilo vymyslet, zkus to znovu.'); return; }
+    lv.key = null; lv.chapter = -1; lv.n = 0;
+    drillStart(lv);
+  }
   function renderDrillPage() {
+    renderTrain();
     const box = $('drChapters');
     box.innerHTML = '';
     FG.CHAPTERS.forEach(ch => {
@@ -2372,16 +2436,19 @@ textarea.fen { min-height: 0; font-size: 14px; word-break: break-all; }
     if (engineOn) setEngineOn(false);
     if (voice.on) voiceStop();
     selected = null;
-    drill = { lv, sq: FG.idx(lv.start), stars: lv.stars.slice(), black: Object.assign({}, lv.black), moves: 0, opt: FG.solve(lv), done: false, warn: [], last: null };
+    drill = { lv, sq: FG.idx(lv.start), stars: lv.stars.slice(), black: Object.assign({}, lv.black), moves: 0, opt: lv.opt || FG.solve(lv), done: false, warn: [], last: null };
     document.body.classList.add('puzzle', 'drill');
     $('drillBox').hidden = false;
-    $('puzTitle').textContent = FG.CHAPTERS[lv.chapter].name + ' · úroveň ' + lv.n;
+    $('puzTitle').textContent = lv.generated ? 'Trénink · ' + PIECE_NAMES[lv.piece] + ' · ' + ['lehké', 'střední', 'těžké'][lv.diff - 1] : FG.CHAPTERS[lv.chapter].name + ' · úroveň ' + lv.n;
     drillMsg(drillGoal(lv), '');
     $('drInfo').textContent = 'Tahy: 0';
-    $('drNext').hidden = true; $('drAgain').textContent = 'Znovu';
+    $('drNext').hidden = !lv.generated; $('drAgain').textContent = 'Znovu';
+    $('drNext').textContent = lv.generated ? 'Jiné cvičení' : 'Další úroveň';
+    $('drNext').classList.toggle('primary', !lv.generated);
     renderBoard();
     window.scrollTo(0, 0);
   }
+  window.drillState = () => drill; // jen pro automatické zkoušky
   function drillMsg(t, kind) { const m = $('drMsg'); m.textContent = t; m.className = 'puz-msg' + (kind ? ' ' + kind : ''); }
   function renderDrillBoard() {
     const files = 'abcdefgh', d = drill;
@@ -2436,16 +2503,22 @@ textarea.fen { min-height: 0; font-size: 14px; word-break: break-all; }
     d.done = true;
     const stars = d.moves <= d.opt ? 3 : d.moves <= d.opt + 2 ? 2 : 1;
     const key = d.lv.key;
-    if (!drStars[key] || stars > drStars[key]) { drStars[key] = stars; try { localStorage.setItem(DR_KEY, JSON.stringify(drStars)); } catch (e) {} }
+    if (d.lv.generated) { // trénink: počet vyřešených cvičení a kolik z nich na tři hvězdy
+      const k = d.lv.piece + d.lv.diff, st = tr[k] || { n: 0, s3: 0 };
+      st.n++; if (stars === 3) st.s3++; tr[k] = st; saveTr();
+    } else if (!drStars[key] || stars > drStars[key]) { drStars[key] = stars; try { localStorage.setItem(DR_KEY, JSON.stringify(drStars)); } catch (e) {} }
     const prom = d.lv.piece === 'p' && d.sq >= 56 ? ' Pěšec došel na poslední řadu a promění se.' : '';
     drillMsg((stars === 3 ? 'Výborně! ' : 'Hotovo! ') + starText(stars), 'ok');
     $('drInfo').textContent = 'Tahů: ' + d.moves + '. Nejkratší cesta má ' + d.opt + ' ' + plural(d.opt, 'tah', 'tahy', 'tahů') + '.' + (stars < 3 ? ' Zkus to na méně tahů.' : '') + prom;
     $('drAgain').textContent = stars < 3 ? 'Zkusit znovu' : 'Znovu';
-    const nxt = drillNext(d.lv);
+    $('drNext').classList.add('primary');
+    const nxt = d.lv.generated || drillNext(d.lv);
     $('drNext').hidden = !nxt;
+    $('drNext').textContent = d.lv.generated ? 'Další cvičení' : 'Další úroveň';
     haptic(stars === 3 ? 80 : 30);
   }
   function drillNext(lv) {
+    if (lv.generated) return null;
     const ch = FG.CHAPTERS[lv.chapter];
     return ch.levels[lv.n] || (FG.CHAPTERS[lv.chapter + 1] && FG.CHAPTERS[lv.chapter + 1].levels[0]) || null;
   }
@@ -2456,7 +2529,10 @@ textarea.fen { min-height: 0; font-size: 14px; word-break: break-all; }
     renderAll();
   }
   $('drAgain').addEventListener('click', () => drill && drillStart(drill.lv));
-  $('drNext').addEventListener('click', () => { const n = drill && drillNext(drill.lv); if (n) drillStart(n); });
+  $('drNext').addEventListener('click', () => {
+    if (drill && drill.lv.generated) { trainNext(); return; }
+    const n = drill && drillNext(drill.lv); if (n) drillStart(n);
+  });
   $('drEnd').addEventListener('click', () => { drillEnd(); setDrawer(true); openPage('pgDrill'); });
 
   /* ---------- Výuka: řešení úloh ---------- */
@@ -2746,13 +2822,15 @@ textarea.fen { min-height: 0; font-size: 14px; word-break: break-all; }
       box.appendChild(b);
     });
     $('anaPrev').disabled = $('anaFirst').disabled = a.ply === 0;
+    $('anaSol').textContent = a.line.join(' ') === a.sol.join(' ') ? 'Řešení' : 'Zpět na řešení';
     $('anaNext').disabled = a.ply >= a.line.length;
     $('anaSol').disabled = a.line.join(' ') === a.sol.join(' ');
     // tahy, které student při řešení zkusil: jedním klepnutím se zahrají do rozboru
     const tr = $('anaTried');
     tr.innerHTML = '';
-    if (puz.tried.length) {
-      const l = document.createElement('span'); l.textContent = 'Tvoje tahy:'; tr.appendChild(l);
+    // nabídka ostatních chybných tahů, jen když jich bylo víc než ten zobrazený
+    if (puz.tried.length > 1 || (puz.tried.length === 1 && anaDeviation() === -1)) {
+      const l = document.createElement('span'); l.textContent = 'Tvoje chyby:'; tr.appendChild(l);
       puz.tried.forEach(t => {
         const b = document.createElement('button'); b.type = 'button'; b.className = 'btn small'; b.textContent = show(t.san);
         b.addEventListener('click', () => { const k = t.k - 1; anaOpen(a.sol.slice(0, k).concat(t.san), k + 1); });
@@ -2791,28 +2869,44 @@ textarea.fen { min-height: 0; font-size: 14px; word-break: break-all; }
   const fmtVal = v => v.mate !== undefined ? (v.mate === 0 ? 'mat' : v.mate > 0 ? 'mat ve ' + v.mate + '. tahu' : 'dostane mat ve ' + (-v.mate) + '. tahu') : (v.cp >= 0 ? '+' : '−') + (Math.abs(v.cp) / 100).toFixed(1).replace('.', ',');
   const valNum = v => v.mate !== undefined ? (v.mate === 0 ? 100000 : v.mate > 0 ? 100000 - v.mate * 100 : -100000 - v.mate * 100) : v.cp;
   function anaDeviation() { const a = puz.ana; for (let i = 0; i < a.line.length && i < a.sol.length; i++) if (a.line[i] !== a.sol[i]) return i; return -1; }
+  // Hodnocení vždy z pohledu toho, kdo úlohu řeší ("pro tebe"): kladné je dobré pro něj
+  function forMe(v, moverIsMe) { // v: hodnota z pohledu hráče, který táhl
+    if (moverIsMe) return v;
+    return v.mate !== undefined ? { mate: -v.mate } : { cp: -v.cp };
+  }
+  const fmtMe = v => v.mate !== undefined ? (v.mate === 0 ? 'mat' : v.mate > 0 ? 'mat za ' + v.mate : 'dostaneš mat') : (v.cp > 0 ? '+' : v.cp < 0 ? '−' : '') + (Math.abs(v.cp) / 100).toFixed(1).replace('.', ',');
+  function meWords(v) {
+    if (v.mate !== undefined) return v.mate > 0 ? 'vyhráváš' : 'prohráváš';
+    const c = v.cp;
+    return c >= 300 ? 'vyhráváš' : c >= 100 ? 'stojíš lépe' : c > -100 ? 'vyrovnané' : c > -300 ? 'stojíš hůř' : 'prohráváš';
+  }
   function anaCompareText() {
-    const a = puz.ana, d = anaDeviation(), el = $('anaCmp');
-    if (d === -1) { el.textContent = a.line.length ? 'Zobrazená linie je řešení úlohy.' : ''; return; }
-    const key = d + ':' + a.line[d];
-    const r = a.cmp.get(key);
-    const mine = show(a.line[d]), best = show(a.sol[d]);
-    if (!r) { el.textContent = 'Porovnávám tah ' + mine + ' s řešením ' + best + '…'; return; }
-    if (r.error) { el.textContent = r.error; return; }
-    const diff = (valNum(r.sol) - valNum(r.mine)) / 100;
-    let t = 'Tah ' + mine + ': ' + fmtVal(r.mine) + '. Řešení ' + best + ': ' + fmtVal(r.sol) + '. ';
-    if (r.sol.mate !== undefined && r.sol.mate >= 0 && !(r.mine.mate !== undefined && r.mine.mate >= 0)) t += 'Řešení vede k matu, ' + mine + ' ne.';
-    else if (diff < 0.3) t += 'Tah ' + mine + ' je skoro stejně dobrý jako řešení.';
-    else t += 'Tah ' + mine + ' je o ' + diff.toFixed(1).replace('.', ',') + ' pěšce horší.';
-    if (r.reply) t += ' Proč: soupeř odpoví ' + r.reply + '.';
-    el.textContent = t;
+    const a = puz.ana, d = anaDeviation(), box = $('anaCmp');
+    box.hidden = d === -1;
+    if (d === -1) return;
+    const r = a.cmp.get(d + ':' + a.line[d]);
+    const meMoves = (d % 2 === 0); // sudé tahy od startu hraje ten, kdo úlohu řeší
+    $('cmpSolMove').textContent = show(a.sol[d]);
+    $('cmpMyMove').textContent = show(a.line[d]);
+    box.querySelector('.cmp-row.bad .cmp-what').textContent = meMoves ? 'tvůj tah' : 'jiný tah';
+    if (!r || r.error) { $('cmpSolVal').textContent = $('cmpMyVal').textContent = '…'; $('cmpWhy').textContent = r && r.error ? r.error : ''; return; }
+    const sol = forMe(r.sol, meMoves), mine = forMe(r.mine, meMoves);
+    $('cmpSolVal').textContent = fmtMe(sol);
+    $('cmpMyVal').textContent = fmtMe(mine);
+    const diff = Math.abs(valNum(r.sol) - valNum(r.mine)) / 100;
+    let why = '';
+    if (diff < 0.3) why = 'Skoro stejně dobrý tah jako řešení.';
+    else if (r.sol.mate !== undefined && r.sol.mate > 0 && !(r.mine.mate !== undefined && r.mine.mate > 0)) why = 'Řešení vede k matu.';
+    else why = 'O ' + diff.toFixed(1).replace('.', ',') + ' pěšce horší.'; // s desetinnou čárkou je správně vždy „pěšce“
+    if (r.reply) why += (meMoves ? ' Soupeř odpoví ' : ' Pak nejlépe ') + r.reply + '.';
+    $('cmpWhy').textContent = why;
   }
   // Stockfish v rozboru: nejdřív porovnání odchylky s řešením, potom průběžné hodnocení zobrazené pozice
   async function anaEngine() {
     const a = puz && puz.ana;
     if (!a) return;
     const run = ++a.run;
-    $('anaScore').textContent = '…'; $('anaDepth').textContent = ''; $('anaPv').hidden = true;
+    $('anaScore').textContent = '…'; $('anaBest').textContent = ''; delete $('anaPv').dataset.san;
     try { await engineLoad(); } catch (e) { $('anaScore').textContent = 'Stockfish se nepodařilo spustit.'; return; }
     if (!puz || puz.ana !== a || a.run !== run) return;
     const d = anaDeviation();
@@ -2831,28 +2925,22 @@ textarea.fen { min-height: 0; font-size: 14px; word-break: break-all; }
     }
     const fen = puz.chess.fen(), turn = fen.split(' ')[1];
     const g = new Chess(fen);
-    if (g.game_over()) { $('anaScore').textContent = g.in_checkmate() ? 'Mat' : 'Remíza'; return; }
+    if (g.game_over()) { $('anaScore').textContent = g.in_checkmate() ? 'Mat' : 'Remíza'; $('anaBest').textContent = ''; return; }
+    const me = new Chess(a.start).turn(); // strana, která úlohu řeší
     engineGo({ fen, multipv: 1, depth: 22,
       onInfo: inf => {
         if (!puz || puz.ana !== a || a.run !== run || inf.mpv !== 1) return;
-        const sc = whiteScore({ turn, cp: inf.cp, mate: inf.mate });
-        $('anaScore').textContent = fmtScore(sc);
-        $('anaDepth').textContent = evalWords(sc) + ' · hloubka ' + inf.depth;
-        const sans = pvToSan(fen, inf.pv, 6);
-        if (sans.length) {
-          const pv = $('anaPv'); pv.hidden = false;
-          pv.textContent = 'Nejlepší: ' + sans.map(show).join(' ');
-          pv.dataset.san = sans[0];
-        }
+        // hodnocení pro stranu na tahu převedené na pohled řešitele
+        const v = inf.mate !== null ? { mate: inf.mate } : { cp: inf.cp };
+        const mine = forMe(v, turn === me);
+        $('anaScore').textContent = fmtMe(mine) + ' · ' + meWords(mine);
+        $('anaScore').title = 'hloubka ' + inf.depth;
+        const sans = pvToSan(fen, inf.pv, 3);
+        if (sans.length) { $('anaBest').textContent = '▶ ' + sans.map(show).join(' '); $('anaPv').dataset.san = sans[0]; }
       } });
   }
-  function evalWords(sc) {
-    if (sc.mate !== undefined) return sc.mate > 0 ? 'bílý dává mat' : 'černý dává mat';
-    const v = Math.abs(sc.cp), who = sc.cp > 0 ? 'bílý' : 'černý';
-    return v < 40 ? 'vyrovnaná pozice' : v < 120 ? who + ' stojí o něco lépe' : v < 300 ? who + ' stojí lépe' : who + ' má rozhodující výhodu';
-  }
   $('anaPv').addEventListener('click', () => {
-    const san = $('anaPv').dataset.san;
+    const san = $('anaPv').dataset.san; // klepnutí zahraje nejlepší tah
     if (!san || !puz || !puz.ana) return;
     const a = puz.ana;
     if (a.line[a.ply] !== san) a.line = a.line.slice(0, a.ply).concat(san);

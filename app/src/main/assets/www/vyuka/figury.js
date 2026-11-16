@@ -158,5 +158,92 @@
     lv.chapter = c; lv.n = l + 1;
   }));
 
-  return { CHAPTERS, idx, name, targets, guarded, moves, done, solve };
+  /* ---------- Trénink: cvičení generovaná podle figury a obtížnosti ---------- */
+  // diff 1 = lehké (jen hvězdičky), 2 = střední (brát figury, překážky), 3 = těžké (hlídaná pole).
+  // Náhodná rozestavení se zkoušejí tak dlouho, dokud nejde vyřešit v rozumném počtu tahů.
+  const RANGE = { 1: [2, 5], 2: [3, 7], 3: [4, 9] }; // nejmenší a největší počet tahů nejkratšího řešení
+  const BLACK = ['p', 'n', 'b', 'r'];
+  function generate(piece, diff, rnd) {
+    rnd = rnd || Math.random;
+    const pick = n => Math.floor(rnd() * n);
+    const [lo, hi] = RANGE[diff] || RANGE[1];
+    if (piece === 'p' && diff > 1) return pawnPath(diff, rnd);
+    for (let attempt = 0; attempt < 400; attempt++) {
+      const used = new Set();
+      const free = (minR, maxR, colorOf) => { // náhodné volné pole v řadách minR..maxR (1..8)
+        for (let k = 0; k < 50; k++) {
+          const i = pick(8) + (minR - 1 + pick(maxR - minR + 1)) * 8;
+          if (used.has(i)) continue;
+          if (colorOf !== undefined && ((i % 8) + Math.floor(i / 8)) % 2 !== colorOf) continue;
+          used.add(i); return name(i);
+        }
+        return null;
+      };
+      const lv = { piece, stars: [], black: {}, goal: 'stars', generated: true, diff };
+      const pawn = piece === 'p';
+      lv.start = pawn ? free(2, 2) : free(1, 8);
+      const color = piece === 'b' ? (idx(lv.start) % 8 + Math.floor(idx(lv.start) / 8)) % 2 : undefined;
+      if (diff === 1) {
+        const n = 2 + pick(pawn ? 1 : 3);
+        // pěšec bez braní táhne jen rovně, hvězdičky proto leží v jeho sloupci
+        if (pawn) { const ranks = [3, 4, 5, 6, 7, 8].sort(() => rnd() - 0.5).slice(0, n); ranks.forEach(r => lv.stars.push(lv.start[0] + r)); }
+        else for (let k = 0; k < n; k++) lv.stars.push(free(1, 8, color));
+      } else {
+        lv.goal = 'capture';
+        const n = (diff === 2 ? 3 : 3) + pick(2);
+        for (let k = 0; k < n; k++) { const sq = pawn ? free(3, 7) : free(2, 7, color); if (sq) lv.black[sq] = BLACK[pick(pawn || diff === 3 ? 2 : 4)]; }
+        // překážky: černé pěšce, které se brát nemusí, se tu nepoužívají; místo toho hvězdička navíc
+        if (diff === 2 && !pawn && rnd() < 0.5) lv.stars.push(free(1, 8, color));
+        if (diff === 3) lv.safe = true;
+      }
+      if (lv.stars.some(x => !x) || !lv.start) continue;
+      if (lv.safe) {
+        // aspoň jedna černá figura musí být krytá jinou, jinak hlídání nic nenaučí
+        const g = guarded(lv.black);
+        if (g.has(idx(lv.start)) || !Object.keys(lv.black).some(sq => g.has(idx(sq)))) continue;
+      }
+      const opt = solve(lv);
+      if (!Number.isFinite(opt) || opt < lo || opt > hi) continue;
+      lv.opt = opt;
+      return lv;
+    }
+    return null;
+  }
+
+  // Pěšec táhne jen dopředu, náhodně rozmístěné figury by skoro nikdy nesebral. Cvičení se proto staví
+  // obráceně: nejdřív náhodná cesta pěšce, na její šikmé kroky se postaví černé figury k braní.
+  // Střední: sebrat všechny figury. Těžké: sebrat všechny a dojít na poslední řadu, v cestě stojí
+  // figura, kterou pěšec nemůže sebrat a musí ji obejít braním.
+  function pawnPath(diff, rnd) {
+    const pick = n => Math.floor(rnd() * n);
+    for (let attempt = 0; attempt < 400; attempt++) {
+      let f = pick(8), r = 1;
+      const lv = { piece: 'p', start: name(f + r * 8), stars: [], black: {}, goal: 'capture', generated: true, diff };
+      const want = diff === 2 ? 2 + pick(2) : 3 + pick(2);
+      let caps = 0;
+      while (r < 7 && caps < want) {
+        const side = rnd() < 0.5 ? -1 : 1, nf = f + side;
+        if (rnd() < 0.6 && nf >= 0 && nf < 8) {
+          // na poslední řadě černý pěšec stát nemůže
+          lv.black[name(nf + (r + 1) * 8)] = r + 1 === 7 ? BLACK[1 + pick(2)] : BLACK[pick(3)];
+          f = nf; r++; caps++;
+        } else r++;
+      }
+      if (caps < 2) continue;
+      if (diff === 3) {
+        lv.target = '8';
+        // figura přímo před pěšcem na některém místě cesty, aby ho donutila táhnout šikmo
+        const sq = name(f + Math.min(7, r + 1) * 8);
+        if (r < 7 && !lv.black[sq]) lv.black[sq] = 'r';
+      }
+      const opt = solve(lv);
+      const [lo, hi] = RANGE[diff];
+      if (!Number.isFinite(opt) || opt < lo || opt > hi) continue;
+      lv.opt = opt;
+      return lv;
+    }
+    return null;
+  }
+
+  return { CHAPTERS, idx, name, targets, guarded, moves, done, solve, generate };
 });

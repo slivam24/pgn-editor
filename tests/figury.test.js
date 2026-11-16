@@ -53,3 +53,21 @@ test('tahy figur odpovídají pravidlům šachu', () => {
     assert.deepEqual(got.filter(x => want.includes(x) || !near(x)), want.filter(x => !near(x)), piece + ' z ' + F.name(from) + ' ' + JSON.stringify(black));
   }
 });
+
+test('trénink: vymyšlená cvičení jdou vyřešit a odpovídají obtížnosti', () => {
+  let seed = 7;
+  const rnd = () => { seed = (seed * 1103515245 + 12345) & 0x7fffffff; return seed / 0x80000000; };
+  const range = { 1: [2, 5], 2: [3, 7], 3: [4, 9] };
+  for (const pc of 'rbqknp') for (const d of [1, 2, 3]) for (let k = 0; k < 25; k++) {
+    const lv = F.generate(pc, d, rnd);
+    assert.ok(lv, 'nevymyšleno: ' + pc + ' ' + d);
+    const opt = F.solve(lv);
+    assert.equal(opt, lv.opt);
+    assert.ok(opt >= range[d][0] && opt <= range[d][1], pc + ' ' + d + ': ' + opt);
+    if (lv.safe) assert.ok(!F.guarded(lv.black).has(F.idx(lv.start)), 'začíná na hlídaném poli');
+    const all = [lv.start].concat(lv.stars, Object.keys(lv.black));
+    assert.equal(new Set(all).size, all.length, 'dvě věci na stejném poli ' + JSON.stringify(lv));
+    if (pc === 'b') { const c = sq => (F.idx(sq) % 8 + Math.floor(F.idx(sq) / 8)) % 2; lv.stars.forEach(s => assert.equal(c(s), c(lv.start))); }
+    Object.entries(lv.black).forEach(([sq, t]) => { if (t === 'p') assert.ok(sq[1] !== '1' && sq[1] !== '8', 'pěšec na kraji'); });
+  }
+});
