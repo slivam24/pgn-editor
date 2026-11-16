@@ -502,5 +502,14 @@
   "winner": "w",
   "nodes": 58619011,
   "exact": true
+ },
+ "7v6": {
+  "a": 7,
+  "b": 6,
+  "limit": 5400,
+  "ms": 38310,
+  "winner": "w",
+  "nodes": 60225212,
+  "exact": true
  }
 }
