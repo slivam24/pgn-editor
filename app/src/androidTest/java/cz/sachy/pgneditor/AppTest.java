@@ -250,6 +250,21 @@ public class AppTest {
         waitFor("konec úlohy", "!document.body.classList.contains('puzzle')");
     }
 
+    /** Tahy figur: úroveň se spustí a vyřeší klepnutím na šachovnici. */
+    @Test
+    public void pieceDrillWorks() throws Exception {
+        scenario = ActivityScenario.launch(MainActivity.class);
+        waitBooted();
+        js("document.getElementById('menuBtn').click(); document.querySelector('[data-page=pgDrill]').click(); return 0;");
+        waitFor("kapitoly", "document.querySelectorAll('.dr-levels .btn').length === 36");
+        js("document.querySelectorAll('.dr-levels .btn')[0].click(); return 0;");
+        waitFor("úroveň", "document.body.classList.contains('drill')");
+        js("document.querySelector('[data-sq=\"d6\"]').click(); return 0;");
+        waitFor("vyřešeno", "/★★★/.test(document.getElementById('drMsg').textContent)");
+        js("document.getElementById('drEnd').click(); return 0;");
+        waitFor("konec", "!document.body.classList.contains('drill')");
+    }
+
     @Test
     public void themeSwitchDoesNotBreakApp() throws Exception {
         scenario = ActivityScenario.launch(MainActivity.class);
