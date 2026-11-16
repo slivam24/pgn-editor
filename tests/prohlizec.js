@@ -345,6 +345,57 @@ const OLD = JSON.stringify({ games: [{ headers: { Event: 'Stary', Site: '?', Dat
     assert.ok(t && !/komentar/.test(t) && /\[White "Novak, Jan 1"\]/.test(t), 'zkrácená partie z QR kódu');
   });
 
+  await step('výuka: úloha se vyřeší, chyba se pozná, úroveň a opakování chybných', async page => {
+    await open(page);
+    // vždy stejná úloha: náhodný výběr nahradí první úloha z nabídky
+    await page.evaluate(() => { Math.random = () => 0; });
+    await click(page, 'menuBtn');
+    await page.$eval('[data-page=pgLearn]', e => e.click());
+    await page.waitForFunction(() => /úloh ve sbírce/.test(document.getElementById('lvCount').textContent), { timeout: 10000 });
+    await click(page, 'lvStart');
+    await page.waitForFunction(() => !document.getElementById('chModal').hidden);
+    assert.equal(await text(page, 'chTitle'), 'Jak silně hraješ?');
+    await page.$$eval('#chBtns button', b => b[1].click()); // úroveň 800
+    await page.waitForFunction(() => /Najdi nejlepší tah/.test(document.getElementById('puzMsg').textContent), { timeout: 10000 });
+    // zadání úlohy podle titulku a pozice
+    const lines = fs.readFileSync(path.join(WWW, 'vyuka', 'ulohy.txt'), 'utf8').trim().split('\n').map(l => l.split('|'));
+    const title = await text(page, 'puzTitle');
+    const rating = /obtížnost (\d+)/.exec(title)[1];
+    const cand = lines.filter(l => l[3] === rating);
+    const { Chess } = require('../app/src/main/assets/www/chess.js');
+    const boardFen = await page.$eval('#fenCur', e => e.value); // FEN se při úloze nemění, poznáme úlohu přes šachovnici
+    const pieces = await page.$$eval('#board .sq', els => els.map(e => e.dataset.sq + (e.querySelector('.piece') ? e.querySelector('.piece').className.slice(-2) : '')).sort().join(','));
+    const task = cand.find(l => { const c = new Chess(l[1] + ' 0 1'); const u = l[2].split(' ')[0]; c.move({ from: u.slice(0, 2), to: u.slice(2, 4), promotion: u[4] || 'q' });
+      const a = []; c.board().forEach((row, r) => row.forEach((p, f) => a.push('abcdefgh'[f] + (8 - r) + (p ? p.color + p.type : '')))); return a.sort().join(',') === pieces; });
+    assert.ok(task, 'úloha na šachovnici ' + boardFen);
+    const mv = task[2].split(' ');
+    // chybný tah
+    const c = new Chess(task[1] + ' 0 1'); c.move({ from: mv[0].slice(0, 2), to: mv[0].slice(2, 4), promotion: 'q' });
+    const wrong = c.moves({ verbose: true }).find(m => m.from + m.to !== mv[1].slice(0, 4) && !m.san.endsWith('#'));
+    await tap(page, wrong.from); await tap(page, wrong.to);
+    assert.match(await text(page, 'puzMsg'), /To není ono/);
+    // správné řešení
+    for (let i = 1; i < mv.length; i += 2) {
+      await page.waitForFunction(() => !/Pokračuj…/.test(document.getElementById('puzMsg').textContent));
+      await tap(page, mv[i].slice(0, 2)); await tap(page, mv[i].slice(2, 4));
+      if (mv[i][4]) { await pause(100); await page.$$eval('#promoRow button', (b, t) => b[{ q: 0, r: 1, b: 2, n: 3 }[t]].click(), mv[i][4]); }
+      await pause(700);
+    }
+    await page.waitForFunction(() => /Hotovo/.test(document.getElementById('puzMsg').textContent), { timeout: 5000 });
+    await click(page, 'puzEnd');
+    const lvData = await page.evaluate(() => JSON.parse(localStorage.getItem('pgn-vyuka')));
+    assert.equal(lvData.n, 1);
+    assert.deepEqual(lvData.wrong, [task[0]]);
+    assert.ok(lvData.rating < 800, 'úroveň po chybě klesne: ' + lvData.rating);
+    // opakování chybné úlohy
+    await click(page, 'menuBtn');
+    await page.$eval('[data-page=pgLearn]', e => e.click());
+    await page.waitForFunction(() => !document.getElementById('lvRetry').hidden);
+    await click(page, 'lvRetry');
+    await page.waitForFunction(() => /Opakování úlohy/.test(document.getElementById('puzInfo').textContent), { timeout: 5000 });
+    assert.equal(await text(page, 'puzTitle'), title);
+  });
+
   await step('nepovedené uložení do paměti telefonu se ohlásí', async page => {
     await open(page);
     await paste(page, game(1, '1. e4 e5 *'));
