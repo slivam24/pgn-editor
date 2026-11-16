@@ -396,6 +396,71 @@ const OLD = JSON.stringify({ games: [{ headers: { Event: 'Stary', Site: '?', Dat
     assert.equal(await text(page, 'puzTitle'), title);
   });
 
+  await step('tahy figur: jezdec z rohu do rohu, hvězdy, hlídané pole', async page => {
+    await open(page);
+    await click(page, 'menuBtn');
+    await page.$eval('[data-page=pgDrill]', e => e.click());
+    await page.waitForFunction(() => document.querySelectorAll('.dr-levels .btn').length === 36);
+    await page.$$eval('.dr-levels .btn', b => b[26].click()); // jezdec, úroveň 3
+    assert.match(await text(page, 'drMsg'), /Dojdi jezdcem na pole h8/);
+    await tap(page, 'a3');
+    assert.match(await text(page, 'drMsg'), /nemůže/);
+    for (const sq of ['c2', 'a1', 'b3', 'c5', 'd7', 'f8', 'g6', 'h8']) await tap(page, sq);
+    assert.match(await text(page, 'drInfo'), /Tahů: 8\. Nejkratší cesta má 6 tahů/);
+    assert.match(await text(page, 'drMsg'), /★★☆/);
+    await click(page, 'drAgain');
+    for (const sq of ['b3', 'c5', 'd7', 'f8', 'g6', 'h8']) await tap(page, sq);
+    assert.match(await text(page, 'drMsg'), /★★★/);
+    assert.deepEqual(await page.evaluate(() => JSON.parse(localStorage.getItem('pgn-figury'))), { n3: 3 });
+    // věž, úroveň 6: na pole hlídané pěšcem nepustí
+    await click(page, 'drEnd');
+    await page.$$eval('.dr-levels .btn', b => b[5].click());
+    await tap(page, 'a4'); await tap(page, 'd4');
+    assert.match(await text(page, 'drMsg'), /sebrala černá figura/);
+    assert.deepEqual(await page.$$eval('#board .sq.warn', e => e.map(x => x.dataset.sq).sort()), ['d4', 'e5']);
+  });
+
+  await step('úloha: předtah a rozbor se Stockfishem', async page => {
+    await open(page);
+    await page.evaluate(() => { localStorage.setItem('pgn-vyuka', JSON.stringify({ rating: 1500 })); });
+    await open(page);
+    await page.evaluate(() => { Math.random = () => 0; });
+    await click(page, 'menuBtn');
+    await page.$eval('[data-page=pgLearn]', e => e.click());
+    await page.waitForFunction(() => /úloh ve sbírce/.test(document.getElementById('lvCount').textContent), { timeout: 10000 });
+    await click(page, 'lvStart');
+    // zadání úlohy se pozná podle obtížnosti a figur před tahem soupeře
+    const title = await text(page, 'puzTitle');
+    const pieces = await page.$$eval('#board .sq', els => els.map(e => e.dataset.sq + (e.querySelector('.piece') ? e.querySelector('.piece').className.slice(-2) : '')).sort().join(','));
+    const { Chess } = require('../app/src/main/assets/www/chess.js');
+    const lines = fs.readFileSync(path.join(WWW, 'vyuka', 'ulohy.txt'), 'utf8').trim().split('\n').map(l => l.split('|'));
+    const task = lines.filter(l => l[3] === /(\d+)$/.exec(title)[1]).find(l => { const c = new Chess(l[1] + ' 0 1'); const a = [];
+      c.board().forEach((row, r) => row.forEach((p, f) => a.push('abcdefgh'[f] + (8 - r) + (p ? p.color + p.type : '')))); return a.sort().join(',') === pieces; });
+    assert.ok(task, 'úloha na šachovnici');
+    const mv = task[2].split(' ');
+    // předtah: první tah řešení dřív, než soupeř táhne
+    await tap(page, mv[1].slice(0, 2)); await tap(page, mv[1].slice(2, 4));
+    await page.waitForFunction(() => /Správně|Vyřešeno/.test(document.getElementById('puzMsg').textContent), { timeout: 5000 });
+    // zbytek s jedním chybným tahem
+    const c = new Chess(task[1] + ' 0 1'); mv.slice(0, 3).forEach(u => c.move({ from: u.slice(0, 2), to: u.slice(2, 4), promotion: u[4] || 'q' }));
+    for (let i = 3; i < mv.length; i += 2) {
+      await page.waitForFunction(() => /Najdi další tah/.test(document.getElementById('puzMsg').textContent), { timeout: 5000 });
+      if (i === 3) { const w = c.moves({ verbose: true }).find(m => m.from + m.to !== mv[3].slice(0, 4) && !m.san.endsWith('#')); await tap(page, w.from); await tap(page, w.to); }
+      await tap(page, mv[i].slice(0, 2)); await tap(page, mv[i].slice(2, 4));
+      if (mv[i][4]) { await pause(100); await page.$$eval('#promoRow button', (b, t) => b[{ q: 0, r: 1, b: 2, n: 3 }[t]].click(), mv[i][4]); }
+    }
+    await page.waitForFunction(() => /Hotovo|Vyřešeno/.test(document.getElementById('puzMsg').textContent), { timeout: 5000 });
+    await click(page, 'puzAna');
+    await page.waitForFunction(() => /hloubka \d+/.test(document.getElementById('anaDepth').textContent), { timeout: 60000 });
+    if (mv.length > 4) {
+      await page.waitForFunction(() => /horší|stejně dobrý|k matu/.test(document.getElementById('anaCmp').textContent), { timeout: 60000 });
+      assert.match(await text(page, 'anaTried'), /Tvoje tahy/);
+    }
+    const n = await page.$$eval('#anaLine .mv', e => e.length);
+    await click(page, 'anaPv');
+    assert.equal(await page.$$eval('#anaLine .mv', e => e.length), n + 1);
+  });
+
   await step('nepovedené uložení do paměti telefonu se ohlásí', async page => {
     await open(page);
     await paste(page, game(1, '1. e4 e5 *'));

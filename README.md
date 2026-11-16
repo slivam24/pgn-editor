@@ -20,14 +20,14 @@ Při změně verze se číslo mění na třech místech: `versionCode` a `versio
 
 Při každém sestavení na GitHubu běží tři sady zkoušek. Když první dvě neprojdou, APK se nevytvoří.
 
-- `tests/pgn.test.js` zkouší čtení a zápis PGN: varianty, komentáře, chybné partie, FEN, českou notaci, názvy zahájení, odkazy na partie. `tests/verze.test.js` hlídá shodu čísla verze. `tests/ulohy.test.js` zahraje všechny úlohy ze sbírky a hlídá, že jsou platné.
+- `tests/pgn.test.js` zkouší čtení a zápis PGN: varianty, komentáře, chybné partie, FEN, českou notaci, názvy zahájení, odkazy na partie. `tests/verze.test.js` hlídá shodu čísla verze. `tests/ulohy.test.js` zahraje všechny úlohy ze sbírky a hlídá, že jsou platné. `tests/figury.test.js` ověří, že každá úroveň tahů figur jde vyřešit a pohyb figur odpovídá pravidlům.
 - `tests/prohlizec.js` otevře aplikaci v prohlížeči Chrome a zkouší ukládání do paměti telefonu, velké soubory, seznam partií, zálohu, tisk a další funkce.
 - `app/src/androidTest/` jsou zkoušky na emulátoru Androidu: start aplikace ve skutečném WebView, otevření souboru z jiné aplikace, uložení zpět do souboru a uložení partie přes restart. Běží jako samostatná úloha `android`, takže APK vznikne, i kdyby emulátor na GitHubu zrovna nenaběhl. Snímek obrazovky z emulátoru se ukládá do vydání `nahled`.
 
 Ruční spuštění v počítači s nainstalovaným Node.js:
 
 ```bash
-node --test tests/pgn.test.js tests/verze.test.js tests/ulohy.test.js
+node --test tests/pgn.test.js tests/verze.test.js tests/ulohy.test.js tests/figury.test.js
 ```
 
 ## Vydání a zkušební sestavení
@@ -66,6 +66,7 @@ Při sestavení v počítači (Android Studio, **Build > Generate App Bundles or
 | `tests/` | testy čtení PGN a zkoušky v prohlížeči |
 | `app/src/androidTest/` | zkoušky na emulátoru Androidu |
 | `tools/eco.js` | vytvoří tabulku zahájení z dat Lichessu |
+| `app/src/main/assets/www/vyuka/figury.js` | Výuka tahů figur: úrovně, pravidla pohybu a výpočet nejkratšího řešení |
 | `app/src/main/assets/www/vyuka/ulohy.txt` | sbírka úloh pro Výuku, vytváří ji `tools/ulohy.js` z databáze úloh Lichessu |
 | `play/` | podklady pro Google Play (texty, ikona, snímky, zásady soukromí) |
 | `app/build.gradle` | číslo verze, podpis, cílová verze Androidu |

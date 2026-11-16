@@ -34,6 +34,8 @@ VÝUKA
 • Přes 6 000 šachových úloh od úplných začátečníků po mistrovskou úroveň, bez internetu.
 • Výběr podle obtížnosti a tématu: maty, vidlička, vazba, oběť, koncovky a další.
 • Vlastní úroveň, která roste s vyřešenými úlohami, a opakování úloh s chybou.
+• Rozbor vyřešené úlohy se Stockfishem: o kolik je tvůj tah horší a proč.
+• Tahy figur pro nejmenší: 36 úrovní, hvězdičky za co nejméně tahů.
 
 ROZBOR
 • Volitelně šachový motor Stockfish: hodnocení pozice, nejlepší pokračování a kontrola celé partie.
