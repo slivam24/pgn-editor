@@ -297,6 +297,54 @@ const OLD = JSON.stringify({ games: [{ headers: { Event: 'Stary', Site: '?', Dat
     assert.match(await text(page, 'modalText'), /není, nebo není veřejná/);
   });
 
+  // QR kód z aplikace přečte nezávislá čtečka (jsQR v Node), obsah musí přesně odpovídat
+  const readQr = async page => {
+    const jsQR = require('jsqr');
+    const r = await page.evaluate(async () => {
+      const img = document.getElementById('qrImg'); await img.decode();
+      const c = document.createElement('canvas'); c.width = img.naturalWidth; c.height = img.naturalHeight;
+      const x = c.getContext('2d'); x.drawImage(img, 0, 0);
+      return { w: c.width, h: c.height, data: Array.from(x.getImageData(0, 0, c.width, c.height).data) };
+    });
+    const q = jsQR(Uint8ClampedArray.from(r.data), r.w, r.h);
+    return q ? q.data : null;
+  };
+  await step('QR kód: partie a pozice se dají přečíst, načtení z obrázku', async page => {
+    await open(page);
+    await paste(page, game(1, '1. e4 e5 2. Nf3 Nc6 {koment} (2... d6) 3. Bb5 *'));
+    await click(page, 'menuBtn');
+    await page.$eval('[data-page=pgQr]', e => e.click());
+    await page.waitForFunction(() => document.getElementById('qrImg').src.startsWith('data:image/png'), { timeout: 10000 });
+    assert.equal(await readQr(page), await page.$eval('#pgnText', e => e.value));
+    await click(page, 'qrPos');
+    await page.waitForFunction(() => /Pozice/.test(document.getElementById('qrNote').textContent));
+    const fen = await page.$eval('#fenCur', e => e.value);
+    assert.equal(await readQr(page), fen);
+    // obrázek s QR kódem pozice se načte do nové partie
+    const os = require('os');
+    const file = path.join(fs.mkdtempSync(path.join(os.tmpdir(), 'pgn-test-')), 'qr.png');
+    fs.writeFileSync(file, Buffer.from((await page.$eval('#qrImg', e => e.src)).split(',')[1], 'base64'));
+    await (await page.$('#qrFile')).uploadFile(file);
+    await page.waitForFunction(() => document.getElementById('modalTitle').textContent === 'Nová partie z pozice?' && !document.getElementById('modal').hidden, { timeout: 10000 });
+    await click(page, 'modalOk');
+    await page.waitForFunction(() => /^2 partie/.test(document.getElementById('fileInfo').textContent), { timeout: 5000 });
+    assert.equal(await page.$eval('#fenCur', e => e.value), fen);
+  });
+
+  await step('QR kód: příliš dlouhá partie se zkrátí bez komentářů a jde přečíst', async page => {
+    await open(page);
+    const { Chess } = require('../app/src/main/assets/www/chess.js');
+    const c = new Chess(); let mv = '', seed = 9;
+    const rnd = n => { seed = (seed * 1103515245 + 12345) & 0x7fffffff; return seed % n; };
+    for (let i = 0; i < 160 && !c.game_over(); i++) { const m = c.moves(); const s = m[rnd(m.length)]; c.move(s); mv += (i % 2 ? '' : (i / 2 + 1) + '. ') + s + ' {dlouhy komentar k tomuto tahu} '; }
+    await paste(page, game(1, mv + '*'));
+    await click(page, 'menuBtn');
+    await page.$eval('[data-page=pgQr]', e => e.click());
+    await page.waitForFunction(() => /bez komentářů/.test(document.getElementById('qrNote').textContent), { timeout: 10000 });
+    const t = await readQr(page);
+    assert.ok(t && !/komentar/.test(t) && /\[White "Novak, Jan 1"\]/.test(t), 'zkrácená partie z QR kódu');
+  });
+
   await step('nepovedené uložení do paměti telefonu se ohlásí', async page => {
     await open(page);
     await paste(page, game(1, '1. e4 e5 *'));

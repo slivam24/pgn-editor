@@ -9,15 +9,18 @@ import android.content.Intent;
 import android.net.Uri;
 import android.os.Build;
 import android.view.ViewGroup;
+import android.webkit.PermissionRequest;
 import android.webkit.WebView;
 
 import androidx.core.content.FileProvider;
 import androidx.test.core.app.ActivityScenario;
 import androidx.test.core.app.ApplicationProvider;
 import androidx.test.ext.junit.runners.AndroidJUnit4;
+import androidx.test.rule.GrantPermissionRule;
 
 import org.json.JSONObject;
 import org.junit.After;
+import org.junit.Rule;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 
@@ -38,6 +41,10 @@ import java.util.concurrent.atomic.AtomicReference;
 public class AppTest {
 
     private static final String GAME = "[Event \"Zkouska\"]\n[White \"Novak, Jan\"]\n[Black \"Dvorak, Petr\"]\n[Result \"*\"]\n\n1. e4 e5 *\n";
+
+    // Fotoaparát pro čtení QR kódů povolený předem, aby zkouška nečekala na okno s dotazem
+    @Rule
+    public GrantPermissionRule camera = GrantPermissionRule.grant(android.Manifest.permission.CAMERA);
 
     private final Context app = ApplicationProvider.getApplicationContext();
     private ActivityScenario<MainActivity> scenario;
@@ -176,6 +183,55 @@ public class AppTest {
         assertEquals("\"ok\"", js("return window.Android.saveToUri(" + JSONObject.quote(uriOf(f).toString()) + "," + JSONObject.quote(text) + ");"));
         assertEquals(text, new String(Files.readAllBytes(f.toPath()), StandardCharsets.UTF_8));
         assertNotEquals("\"ok\"", js("return window.Android.saveToUri('content://neexistuje.pgneditor/x.pgn', 'a');"));
+    }
+
+    /** Napodobená žádost stránky o fotoaparát: zapamatuje si, jestli ji aplikace povolila, nebo odmítla. */
+    private static class FakeRequest extends PermissionRequest {
+        final Uri origin;
+        final String[] resources;
+        final CountDownLatch answered = new CountDownLatch(1);
+        volatile String result = "";
+        FakeRequest(String origin, String... resources) { this.origin = Uri.parse(origin); this.resources = resources; }
+        @Override public Uri getOrigin() { return origin; }
+        @Override public String[] getResources() { return resources; }
+        @Override public void grant(String[] r) { result = "grant:" + String.join(",", r); answered.countDown(); }
+        @Override public void deny() { result = "deny"; answered.countDown(); }
+    }
+
+    private String askCamera(FakeRequest r) throws Exception {
+        scenario.onActivity(a -> {
+            WebView web = (WebView) ((ViewGroup) ((ViewGroup) a.findViewById(android.R.id.content)).getChildAt(0)).getChildAt(0);
+            web.getWebChromeClient().onPermissionRequest(r);
+        });
+        assertTrue("aplikace na žádost o fotoaparát neodpověděla", r.answered.await(10, TimeUnit.SECONDS));
+        return r.result;
+    }
+
+    /**
+     * Fotoaparát pro čtení QR kódů smí dostat jen stránka aplikace a jen obraz, nikdy mikrofon
+     * ani cizí stránka. (Skutečnou kameru emulátor na GitHubu spolehlivě nespustí, proto se zkouší
+     * rozhodování aplikace přímo.)
+     */
+    @Test
+    public void cameraOnlyForAppPage() throws Exception {
+        scenario = ActivityScenario.launch(MainActivity.class);
+        waitBooted();
+        assertEquals("grant:" + PermissionRequest.RESOURCE_VIDEO_CAPTURE,
+                askCamera(new FakeRequest("https://appassets.androidplatform.net/", PermissionRequest.RESOURCE_VIDEO_CAPTURE)));
+        assertEquals("deny", askCamera(new FakeRequest("https://example.com/", PermissionRequest.RESOURCE_VIDEO_CAPTURE)));
+        assertEquals("deny", askCamera(new FakeRequest("https://appassets.androidplatform.net/", PermissionRequest.RESOURCE_AUDIO_CAPTURE)));
+        assertEquals("\"function\"", js("return typeof (navigator.mediaDevices && navigator.mediaDevices.getUserMedia);"));
+    }
+
+    /** QR kód: knihovna se načte z aplikace a kód partie se vytvoří i ve WebView v telefonu. */
+    @Test
+    public void makesQrCode() throws Exception {
+        scenario = ActivityScenario.launch(MainActivity.class);
+        waitBooted();
+        js("document.getElementById('menuBtn').click(); document.querySelector('[data-page=pgQr]').click(); return 0;");
+        waitFor("QR kód partie", "document.getElementById('qrImg').src.indexOf('data:image/png') === 0");
+        js("document.getElementById('qrPos').click(); return 0;");
+        waitFor("QR kód pozice", "/Pozice/.test(document.getElementById('qrNote').textContent)");
     }
 
     @Test

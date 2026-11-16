@@ -28,6 +28,7 @@ import android.print.PrintManager;
 import android.provider.DocumentsContract;
 import android.provider.OpenableColumns;
 import android.webkit.JavascriptInterface;
+import android.webkit.PermissionRequest;
 import android.webkit.ValueCallback;
 import android.webkit.WebChromeClient;
 import android.webkit.WebResourceRequest;
@@ -83,6 +84,7 @@ public class MainActivity extends Activity {
     private static final int REQ_OPEN = 1;
     private static final int REQ_SAVE = 2;
     private static final int REQ_MIC = 3;
+    private static final int REQ_CAM = 4;
 
     // Servery, ze kterých smí funkce Stáhnout z odkazu číst. Nic jiného aplikace z internetu nestahuje.
     private static final List<String> HTTP_HOSTS = Arrays.asList("lichess.org", "www.chess.com", "api.chess.com");
@@ -93,6 +95,7 @@ public class MainActivity extends Activity {
     private ValueCallback<Uri[]> fileCallback;
     private byte[] pendingSaveBytes;
     private SpeechRecognizer recognizer;
+    private PermissionRequest pendingCamera; // stránka chce fotoaparát (čtení QR kódu), čeká se na povolení
     private boolean pageLoaded;
     private String pendingOpenText, pendingOpenName, pendingOpenUri;
     // Adresa souboru vybraného přes Otevřít soubor, pokud do něj jde zapisovat. Stránka si ji vyzvedne
@@ -170,6 +173,25 @@ public class MainActivity extends Activity {
         });
 
         web.setWebChromeClient(new WebChromeClient() {
+            // Fotoaparát pro čtení QR kódů: stránka ho smí použít jen z vlastní adresy aplikace
+            @Override
+            public void onPermissionRequest(PermissionRequest request) {
+                boolean video = Arrays.asList(request.getResources()).contains(PermissionRequest.RESOURCE_VIDEO_CAPTURE);
+                if (!video || !HOST.equals(request.getOrigin().getHost())) { request.deny(); return; }
+                if (checkSelfPermission(Manifest.permission.CAMERA) == PackageManager.PERMISSION_GRANTED) {
+                    request.grant(new String[]{PermissionRequest.RESOURCE_VIDEO_CAPTURE});
+                    return;
+                }
+                if (pendingCamera != null) pendingCamera.deny();
+                pendingCamera = request;
+                requestPermissions(new String[]{Manifest.permission.CAMERA}, REQ_CAM);
+            }
+
+            @Override
+            public void onPermissionRequestCanceled(PermissionRequest request) {
+                if (request == pendingCamera) pendingCamera = null;
+            }
+
             @Override
             public boolean onShowFileChooser(WebView view, ValueCallback<Uri[]> callback, FileChooserParams params) {
                 if (fileCallback != null) fileCallback.onReceiveValue(null);
@@ -263,6 +285,14 @@ public class MainActivity extends Activity {
     @Override
     public void onRequestPermissionsResult(int requestCode, String[] permissions, int[] grantResults) {
         super.onRequestPermissionsResult(requestCode, permissions, grantResults);
+        if (requestCode == REQ_CAM) {
+            PermissionRequest r = pendingCamera;
+            pendingCamera = null;
+            if (r == null) return;
+            if (grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED) r.grant(new String[]{PermissionRequest.RESOURCE_VIDEO_CAPTURE});
+            else r.deny();
+            return;
+        }
         if (requestCode != REQ_MIC) return;
         if (grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED) startListening();
         else js("window.onVoiceError && window.onVoiceError(9)");
