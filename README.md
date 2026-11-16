@@ -70,6 +70,7 @@ Při sestavení v počítači (Android Studio, **Build > Generate App Bundles or
 | `app/src/main/assets/www/trenink/pesci.js` | Trénink pěšci proti pěšcům: pravidla hry (tahy, braní mimochodem, konec hry a pat), výchozí postavení podle počtu pěšců a série kol |
 | `app/src/main/assets/www/trenink/pesci-engine.js` | Počítačový soupeř pro pěšce proti pěšcům: minimax s alfa-beta a tabulkou pozic, v malých pozicích hraje dokonale, úrovně obtížnosti |
 | `app/src/main/assets/www/vyuka/ulohy.txt` | sbírka úloh pro Výuku, vytváří ji `tools/ulohy.js` z databáze úloh Lichessu |
+| `tools/pesci-analyza.js` | Analýza pěšců proti pěšcům: teoretický výsledek při dokonalé hře pro každou dvojici počtů pěšců a co z toho plyne pro sérii kol. Výsledky jsou v `tools/pesci-analyza.md`, rozpracovaný výpočet v `tools/pesci-analyza.json` |
 | `play/` | podklady pro Google Play (texty, ikona, snímky, zásady soukromí) |
 | `app/build.gradle` | číslo verze, podpis, cílová verze Androidu |
 | `.github/workflows/build.yml` | návod pro GitHub, jak APK sestavit |
