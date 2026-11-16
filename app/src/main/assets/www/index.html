@@ -197,6 +197,34 @@ body.editing .graph { display: none !important; }
 
 /* Rozestavení pozice */
 .ed-title { display: none; font-weight: 600; font-size: 17px; flex: 1; }
+/* Výuka: řešení úloh */
+.puz-title { display: none; font-weight: 600; font-size: 17px; flex: 1; }
+body.puzzle .puz-title { display: block; }
+body.puzzle #menuBtn, body.puzzle #undo, body.puzzle #commentBtn, body.puzzle #sendIcon, body.puzzle #nagBtn, body.puzzle #clockBtn,
+body.puzzle #micBtn, body.puzzle #engineBtn, body.puzzle .voice, body.puzzle .player, body.puzzle .nav, body.puzzle .strip,
+body.puzzle #curComment, body.puzzle .engine, body.puzzle .graph, body.puzzle .arrows,
+body.puzzle .app > .col + .col { display: none !important; }
+.puz { display: grid; gap: 8px; max-width: 520px; }
+.puz[hidden] { display: none; }
+.puz-msg { margin: 0; font-size: 17px; font-weight: 600; min-height: 1.4em; }
+.puz-msg.ok { color: var(--accent); }
+.puz-msg.bad { color: var(--warn); }
+.puz-info { margin: 0; font-size: 13.5px; color: var(--muted); min-height: 1.3em; }
+.puz-act .btn { flex: 1; }
+.puz-act2 { align-items: center; }
+.puz-act2 .spacer { flex: 1; }
+.sq.hint::before { content: ""; position: absolute; inset: 0; box-shadow: inset 0 0 0 4px var(--accent); background: rgba(47,107,79,.18); }
+.sq.bad::before { content: ""; position: absolute; inset: 0; background: rgba(224,97,74,.55); }
+.lv-card { border: 1px solid var(--line); border-radius: 10px; background: var(--surface); padding: 12px 14px; display: grid; gap: 4px; margin-bottom: 4px; }
+.lv-main { display: flex; align-items: baseline; justify-content: space-between; gap: 8px; }
+.lv-label { color: var(--muted); font-size: 14px; }
+.lv-num { font-size: 28px; font-weight: 600; font-family: var(--font-mono); }
+.lv-stats { margin: 0; font-size: 13.5px; color: var(--muted); }
+.lv-themes { display: grid; gap: 2px; font-size: 13.5px; margin: 4px 0 8px; }
+.lv-themes[hidden] { display: none; }
+.lv-themes .row { display: flex; justify-content: space-between; gap: 8px; padding: 4px 0; border-bottom: 1px solid var(--line); }
+.lv-themes .row b { font-weight: 500; }
+.lv-themes .row span { color: var(--muted); font-family: var(--font-mono); font-size: 13px; }
 body.editing .ed-title { display: block; }
 body.editing #menuBtn, body.editing #undo, body.editing #commentBtn, body.editing #sendIcon,
 body.editing .player, body.editing #counter, body.editing #curComment, body.editing .nav,
@@ -456,6 +484,7 @@ textarea.fen { min-height: 0; font-size: 14px; word-break: break-all; }
   <div class="col">
     <div class="topbar">
       <span class="ed-title">Rozestavení pozice</span>
+      <span class="puz-title" id="puzTitle">Úloha</span>
       <button class="icon-btn" id="menuBtn" type="button" aria-label="Menu" aria-controls="drawer" aria-expanded="false"><svg viewBox="0 0 24 24" width="24" height="24" aria-hidden="true"><path d="M4 6h16M4 12h16M4 18h16" stroke="currentColor" stroke-width="2" stroke-linecap="round" fill="none"/></svg></button>
       <button class="icon-btn" id="flip" type="button" aria-label="Otočit šachovnici" title="Otočit šachovnici"><svg viewBox="0 0 24 24" width="24" height="24" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M7 20V5M3.5 8.5L7 5l3.5 3.5M17 4v15M13.5 15.5L17 19l3.5-3.5"/></svg></button>
       <button class="icon-btn" id="undo" type="button" aria-label="Vrátit poslední akci" title="Vrátit poslední akci" hidden><svg viewBox="0 0 24 24" width="24" height="24" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 14L4 9l5-5"/><path d="M4 9h10.5a5.5 5.5 0 0 1 0 11H11"/></svg></button>
@@ -512,6 +541,20 @@ textarea.fen { min-height: 0; font-size: 14px; word-break: break-all; }
       <div class="actions ed-end">
         <button class="btn" id="edCancel" type="button">Zrušit</button>
         <button class="btn primary" id="edDone" type="button">Hotovo, začít partii</button>
+      </div>
+    </section>
+    <section class="puz" id="puzBox" hidden aria-label="Řešení úlohy">
+      <p class="puz-msg" id="puzMsg" role="status" aria-live="polite"></p>
+      <p class="puz-info" id="puzInfo"></p>
+      <div class="actions puz-act">
+        <button class="btn" id="puzHint" type="button">Nápověda</button>
+        <button class="btn" id="puzShow" type="button">Řešení</button>
+        <button class="btn primary" id="puzNext" type="button">Další úloha</button>
+      </div>
+      <div class="actions puz-act2">
+        <button class="btn small" id="puzEdit" type="button" hidden>Do editoru</button>
+        <span class="spacer"></span>
+        <button class="btn small" id="puzEnd" type="button">Ukončit</button>
       </div>
     </section>
     <div class="nav">
@@ -609,6 +652,7 @@ textarea.fen { min-height: 0; font-size: 14px; word-break: break-all; }
     </div>
     <nav class="mlist">
       <button class="mi" type="button" data-page="pgGames"><svg class="mi-ic" viewBox="0 0 24 24" width="22" height="22" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M8 6h12M8 12h12M8 18h12"/><circle cx="4" cy="6" r="1"/><circle cx="4" cy="12" r="1"/><circle cx="4" cy="18" r="1"/></svg><span class="mi-l">Partie v souboru</span><span class="mi-badge" id="gamesCount"></span><svg class="mi-chev" viewBox="0 0 24 24" width="18" height="18" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 6l6 6-6 6"/></svg></button>
+      <button class="mi" type="button" data-page="pgLearn"><svg class="mi-ic" viewBox="0 0 24 24" width="22" height="22" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M2 9l10-5 10 5-10 5z"/><path d="M6 11v5c0 1.7 2.7 3 6 3s6-1.3 6-3v-5"/><path d="M22 9v6"/></svg><span class="mi-l">Výuka: úlohy</span><svg class="mi-chev" viewBox="0 0 24 24" width="18" height="18" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 6l6 6-6 6"/></svg></button>
       <div class="msep"></div>
       <button class="mi" type="button" id="openFile"><svg class="mi-ic" viewBox="0 0 24 24" width="22" height="22" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M3 7a2 2 0 0 1 2-2h4l2 2h8a2 2 0 0 1 2 2v1"/><path d="M3 7v11a2 2 0 0 0 2 2h12.5a2 2 0 0 0 1.9-1.4L22 11H7.5a2 2 0 0 0-1.9 1.4L3 18"/></svg><span class="mi-l">Otevřít soubor</span></button>
       <button class="mi" type="button" id="saveFile"><svg class="mi-ic" viewBox="0 0 24 24" width="22" height="22" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M12 4v11M7.5 10.5L12 15l4.5-4.5"/><path d="M5 19h14"/></svg><span class="mi-l">Uložit</span></button>
@@ -699,6 +743,37 @@ textarea.fen { min-height: 0; font-size: 14px; word-break: break-all; }
     <div class="pfoot">
       <button class="btn primary" id="diagShare" type="button">Sdílet</button>
       <button class="btn" id="diagSave" type="button">Uložit</button>
+    </div>
+  </section>
+  <section class="dpage" id="pgLearn" hidden>
+    <div class="phead">
+      <button class="icon-btn plain" type="button" data-back aria-label="Zpět"><svg viewBox="0 0 24 24" width="22" height="22" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M15 6l-6 6 6 6"/></svg></button>
+      <h2>Výuka: úlohy</h2>
+    </div>
+    <div class="pbody">
+        <div class="lv-card">
+          <div class="lv-main"><span class="lv-label">Moje úroveň</span><span class="lv-num" id="lvRating">–</span></div>
+          <p class="lv-stats" id="lvStats"></p>
+        </div>
+        <label class="srow"><span class="st"><b>Obtížnost</b></span>
+          <select id="lvLevel">
+            <option value="auto">Podle mé úrovně</option>
+            <option value="400-800">Úplný začátečník (do 800)</option>
+            <option value="800-1200">Začátečník (800–1200)</option>
+            <option value="1200-1600">Mírně pokročilý (1200–1600)</option>
+            <option value="1600-2000">Pokročilý (1600–2000)</option>
+            <option value="2000-2300">Silný hráč (2000–2300)</option>
+            <option value="2300-3000">Mistrovská úroveň (od 2300)</option>
+          </select></label>
+        <label class="srow"><span class="st"><b>Téma</b></span><select id="lvTheme"><option value="">Všechna témata</option></select></label>
+        <p class="note" id="lvCount"></p>
+        <div class="lv-themes" id="lvThemes" hidden></div>
+        <p class="note">Úlohy jsou vybrané z databáze úloh Lichessu. Obtížnost je hodnocení úlohy na Lichessu, s Elo hráče odpovídá jen přibližně. Moje úroveň se po každé úloze upraví: vyřešená napoprvé ji zvedne, chyba, nápověda nebo zobrazené řešení ji sníží.</p>
+        <div class="actions"><button class="btn small" id="lvReset" type="button">Začít úroveň znovu</button></div>
+    </div>
+    <div class="pfoot rows">
+      <button class="btn primary" id="lvStart" type="button">Začít řešit</button>
+      <button class="btn" id="lvRetry" type="button" hidden>Opakovat chybné</button>
     </div>
   </section>
   <section class="dpage" id="pgQr" hidden>
@@ -863,7 +938,7 @@ textarea.fen { min-height: 0; font-size: 14px; word-break: break-all; }
     </div>
     <div class="pbody prose">
 
-        <p><strong>PGN editor</strong> <span class="ver-badge">verze 0.25</span></p>
+        <p><strong>PGN editor</strong> <span class="ver-badge">verze 0.26</span></p>
         <p>Jednoduchý editor pro zápis a úpravu šachových partií ve formátu PGN, určený hlavně pro telefon s Androidem. Aplikaci programuje Claude (umělá inteligence od společnosti Anthropic) ve spolupráci s Michalem Slivou, který určuje, co má aplikace umět a jak má vypadat.</p>
         <h3>Co aplikace umí</h3>
         <ul>
@@ -891,6 +966,7 @@ textarea.fen { min-height: 0; font-size: 14px; word-break: break-all; }
           <li>Záloha všech partií a nastavení do jednoho souboru a obnova z něj (v Nastavení).</li>
           <li>V seznamu partií jde vybrat víc partií najednou a uložit je do samostatného souboru nebo smazat, seřadit partie a najít duplicity.</li>
           <li>Načte i zápis v české notaci (J, S, V, D).</li>
+          <li>Výuka: přes 6 000 úloh z databáze Lichessu od úplných začátečníků po mistrovskou úroveň, výběr podle obtížnosti a tématu, vlastní úroveň a opakování chybných úloh. Funguje bez internetu.</li>
           <li>Partie nebo pozice jako QR kód pro přenos do jiného telefonu, načtení QR kódu fotoaparátem nebo z obrázku.</li>
           <li>Potvrzení před smazáním nebo přepsáním partie.</li>
           <li>Volitelně (zapíná se v Nastavení): tlačítko ↶ pro vrácení posledních akcí a komentáře k tahům tlačítkem ✎.</li>
@@ -926,6 +1002,16 @@ textarea.fen { min-height: 0; font-size: 14px; word-break: break-all; }
       <h2>Verze a změny</h2>
     </div>
     <div class="pbody log">
+        <section>
+          <div class="head"><span class="ver-badge">0.26</span><span class="date">16. 11. 2026</span></div>
+          <ul>
+            <li>Nová sekce Výuka: úlohy (menu): 6 270 úloh vybraných z databáze Lichessu, od úplných začátečníků (obtížnost 400) po mistrovskou úroveň (2600). Fungují bez internetu.</li>
+            <li>Výběr obtížnosti (od Úplný začátečník po Mistrovská úroveň, nebo Podle mé úrovně) a tématu: maty jedním až třemi tahy, vidlička, vazba, odtažný útok, oběť, koncovky a další.</li>
+            <li>Úloha se řeší přímo na šachovnici: první tah zahraje soupeř, pak hledáš nejlepší pokračování. Nápověda ukáže figuru a pak pole, Řešení zahraje celé pokračování.</li>
+            <li>Moje úroveň se po každé úloze upraví a podle ní se vybírají další úlohy. Úlohy s chybou jde opakovat, přehled ukazuje úspěšnost podle témat. Pokrok zůstává v telefonu a je součástí zálohy.</li>
+            <li>Vyřešenou úlohu jde poslat do editoru jako novou partii, třeba na rozbor se Stockfishem.</li>
+          </ul>
+        </section>
         <section>
           <div class="head"><span class="ver-badge">0.25</span><span class="date">16. 11. 2026</span></div>
           <ul>
@@ -1182,6 +1268,7 @@ textarea.fen { min-height: 0; font-size: 14px; word-break: break-all; }
           <li><strong>chess.js 0.10.3</strong>, pravidla šachu. © Jeff Hlywa, licence BSD.</li>
           <li><strong>Figury cburnett</strong>, autor Colin M. L. Burnett, převzaté z projektu chessground (Lichess), licence GPL 3.</li>
           <li><strong>Písma IBM Plex Sans a IBM Plex Mono</strong>, © IBM Corp., licence SIL Open Font License 1.1.</li>
+          <li><strong>Úlohy</strong> z databáze úloh Lichessu (database.lichess.org), volné dílo (CC0).</li>
           <li><strong>QR Code Generator for JavaScript 1.4.4</strong>, vytváření QR kódů. © Kazuhiko Arase, licence MIT. QR Code je ochranná známka společnosti DENSO WAVE.</li>
           <li><strong>jsQR 1.4.0</strong>, čtení QR kódů. © Cosmo Wolfe, licence Apache 2.0.</li>
           <li><strong>Tabulka zahájení</strong> (kódy ECO a názvy) z projektu chess-openings, Lichess, volné dílo (CC0). Zdroj: <a href="https://github.com/lichess-org/chess-openings">github.com/lichess-org/chess-openings</a></li>
@@ -1461,12 +1548,15 @@ textarea.fen { min-height: 0; font-size: 14px; word-break: break-all; }
   }
 
   /* ---------- Šachovnice ---------- */
+  // Pozice, se kterou se na šachovnici právě hraje: úloha ve Výuce, jinak zobrazený tah partie
+  function boardGame() { return puz ? puz.chess : gameAt(state.ply); }
   function renderBoard() {
     if (editor) { renderEditorBoard(); return; }
-    const g = gameAt(state.ply);
+    const g = boardGame();
     if ($('fenCur')) $('fenCur').value = g.fen();
     if (typeof renderPlayers === 'function') renderPlayers();
-    const last = lastMoveAt(state.ply);
+    const last = puz ? puz.last : lastMoveAt(state.ply);
+    const flipped = puz ? puz.flip : state.flipped;
     const board = g.board();
     const targets = selected ? g.moves({ square: selected, verbose: true }) : [];
     const inCheck = g.in_check();
@@ -1475,8 +1565,8 @@ textarea.fen { min-height: 0; font-size: 14px; word-break: break-all; }
     boardEl.innerHTML = '';
     for (let vr = 0; vr < 8; vr++) {
       for (let vc = 0; vc < 8; vc++) {
-        const r = state.flipped ? 7 - vr : vr;
-        const c = state.flipped ? 7 - vc : vc;
+        const r = flipped ? 7 - vr : vr;
+        const c = flipped ? 7 - vc : vc;
         const sq = files[c] + (8 - r);
         const p = board[r][c];
         const btn = document.createElement('button');
@@ -1485,6 +1575,8 @@ textarea.fen { min-height: 0; font-size: 14px; word-break: break-all; }
         btn.dataset.sq = sq;
         if (last && (last.from === sq || last.to === sq)) btn.classList.add('last');
         if (selected === sq) btn.classList.add('sel');
+        if (puz && puz.hint === sq) btn.classList.add('hint');
+        if (puz && puz.bad === sq) btn.classList.add('bad');
         if (inCheck && p && p.type === 'k' && p.color === turn) btn.classList.add('check');
         let label = sq;
         if (p) {
@@ -1504,6 +1596,7 @@ textarea.fen { min-height: 0; font-size: 14px; word-break: break-all; }
         boardEl.appendChild(btn);
       }
     }
+    if (puz) return;
     analyzeCurrent();
     drawArrow();
   }
@@ -1516,8 +1609,9 @@ textarea.fen { min-height: 0; font-size: 14px; word-break: break-all; }
 
   function onSquare(sq) {
     if (editor) { editSquare(sq); return; }
-    if (eng.checking) { toast('Počkej, až Stockfish dokončí kontrolu partie.'); return; }
-    const g = gameAt(state.ply);
+    if (eng.checking && !puz) { toast('Počkej, až Stockfish dokončí kontrolu partie.'); return; }
+    if (puz && puz.lock) return;
+    const g = boardGame();
     if (selected) {
       const cands = g.moves({ square: selected, verbose: true }).filter(m => m.to === sq);
       if (cands.length) {
@@ -1555,6 +1649,7 @@ textarea.fen { min-height: 0; font-size: 14px; word-break: break-all; }
   $('promoCancel').addEventListener('click', () => { $('promo').hidden = true; pendingPromo = null; selected = null; renderBoard(); });
 
   async function playMove(from, to, promotion) {
+    if (puz) { puzMove(from, to, promotion); return; }
     const k = state.ply;
     const g = gameAt(k);
     const m = g.move({ from, to, promotion: promotion || 'q' });
@@ -2133,6 +2228,253 @@ textarea.fen { min-height: 0; font-size: 14px; word-break: break-all; }
   }
   $('linkGo').addEventListener('click', () => importLink($('linkIn').value));
   $('linkIn').addEventListener('keydown', e => { if (e.key === 'Enter') { e.preventDefault(); importLink($('linkIn').value); } });
+
+  /* ---------- Výuka: řešení úloh ---------- */
+  // Sbírka úloh je ve vyuka/ulohy.txt (vybraná z databáze úloh Lichessu, nástroj tools/ulohy.js).
+  // Řádek: id|FEN|tahy UCI (první táhne soupeř, pak se střídá řešení a odpovědi)|obtížnost|témata
+  const THEME_NAMES = ['Mat 1 tahem', 'Mat 2 tahy', 'Mat 3 tahy', 'Vidlička', 'Vazba', 'Odtažný útok', 'Dvojitý šach', 'Mat na poslední řadě',
+    'Oběť', 'Odlákání', 'Vlákání', 'Nekrytá figura', 'Chycená figura', 'Proměna pěšce', 'Tichý tah', 'Obrana',
+    'Mezitah', 'Nevýhoda tahu', 'Zahájení', 'Střední hra', 'Koncovka', 'Pěšcová koncovka', 'Věžová koncovka', ''];
+  let puz = null;     // rozehraná úloha
+  let PUZZLES = null; // načtená sbírka
+  const LV_KEY = 'pgn-vyuka';
+  // Pokrok se ukládá jen v telefonu (a do zálohy): úroveň, počty, vyřešené a chybné úlohy, úspěšnost podle témat
+  let lv = { rating: 0, n: 0, clean: 0, seen: [], wrong: [], th: {}, level: 'auto', theme: '' };
+  try { const o = JSON.parse(localStorage.getItem(LV_KEY) || 'null'); if (o) lv = Object.assign(lv, o); } catch (e) {}
+  function saveLv() { try { localStorage.setItem(LV_KEY, JSON.stringify(lv)); } catch (e) {} }
+  async function loadPuzzles() {
+    if (PUZZLES) return PUZZLES;
+    const r = await fetch('vyuka/ulohy.txt');
+    if (!r.ok) throw new Error('sbírka úloh chybí');
+    PUZZLES = (await r.text()).trim().split('\n').map(line => {
+      const f = line.split('|');
+      return { id: f[0], fen: f[1] + ' 0 1', moves: f[2].split(' '), rating: +f[3], themes: f[4] ? f[4].split(',').map(Number) : [] };
+    });
+    return PUZZLES;
+  }
+  function lvRange() {
+    if (lv.level !== 'auto') { const [a, b] = lv.level.split('-').map(Number); return [a, b]; }
+    return [lv.rating - 120, lv.rating + 120];
+  }
+  function lvPool(onlyWrong) {
+    let list = PUZZLES.filter(p => lv.theme === '' || p.themes.includes(+lv.theme));
+    if (onlyWrong) { const w = new Set(lv.wrong); return list.filter(p => w.has(p.id)); }
+    let [a, b] = lvRange();
+    let pool = list.filter(p => p.rating >= a && p.rating < b);
+    // podle mé úrovně: když je v pásmu málo úloh (třeba u vzácného tématu), pásmo se rozšíří
+    while (lv.level === 'auto' && pool.length < 12 && (a > 300 || b < 3000)) { a -= 100; b += 100; pool = list.filter(p => p.rating >= a && p.rating < b); }
+    return pool;
+  }
+  async function renderLearn() {
+    $('lvLevel').value = lv.level;
+    try { await loadPuzzles(); } catch (e) { $('lvCount').textContent = 'Sbírku úloh se nepodařilo načíst.'; return; }
+    const sel = $('lvTheme');
+    if (sel.options.length === 1) {
+      const counts = THEME_NAMES.map((_, i) => PUZZLES.filter(p => p.themes.includes(i)).length);
+      THEME_NAMES.map((n, i) => [n, i]).sort((x, y) => x[0].localeCompare(y[0], 'cs')).forEach(([n, i]) => {
+        if (counts[i] < 20 || !n) return;
+        const o = document.createElement('option'); o.value = String(i); o.textContent = n; sel.appendChild(o);
+      });
+    }
+    sel.value = lv.theme;
+    $('lvRating').textContent = lv.rating ? Math.round(lv.rating) : '–';
+    $('lvStats').textContent = lv.n
+      ? 'Vyřešeno ' + lv.n + ' ' + plural(lv.n, 'úloha', 'úlohy', 'úloh') + ', napoprvé ' + Math.round(lv.clean / lv.n * 100) + ' %.'
+      : 'Zatím žádná vyřešená úloha. Úroveň se nastaví podle první volby a pak se upravuje sama.';
+    const pool = lvPool(false), seen = new Set(lv.seen);
+    const fresh = pool.filter(p => !seen.has(p.id)).length;
+    $('lvCount').textContent = PUZZLES.length + ' úloh ve sbírce. Pro tuto volbu: ' + pool.length + ' ' + plural(pool.length, 'úloha', 'úlohy', 'úloh') + (fresh < pool.length ? ', z toho ' + fresh + ' ještě neřešených.' : '.');
+    // přehled témat: kde se daří a kde ne (od 3 pokusů)
+    const rows = Object.keys(lv.th).map(k => [+k, lv.th[k][0], lv.th[k][1]]).filter(r => r[2] >= 3 && THEME_NAMES[r[0]] && r[0] < 18)
+      .sort((x, y) => x[1] / x[2] - y[1] / y[2]).slice(0, 6);
+    const box = $('lvThemes');
+    box.hidden = !rows.length;
+    box.innerHTML = '';
+    if (rows.length) {
+      const h = document.createElement('p'); h.className = 'note'; h.style.margin = '0 0 2px'; h.textContent = 'Úspěšnost podle témat (od nejslabšího):'; box.appendChild(h);
+      rows.forEach(([i, ok, n]) => { const d = document.createElement('div'); d.className = 'row'; const b = document.createElement('b'); b.textContent = THEME_NAMES[i]; const sp = document.createElement('span'); sp.textContent = ok + ' z ' + n; d.append(b, sp); box.appendChild(d); });
+    }
+    $('lvRetry').hidden = !lv.wrong.length;
+    $('lvRetry').textContent = 'Opakovat chybné (' + lv.wrong.length + ')';
+  }
+  $('lvLevel').addEventListener('change', e => { lv.level = e.target.value; saveLv(); renderLearn(); });
+  $('lvTheme').addEventListener('change', e => { lv.theme = e.target.value; saveLv(); renderLearn(); });
+  $('lvReset').addEventListener('click', async () => {
+    if (!(await askConfirm('Začít úroveň znovu?', 'Smaže se úroveň, počty vyřešených úloh, seznam chybných úloh a úspěšnost podle témat.', 'Začít znovu'))) return;
+    lv = Object.assign(lv, { rating: 0, n: 0, clean: 0, seen: [], wrong: [], th: {} });
+    saveLv(); renderLearn();
+  });
+  // Při prvním řešení podle úrovně se aplikace zeptá, jak silně student hraje
+  async function lvStartRating() {
+    if (lv.rating) return true;
+    const i = await askChoice('Jak silně hraješ?', 'Podle toho začnou úlohy. Dál se obtížnost upravuje sama podle toho, jak se ti daří.',
+      ['Začínám, učím se pravidla', 'Umím pravidla, hraju první turnaje', 'Hraju turnaje (Elo kolem 1200)', 'Pokročilý (Elo kolem 1600)', 'Silný hráč (Elo 2000 a víc)']);
+    if (i < 0) return false;
+    lv.rating = [500, 800, 1200, 1600, 2000][i];
+    saveLv();
+    return true;
+  }
+  $('lvStart').addEventListener('click', async () => { if (lv.level === 'auto' && !(await lvStartRating())) return; puzStart(false); });
+  $('lvRetry').addEventListener('click', () => puzStart(true));
+  function pickPuzzle(onlyWrong) {
+    const pool = lvPool(onlyWrong);
+    if (!pool.length) return null;
+    const seen = new Set(lv.seen);
+    const fresh = onlyWrong ? pool : pool.filter(p => !seen.has(p.id));
+    const from = fresh.length ? fresh : pool; // když je všechno vyřešené, úlohy se opakují
+    const last = puz && puz.p;
+    const cand = from.length > 1 ? from.filter(p => p !== last) : from;
+    return cand[Math.floor(Math.random() * cand.length)];
+  }
+  async function puzStart(onlyWrong) {
+    try { await loadPuzzles(); } catch (e) { showInfo('Výuka', 'Sbírku úloh se nepodařilo načíst.'); return; }
+    const p = pickPuzzle(onlyWrong);
+    if (!p) { toast(onlyWrong ? 'Žádné chybné úlohy k opakování.' : 'Pro tuto volbu nejsou žádné úlohy.'); return; }
+    if (drawerOpen()) setDrawer(false);
+    if (engineOn) setEngineOn(false);
+    if (voice.on) voiceStop();
+    selected = null;
+    const chess = new Chess(p.fen);
+    puz = { p, chess, k: 0, last: null, hint: null, bad: null, failed: false, hinted: false, done: false, lock: true, retry: onlyWrong, flip: chess.turn() === 'w' };
+    document.body.classList.add('puzzle');
+    $('puzBox').hidden = false;
+    $('puzEdit').hidden = true;
+    $('puzTitle').textContent = 'Úloha · obtížnost ' + p.rating;
+    puzMsg('', '');
+    $('puzInfo').textContent = onlyWrong ? 'Opakování úlohy, ve které byla chyba.' : '';
+    puzButtons();
+    renderBoard();
+    window.scrollTo(0, 0);
+    // první tah zahraje soupeř, pak je na řadě student
+    setTimeout(() => {
+      if (!puz || puz.p !== p) return;
+      puzAuto();
+      puz.lock = false;
+      const me = puz.chess.turn() === 'w' ? 'Bílý' : 'Černý';
+      puzMsg(me + ' na tahu. Najdi nejlepší tah.', '');
+      puzButtons(); renderBoard();
+    }, 700);
+  }
+  function puzMsg(t, kind) { const m = $('puzMsg'); m.textContent = t; m.className = 'puz-msg' + (kind ? ' ' + kind : ''); }
+  function puzButtons() {
+    $('puzHint').disabled = $('puzShow').disabled = !!(puz && (puz.done || puz.lock));
+    $('puzNext').textContent = puz && puz.done ? 'Další úloha' : 'Přeskočit';
+    $('puzNext').classList.toggle('primary', !!(puz && puz.done));
+  }
+  const uciOf = m => m.from + m.to + (m.promotion || '');
+  function uciMove(chess, u) { return chess.move({ from: u.slice(0, 2), to: u.slice(2, 4), promotion: u[4] || 'q' }); }
+  // tah ze zadání (soupeřův), zvýrazní se jako poslední tah
+  function puzAuto() {
+    const m = uciMove(puz.chess, puz.p.moves[puz.k]);
+    puz.last = m; puz.k++;
+    haptic(15);
+  }
+  function puzMove(from, to, promotion) {
+    if (!puz || puz.done || puz.lock) return;
+    selected = null;
+    const want = puz.p.moves[puz.k];
+    const test = new Chess(puz.chess.fen());
+    const m = test.move({ from, to, promotion: promotion || 'q' });
+    if (!m) { renderBoard(); return; }
+    // správně je tah ze řešení, nebo jakýkoli tah, který dá mat (u matu jedním tahem jich může být víc)
+    if (uciOf(m) === want || (m.san.endsWith('#') && puz.k === puz.p.moves.length - 1)) {
+      puz.chess.move({ from, to, promotion: promotion || 'q' });
+      puz.last = m; puz.k++; puz.hint = null;
+      haptic(m.captured ? 40 : 20);
+      if (puz.k >= puz.p.moves.length) { puzSolved(); return; }
+      puzMsg('Správně! Pokračuj…', 'ok');
+      puz.lock = true; puzButtons(); renderBoard();
+      setTimeout(() => {
+        if (!puz || puz.done) return;
+        puzAuto(); puz.lock = false;
+        puzMsg('Správně! Najdi další tah.', 'ok');
+        puzButtons(); renderBoard();
+      }, 550);
+      return;
+    }
+    // chyba: tah se nezahraje, pole se krátce rozsvítí
+    puz.failed = true;
+    puz.bad = to;
+    puzMsg('To není ono. Zkus to znovu.', 'bad');
+    haptic(60);
+    renderBoard();
+    setTimeout(() => { if (puz && puz.bad === to) { puz.bad = null; renderBoard(); } }, 600);
+  }
+  $('puzHint').addEventListener('click', () => {
+    if (!puz || puz.done) return;
+    puz.hinted = true;
+    const want = puz.p.moves[puz.k];
+    if (puz.hint !== want.slice(0, 2)) { puz.hint = want.slice(0, 2); puzMsg('Táhni figurou na zvýrazněném poli.', ''); }
+    else { selected = want.slice(0, 2); puz.hint = want.slice(2, 4); puzMsg('Táhni na zvýrazněné pole.', ''); }
+    renderBoard();
+  });
+  $('puzShow').addEventListener('click', () => {
+    if (!puz || puz.done) return;
+    puz.failed = true; puz.lock = true; puz.hint = null; selected = null;
+    puzMsg('Řešení…', '');
+    puzButtons();
+    const step = () => {
+      if (!puz || puz.done) return;
+      if (puz.k >= puz.p.moves.length) { puzSolved(); return; }
+      puzAuto(); renderBoard();
+      setTimeout(step, 800);
+    };
+    step();
+  });
+  function puzSolved() {
+    const p = puz.p, clean = !puz.failed && !puz.hinted;
+    puz.done = true; puz.lock = true; puz.hint = null;
+    // úroveň: jako Elo, na začátku se mění rychleji, aby se rychle našla správná obtížnost
+    if (lv.rating && !puz.retry) {
+      const exp = 1 / (1 + Math.pow(10, (p.rating - lv.rating) / 400));
+      const K = lv.n < 15 ? 60 : lv.n < 50 ? 40 : 24;
+      lv.rating = Math.max(400, Math.min(3000, lv.rating + K * ((clean ? 1 : 0) - exp)));
+    }
+    lv.n++; if (clean) lv.clean++;
+    if (lv.seen.indexOf(p.id) === -1) { lv.seen.push(p.id); if (lv.seen.length > 7000) lv.seen.shift(); }
+    lv.wrong = lv.wrong.filter(x => x !== p.id);
+    if (!clean) lv.wrong.push(p.id);
+    if (lv.wrong.length > 300) lv.wrong.shift();
+    p.themes.forEach(t => { const a = lv.th[t] || [0, 0]; a[1]++; if (clean) a[0]++; lv.th[t] = a; });
+    saveLv();
+    puzMsg(clean ? 'Vyřešeno napoprvé!' : puz.hinted && !puz.failed ? 'Vyřešeno s nápovědou.' : 'Hotovo. Úloha se ti později připomene.', clean ? 'ok' : '');
+    const names = p.themes.filter(t => t < 18 || t === 21 || t === 22).map(t => THEME_NAMES[t]).filter(Boolean);
+    $('puzInfo').textContent = (names.length ? 'Téma: ' + names.join(', ') + '. ' : '') + (lv.rating ? 'Moje úroveň: ' + Math.round(lv.rating) + '.' : '');
+    $('puzEdit').hidden = false;
+    haptic(clean ? 60 : 20);
+    puzButtons(); renderBoard();
+  }
+  $('puzNext').addEventListener('click', () => {
+    if (puz && !puz.done && !puz.lock) { // přeskočená úloha se počítá jako nevyřešená, ale bez připomenutí
+      if (lv.rating && !puz.retry) { const exp = 1 / (1 + Math.pow(10, (puz.p.rating - lv.rating) / 400)); lv.rating = Math.max(400, lv.rating - 16 * exp); saveLv(); }
+    }
+    puzStart(!!(puz && puz.retry && lv.wrong.length));
+  });
+  function puzEnd() {
+    puz = null; selected = null;
+    document.body.classList.remove('puzzle');
+    $('puzBox').hidden = true;
+    renderAll();
+  }
+  $('puzEnd').addEventListener('click', puzEnd);
+  // Úloha do editoru: nová partie z výchozí pozice úlohy s celým řešením, třeba na rozbor se Stockfishem
+  $('puzEdit').addEventListener('click', () => {
+    if (!puz) return;
+    const p = puz.p, c = new Chess(p.fen);
+    uciMove(c, p.moves[0]);
+    const fen = c.fen();
+    const sans = p.moves.slice(1).map(u => uciMove(c, u).san);
+    puzEnd();
+    addGame(fen);
+    let node = state.root;
+    sans.forEach(san => { const n = newNode(san); node.ch.push(n); node = n; });
+    state.headers.Event = 'Uloha Lichess ' + p.id;
+    state.headers.Site = 'https://lichess.org/training/' + p.id;
+    state.root.c = 'Obtiznost ' + p.rating;
+    state.ply = 0;
+    rebuildLine(); fillTags(); renderAll();
+    toast('Úloha je v souboru jako nová partie.');
+  });
 
   /* ---------- QR kód ---------- */
   // Partie nebo pozice jako QR kód s obyčejným textem PGN nebo FEN. Přečte ho i fotoaparát
@@ -2922,6 +3264,7 @@ textarea.fen { min-height: 0; font-size: 14px; word-break: break-all; }
     if (!$('scanBox').hidden) { scanStop(); return true; }
     if (voice.on && $('modal').hidden && $('chModal').hidden) { voiceStop(); $('voiceBar').hidden = true; return true; }
     if (editor && $('modal').hidden) { closeEditor(); return true; }
+    if (puz && $('modal').hidden && $('chModal').hidden && !drawerOpen()) { puzEnd(); return true; }
     if (!$('modal').hidden && $('modalCancel').hidden) { $('modalOk').click(); return true; }
     for (const [box, btn] of [['modal', 'modalCancel'], ['cModal', 'cCancel'], ['kModal', 'kCancel'], ['nModal', 'nCancel'], ['chModal', 'chCancel'], ['lModal', 'lClose'], ['promo', 'promoCancel']]) {
       if (!$(box).hidden) { $(btn).click(); return true; }
@@ -3101,7 +3444,7 @@ textarea.fen { min-height: 0; font-size: 14px; word-break: break-all; }
 
   // Průběžný rozbor zobrazené pozice
   function analyzeCurrent() {
-    if (!engineOn || eng.checking || editor || document.hidden) return;
+    if (!engineOn || eng.checking || editor || puz || document.hidden) return;
     const g = gameAt(state.ply), fen = g.fen();
     if (fen === eng.liveFen) return;
     eng.liveFen = fen; eng.liveDone = false; eng.lines = []; eng.depth = 0; eng.error = '';
@@ -3748,6 +4091,7 @@ textarea.fen { min-height: 0; font-size: 14px; word-break: break-all; }
     if (id === 'pgGames') { renderGames(true); }
     if (id === 'pgImage') { $('diagCaption').value = autoCaption(); refreshDiagram(); }
     if (id === 'pgQr') renderQr();
+    if (id === 'pgLearn') renderLearn();
     const pb = $(id).querySelector('.pbody, .mlist');
     if (pb && id !== 'pgGames') pb.scrollTop = 0;
   }
@@ -3800,7 +4144,7 @@ textarea.fen { min-height: 0; font-size: 14px; word-break: break-all; }
     const ignore = el => el.closest('.board-wrap, .strip, .graph, input, textarea, select, .engine, .sugg, .moves .var');
     document.querySelector('.app').addEventListener('touchstart', e => {
       t0 = null;
-      if (e.touches.length !== 1 || FILE.games.length < 2 || editor || eng.checking || drawerOpen()) return;
+      if (e.touches.length !== 1 || FILE.games.length < 2 || editor || puz || eng.checking || drawerOpen()) return;
       const t = e.touches[0];
       if (t.clientX < 28 || t.clientX > window.innerWidth - 28 || ignore(e.target)) return; // okraje patří gestu Zpět
       t0 = { x: t.clientX, y: t.clientY, time: Date.now() };
@@ -4179,10 +4523,10 @@ textarea.fen { min-height: 0; font-size: 14px; word-break: break-all; }
   let drag = null;
   let suppressClick = false;
   boardEl.addEventListener('pointerdown', e => {
-    if (editor || eng.checking) return;
+    if (editor || (eng.checking && !puz) || (puz && puz.lock)) return;
     const btn = e.target.closest('.sq');
     if (!btn || e.button > 0) return;
-    const g = gameAt(state.ply);
+    const g = boardGame();
     const p = g.get(btn.dataset.sq);
     if (!p || p.color !== g.turn()) return;
     drag = { from: btn.dataset.sq, x: e.clientX, y: e.clientY, started: false, ghost: null, cls: 'p-' + p.color + p.type };
@@ -4216,7 +4560,7 @@ textarea.fen { min-height: 0; font-size: 14px; word-break: break-all; }
     const el = cancelled ? null : document.elementFromPoint(e.clientX, e.clientY);
     const target = el && el.closest ? el.closest('.sq') : null;
     if (target && target.dataset.sq !== d.from) {
-      const g = gameAt(state.ply);
+      const g = boardGame();
       const legal = g.moves({ square: d.from, verbose: true }).some(m => m.to === target.dataset.sq);
       if (legal) { selected = d.from; onSquare(target.dataset.sq); return; }
     }
@@ -4233,9 +4577,12 @@ textarea.fen { min-height: 0; font-size: 14px; word-break: break-all; }
   $('navNext').addEventListener('click', () => go(state.ply + 1));
   $('navEnd').addEventListener('click', () => go(state.moves.length));
   $('undo').addEventListener('click', undo);
-  $('flip').addEventListener('click', () => { state.flipped = !state.flipped; renderBoard(); persist(); });
+  $('flip').addEventListener('click', () => {
+    if (puz) { puz.flip = !puz.flip; renderBoard(); return; }
+    state.flipped = !state.flipped; renderBoard(); persist();
+  });
   document.addEventListener('keydown', e => {
-    if (/^(INPUT|TEXTAREA|SELECT)$/.test(e.target.tagName) || !$('modal').hidden || !$('cModal').hidden || !$('kModal').hidden) return;
+    if (/^(INPUT|TEXTAREA|SELECT)$/.test(e.target.tagName) || !$('modal').hidden || !$('cModal').hidden || !$('kModal').hidden || puz) return;
     if (e.key === 'ArrowLeft') go(state.ply - 1);
     else if (e.key === 'ArrowRight') go(state.ply + 1);
     else if (e.key === 'Home') go(0);

@@ -30,6 +30,11 @@ SOUBORY
 • Stažení partie z odkazu na Lichess nebo Chess.com.
 • Záloha všech partií a nastavení do jednoho souboru.
 
+VÝUKA
+• Přes 6 000 šachových úloh od úplných začátečníků po mistrovskou úroveň, bez internetu.
+• Výběr podle obtížnosti a tématu: maty, vidlička, vazba, oběť, koncovky a další.
+• Vlastní úroveň, která roste s vyřešenými úlohami, a opakování úloh s chybou.
+
 ROZBOR
 • Volitelně šachový motor Stockfish: hodnocení pozice, nejlepší pokračování a kontrola celé partie.
 • Graf průběhu partie.

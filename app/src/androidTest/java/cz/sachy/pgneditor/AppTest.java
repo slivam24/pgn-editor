@@ -234,6 +234,22 @@ public class AppTest {
         waitFor("QR kód pozice", "/Pozice/.test(document.getElementById('qrNote').textContent)");
     }
 
+    /** Výuka: sbírka úloh se načte ve WebView a úloha se rozehraje na šachovnici. */
+    @Test
+    public void learningStartsPuzzle() throws Exception {
+        scenario = ActivityScenario.launch(MainActivity.class);
+        waitBooted();
+        js("document.getElementById('menuBtn').click(); document.querySelector('[data-page=pgLearn]').click(); return 0;");
+        waitFor("sbírka úloh", "/\\d+ úloh ve sbírce/.test(document.getElementById('lvCount').textContent)");
+        js("document.getElementById('lvLevel').value = 'auto'; document.getElementById('lvStart').click(); return 0;");
+        // při prvním řešení se aplikace zeptá, jak silně student hraje: odpoví se jako hráč kolem 1200
+        waitFor("rozehraná úloha", "(function () { var m = document.getElementById('chModal');"
+                + " if (!m.hidden) { document.querySelectorAll('#chBtns button')[2].click(); return false; }"
+                + " return document.body.classList.contains('puzzle') && /Najdi nejlepší tah/.test(document.getElementById('puzMsg').textContent); })()");
+        js("document.getElementById('puzEnd').click(); return 0;");
+        waitFor("konec úlohy", "!document.body.classList.contains('puzzle')");
+    }
+
     @Test
     public void themeSwitchDoesNotBreakApp() throws Exception {
         scenario = ActivityScenario.launch(MainActivity.class);
