@@ -40,7 +40,6 @@ const arg = (name, def) => { const i = args.indexOf('--' + name); return i === -
 const LIMIT = +arg('limit', 600), ESTIMATE = +arg('odhad', 20), THREADS = +arg('vlakna', 4), TT = +arg('tt', 24);
 const MD = arg('md', null);
 const CACHE = path.join(__dirname, 'pesci-analyza.json');
-const MIN = P.MIN_PAWNS;
 
 let cache = {};
 if (!args.includes('--znovu')) try { cache = JSON.parse(fs.readFileSync(CACHE, 'utf8')); } catch (e) {}
@@ -108,36 +107,73 @@ function report() {
   out();
 
   // Série: z každého stavu (a, b) vede výhra bílého do (a-1, b), výhra černého do (a, b-1);
-  // kdo vyhraje kolo s MIN pěšci, vyhrál sérii. Bílý = hráč, černý = počítač.
+  // kdo vyhraje kolo s nejmenším počtem (min), vyhrál sérii. Bílý = hráč, černý = počítač.
+  // Nevyřešené dvojice se projdou ve všech možných výsledcích.
+  const unknown = [];
+  for (let a = 1; a <= 8; a++) for (let b = 1; b <= 8; b++) { const r = R(a, b); if (!r || !r.exact) unknown.push([a, b]); }
+  const variants = []; // každá varianta: { pick: { 'avb': 'w'|'b' }, label }
+  for (let m = 0; m < (1 << unknown.length); m++) {
+    const pick = {};
+    unknown.forEach(([a, b], i) => { pick[a + 'v' + b] = (m >> i) & 1 ? 'w' : 'b'; });
+    variants.push(pick);
+  }
+  const theory = (pick, a, b) => { const r = R(a, b); return r && r.exact ? r.winner : pick[a + 'v' + b]; };
+  function perfectSeries(min, pick) {
+    let s = P.newSeries({ minPawns: min });
+    const path = [];
+    while (!s.winner) { const w = theory(pick, s.white, s.black); path.push(s.white + '-' + s.black + ' ' + (w === 'w' ? 'B' : 'Č')); s = P.nextRound(s, w); }
+    return { winner: s.winner, rounds: s.round - 1, path };
+  }
+  const unknownText = unknown.map(([a, b]) => a + ' proti ' + b).join(', ');
+
   out('## Série kol při dokonalé hře obou stran');
   out();
-  const winnerOf = (a, b) => { const r = R(a, b); return !r ? null : r.exact ? r.winner : null; };
-  let s = P.newSeries(), path = [], ok = true;
-  while (!s.winner) {
-    const w = winnerOf(s.white, s.black);
-    if (!w) { ok = false; path.push(s.white + '-' + s.black + ' (nevyřešeno)'); break; }
-    path.push(s.white + '-' + s.black + ' ' + (w === 'w' ? 'B' : 'Č'));
-    s = P.nextRound(s, w);
-  }
-  out('Průběh od 8-8 (počty bílý-černý a vítěz kola): ' + path.join(', ') + '.');
-  if (ok) out('Sérii vyhraje **' + name(s.winner) + '** po ' + (s.round - 1) + ' kolech (' + s.wins.w + ' : ' + s.wins.b + ' na kola).');
+  out('Série začíná 8-8 (bílý-černý), vítězi kola ubude pěšec, kdo vyhraje kolo s nejmenším počtem pěšců, vyhrál sérii.');
+  out('Bílý je hráč, černý počítač. Pro srovnání i varianta, kdy série končí výhrou se 4 pěšci.');
+  if (unknown.length) out('Nevyřešené dvojice (' + unknownText + ') se berou ve všech ' + variants.length + ' možných výsledcích.');
   out();
+  for (const min of [3, 4]) {
+    out('### Série končí výhrou se ' + min + ' pěšci');
+    out();
+    // kdo vůbec může vyhrát kolo s nejmenším počtem
+    const beatsW = [], beatsB = [];
+    for (let x = min; x <= 8; x++) {
+      const rw = R(min, x), rb = R(x, min);
+      if (rw && rw.exact && rw.winner === 'w') beatsW.push(x);
+      if (rb && rb.exact && rb.winner === 'b') beatsB.push(x);
+    }
+    out('Bílý se ' + min + ' pěšci vyhraje proti ' + (beatsW.length ? beatsW.join(', ') + ' černým' : 'žádnému povolenému počtu černých') +
+      ', černý se ' + min + ' pěšci vyhraje proti ' + (beatsB.length ? beatsB.join(', ') + ' bílým' : 'žádnému povolenému počtu bílých') + '.');
+    out();
+    const groups = new Map();
+    for (const pick of variants) {
+      const r = perfectSeries(min, pick);
+      const k = r.path.join(', ');
+      if (!groups.has(k)) groups.set(k, { r, n: 0 });
+      groups.get(k).n++;
+    }
+    for (const { r, n } of groups.values()) {
+      out('- ' + (unknown.length ? n + ' z ' + variants.length + ' možností: ' : '') + r.path.join(', ') + ' → sérii vyhraje **' + name(r.winner) + '** po ' + r.rounds + ' kolech.');
+    }
+    out();
+  }
 
   // Pravděpodobnost výhry v sérii, když teoretický vítěz kola opravdu vyhraje s pravděpodobností p
   // (model nedokonalé hry). U nevyřešených dvojic se použije odhad enginu.
   out('## Série při nedokonalé hře (model)');
   out();
-  out('Předpoklad: kolo vyhraje strana, která má pozici teoreticky vyhranou, s pravděpodobností p, jinak soupeř.');
-  out('U nevyřešených dvojic se bere odhad enginu. Tabulka ukazuje pravděpodobnost, že sérii od 8-8 vyhraje bílý.');
+  out('Předpoklad: kolo vyhraje strana, která má pozici teoreticky vyhranou, s pravděpodobností p, jinak soupeř');
+  out('(p = 0,5 je hra náhodná, p = 1 dokonalá). U nevyřešených dvojic se bere odhad enginu.');
+  out('Tabulka ukazuje pravděpodobnost, že sérii od 8-8 vyhraje bílý, a průměrný počet kol.');
   out();
-  out('| p | bílý vyhraje sérii | průměrný počet kol |');
-  out('|---|---|---|');
+  out('| p | konec se 3 pěšci | kol | konec se 4 pěšci | kol |');
+  out('|---|---|---|---|---|');
   for (const p of [0.5, 0.6, 0.7, 0.8, 0.9, 1]) {
-    const m = seriesOdds(p);
-    out('| ' + p.toFixed(1) + ' | ' + (100 * m.white).toFixed(1) + ' % | ' + m.rounds.toFixed(1) + ' |');
+    const m3 = seriesOdds(p, 3), m4 = seriesOdds(p, 4);
+    out('| ' + p.toFixed(1) + ' | ' + (100 * m3.white).toFixed(1) + ' % | ' + m3.rounds.toFixed(1) + ' | ' + (100 * m4.white).toFixed(1) + ' % | ' + m4.rounds.toFixed(1) + ' |');
   }
   out();
-  function seriesOdds(p) {
+  function seriesOdds(p, min) {
     const memo = new Map();
     const go = (a, b) => { // { white: P(bílý vyhraje sérii), rounds: střední počet zbývajících kol }
       const k = a + ',' + b;
@@ -145,8 +181,8 @@ function report() {
       const r = R(a, b);
       const tw = r ? (r.exact ? r.winner : r.estimateWinner) : 'w';
       const pw = tw === 'w' ? p : 1 - p; // pravděpodobnost, že kolo vyhraje bílý
-      const ifW = a - 1 < MIN ? { white: 1, rounds: 0 } : go(a - 1, b);
-      const ifB = b - 1 < MIN ? { white: 0, rounds: 0 } : go(a, b - 1);
+      const ifW = a - 1 < min ? { white: 1, rounds: 0 } : go(a - 1, b);
+      const ifB = b - 1 < min ? { white: 0, rounds: 0 } : go(a, b - 1);
       const v = { white: pw * ifW.white + (1 - pw) * ifB.white, rounds: 1 + pw * ifW.rounds + (1 - pw) * ifB.rounds };
       memo.set(k, v);
       return v;

@@ -511,5 +511,72 @@
   "winner": "w",
   "nodes": 60225212,
   "exact": true
+ },
+ "6v7": {
+  "a": 6,
+  "b": 7,
+  "limit": 5400,
+  "ms": 63756,
+  "winner": "b",
+  "nodes": 97567757,
+  "exact": true
+ },
+ "8v6": {
+  "a": 8,
+  "b": 6,
+  "limit": 5400,
+  "ms": 324210,
+  "winner": "w",
+  "nodes": 516063512,
+  "exact": true
+ },
+ "6v8": {
+  "a": 6,
+  "b": 8,
+  "limit": 5400,
+  "ms": 864554,
+  "winner": "b",
+  "nodes": 1419418275,
+  "exact": true
+ },
+ "7v7": {
+  "a": 7,
+  "b": 7,
+  "limit": 5400,
+  "ms": 5400000,
+  "exact": false,
+  "estimate": -2,
+  "estimateDepth": 14,
+  "estimateWinner": "b"
+ },
+ "7v8": {
+  "a": 7,
+  "b": 8,
+  "limit": 5400,
+  "ms": 5400001,
+  "exact": false,
+  "estimate": -30,
+  "estimateDepth": 14,
+  "estimateWinner": "b"
+ },
+ "8v7": {
+  "a": 8,
+  "b": 7,
+  "limit": 5400,
+  "ms": 5400001,
+  "exact": false,
+  "estimate": 42,
+  "estimateDepth": 13,
+  "estimateWinner": "w"
+ },
+ "8v8": {
+  "a": 8,
+  "b": 8,
+  "limit": 5400,
+  "ms": 5400001,
+  "exact": false,
+  "estimate": 18,
+  "estimateDepth": 13,
+  "estimateWinner": "w"
  }
 }
