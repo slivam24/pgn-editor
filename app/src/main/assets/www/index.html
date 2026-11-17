@@ -200,7 +200,7 @@ body.editing .graph { display: none !important; }
 /* Výuka: řešení úloh */
 .puz-title { display: none; font-weight: 600; font-size: 17px; flex: 1; }
 body.puzzle .puz-title { display: block; }
-body.drill #flip, body.pawns #flip { display: none; }
+body.drill #flip, body.hra #flip { display: none; }
 body.puzzle #menuBtn, body.puzzle #undo, body.puzzle #commentBtn, body.puzzle #sendIcon, body.puzzle #nagBtn, body.puzzle #clockBtn,
 body.puzzle #micBtn, body.puzzle #engineBtn, body.puzzle .voice, body.puzzle .player, body.puzzle .nav, body.puzzle .strip,
 body.puzzle #curComment, body.puzzle .engine, body.puzzle .graph, body.puzzle .arrows,
@@ -276,8 +276,12 @@ body.puzzle .app > .col + .col { display: none !important; }
 .pw-mid { display: grid; justify-items: center; line-height: 1.15; }
 .pw-mid small { font-size: 11px; color: var(--muted); text-transform: uppercase; letter-spacing: .05em; }
 .pw-mid b { font-family: var(--font-mono); font-size: 18px; }
-.pw-level { display: flex; }
-.pw-level .btn { flex: 1; min-width: 0; }
+.pw-level, .vl-side { display: flex; }
+.pw-level .btn, .vl-side .btn { flex: 1; min-width: 0; }
+/* Vlci a ovečka: vlastní obrázky, nepoužívaná černá pole ztlumená */
+.p-sheep { background-image: url('data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCA0NSA0NSI+PHBhdGggZD0iTTE1IDMxdjdNMjAgMzJ2N00yNyAzMnY3TTMyIDMxdjciIHN0cm9rZT0iIzJiMmIyYiIgc3Ryb2tlLXdpZHRoPSIyLjYiIHN0cm9rZS1saW5lY2FwPSJyb3VuZCIvPjxnIGZpbGw9IiNmZmYiIHN0cm9rZT0iIzJiMmIyYiIgc3Ryb2tlLXdpZHRoPSIxLjYiPjxjaXJjbGUgY3g9IjE1IiBjeT0iMjMiIHI9IjYuNSIvPjxjaXJjbGUgY3g9IjIxIiBjeT0iMTciIHI9IjYuNSIvPjxjaXJjbGUgY3g9IjI5IiBjeT0iMTcuNSIgcj0iNi41Ii8+PGNpcmNsZSBjeD0iMzQiIGN5PSIyNCIgcj0iNiIvPjxjaXJjbGUgY3g9IjE5IiBjeT0iMjkiIHI9IjYiLz48Y2lyY2xlIGN4PSIyOCIgY3k9IjI5LjUiIHI9IjYiLz48L2c+PGcgZmlsbD0iI2ZmZiI+PGNpcmNsZSBjeD0iMTUiIGN5PSIyMyIgcj0iNS42Ii8+PGNpcmNsZSBjeD0iMjEiIGN5PSIxNyIgcj0iNS42Ii8+PGNpcmNsZSBjeD0iMjkiIGN5PSIxNy41IiByPSI1LjYiLz48Y2lyY2xlIGN4PSIzNCIgY3k9IjI0IiByPSI1LjEiLz48Y2lyY2xlIGN4PSIxOSIgY3k9IjI5IiByPSI1LjEiLz48Y2lyY2xlIGN4PSIyOCIgY3k9IjI5LjUiIHI9IjUuMSIvPjxjaXJjbGUgY3g9IjI0IiBjeT0iMjMuNSIgcj0iNy41Ii8+PC9nPjxlbGxpcHNlIGN4PSI5LjUiIGN5PSIxOCIgcng9IjUiIHJ5PSI2IiBmaWxsPSIjM2IzYjNiIiBzdHJva2U9IiMyYjJiMmIiIHN0cm9rZS13aWR0aD0iMS4yIi8+PGVsbGlwc2UgY3g9IjUuNiIgY3k9IjE0LjIiIHJ4PSIyLjYiIHJ5PSIxLjMiIHRyYW5zZm9ybT0icm90YXRlKC0zMCA1LjYgMTQuMikiIGZpbGw9IiMzYjNiM2IiLz48ZWxsaXBzZSBjeD0iMTMuNiIgY3k9IjEzLjYiIHJ4PSIyLjQiIHJ5PSIxLjIiIHRyYW5zZm9ybT0icm90YXRlKDM1IDEzLjYgMTMuNikiIGZpbGw9IiMzYjNiM2IiLz48Y2lyY2xlIGN4PSI4IiBjeT0iMTciIHI9IjEuMiIgZmlsbD0iI2ZmZiIvPjxjaXJjbGUgY3g9IjExLjYiIGN5PSIxNyIgcj0iMS4yIiBmaWxsPSIjZmZmIi8+PGNpcmNsZSBjeD0iOCIgY3k9IjE3LjIiIHI9Ii41NSIgZmlsbD0iIzExMSIvPjxjaXJjbGUgY3g9IjExLjYiIGN5PSIxNy4yIiByPSIuNTUiIGZpbGw9IiMxMTEiLz48L3N2Zz4='); }
+.p-wolf { background-image: url('data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCA0NSA0NSI+PHBhdGggZD0iTTggNS41bDkgMTBoMTFsOS0xMCAxLjUgMTUuNUMzOC41IDMxIDMxLjUgMzkgMjIuNSA0MCAxMy41IDM5IDYuNSAzMSA2LjUgMjF6IiBmaWxsPSIjNmY3NjgwIiBzdHJva2U9IiMyNTI4MmMiIHN0cm9rZS13aWR0aD0iMS42IiBzdHJva2UtbGluZWpvaW49InJvdW5kIi8+PHBhdGggZD0iTTEwLjUgMTBsNC41IDYuMk0zNC41IDEwbC00LjUgNi4yIiBzdHJva2U9IiNkOGI0YWUiIHN0cm9rZS13aWR0aD0iMi40IiBzdHJva2UtbGluZWNhcD0icm91bmQiLz48cGF0aCBkPSJNMTQgMjUuNWMzLTEgNSAxIDguNSAxczUuNS0yIDguNS0xYy0uNSA3LTQgMTEuNS04LjUgMTItNC41LS41LTgtNS04LjUtMTJ6IiBmaWxsPSIjZTZlNmU2IiBzdHJva2U9IiMyNTI4MmMiIHN0cm9rZS13aWR0aD0iMS4zIiBzdHJva2UtbGluZWpvaW49InJvdW5kIi8+PHBhdGggZD0iTTE5LjUgMjYuOGg2bC0zIDMuMnoiIGZpbGw9IiMxNTE1MTUiIHN0cm9rZT0iIzE1MTUxNSIgc3Ryb2tlLXdpZHRoPSIxIiBzdHJva2UtbGluZWpvaW49InJvdW5kIi8+PHBhdGggZD0iTTIyLjUgMzB2MyIgc3Ryb2tlPSIjMjUyODJjIiBzdHJva2Utd2lkdGg9IjEiLz48cGF0aCBkPSJNMTMuNSAyMC41bDUgMS45TTMxLjUgMjAuNWwtNSAxLjkiIHN0cm9rZT0iI2YyYzIzMCIgc3Ryb2tlLXdpZHRoPSIyLjgiIHN0cm9rZS1saW5lY2FwPSJyb3VuZCIvPjxjaXJjbGUgY3g9IjE2LjIiIGN5PSIyMS41IiByPSIuOSIgZmlsbD0iIzExMSIvPjxjaXJjbGUgY3g9IjI4LjgiIGN5PSIyMS41IiByPSIuOSIgZmlsbD0iIzExMSIvPjwvc3ZnPg=='); }
+.sq.off { filter: saturate(.3) brightness(.9); }
 .pw-rules { margin: 0; padding-left: 18px; font-size: 13.5px; color: var(--muted); line-height: 1.4; display: grid; gap: 4px; }
 .lv-card { border: 1px solid var(--line); border-radius: 10px; background: var(--surface); padding: 12px 14px; display: grid; gap: 4px; margin-bottom: 4px; }
 .lv-main { display: flex; align-items: baseline; justify-content: space-between; gap: 8px; }
@@ -619,25 +623,21 @@ textarea.fen { min-height: 0; font-size: 14px; word-break: break-all; }
         <button class="btn small" id="drEnd" type="button">Ukončit</button>
       </div>
     </section>
-    <section class="puz" id="pawnBox" hidden aria-label="Pěšci proti pěšcům">
-      <p class="puz-msg" id="pwMsg" role="status" aria-live="polite"></p>
+    <section class="puz" id="hraBox" hidden aria-label="Hra proti počítači">
+      <p class="puz-msg" id="hraMsg" role="status" aria-live="polite"></p>
       <div class="pw-score">
-        <div class="pw-side w"><span class="piece p-wp" aria-hidden="true"></span><span>Ty</span><b id="pwWhite" aria-label="tvých pěšců">8</b></div>
-        <div class="pw-mid"><small>Kola</small><b id="pwRounds">0 : 0</b></div>
-        <div class="pw-side b"><b id="pwBlack" aria-label="pěšců počítače">8</b><span>Počítač</span><span class="piece p-bp" aria-hidden="true"></span></div>
+        <div class="pw-side w"><span class="piece" id="hraLeftPc" aria-hidden="true"></span><span id="hraLeftName">Ty</span><b id="hraLeft"></b></div>
+        <div class="pw-mid"><small id="hraMidName"></small><b id="hraMid"></b></div>
+        <div class="pw-side b"><b id="hraRight"></b><span id="hraRightName">Počítač</span><span class="piece" id="hraRightPc" aria-hidden="true"></span></div>
       </div>
-      <p class="puz-info" id="pwInfo"></p>
-      <div class="seg pw-level" role="group" aria-label="Obtížnost">
-        <button class="btn" type="button" data-level="easy" aria-pressed="true">Lehká</button>
-        <button class="btn" type="button" data-level="medium" aria-pressed="false">Střední</button>
-        <button class="btn" type="button" data-level="hard" aria-pressed="false">Těžká</button>
-      </div>
+      <p class="puz-info" id="hraInfo"></p>
+      <div class="seg pw-level" id="hraLevels" role="group" aria-label="Obtížnost"></div>
       <div class="actions puz-act">
-        <button class="btn primary" id="pwNext" type="button" hidden>Další kolo</button>
+        <button class="btn primary" id="hraNext" type="button" hidden>Další kolo</button>
       </div>
       <div class="actions puz-act2">
         <span class="spacer"></span>
-        <button class="btn small" id="pwEnd" type="button">Ukončit</button>
+        <button class="btn small" id="hraEnd" type="button">Ukončit</button>
       </div>
     </section>
     <section class="puz" id="puzBox" hidden aria-label="Řešení úlohy">
@@ -772,6 +772,7 @@ textarea.fen { min-height: 0; font-size: 14px; word-break: break-all; }
       <button class="mi" type="button" data-page="pgLearn"><svg class="mi-ic" viewBox="0 0 24 24" width="22" height="22" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M2 9l10-5 10 5-10 5z"/><path d="M6 11v5c0 1.7 2.7 3 6 3s6-1.3 6-3v-5"/><path d="M22 9v6"/></svg><span class="mi-l">Výuka: úlohy</span><svg class="mi-chev" viewBox="0 0 24 24" width="18" height="18" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 6l6 6-6 6"/></svg></button>
       <button class="mi" type="button" data-page="pgDrill"><svg class="mi-ic" viewBox="0 0 24 24" width="22" height="22" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3l2.6 5.4 5.9.8-4.3 4.1 1 5.8L12 16.4 6.8 19.1l1-5.8L3.5 9.2l5.9-.8z"/></svg><span class="mi-l">Výuka: tahy figur</span><svg class="mi-chev" viewBox="0 0 24 24" width="18" height="18" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 6l6 6-6 6"/></svg></button>
       <button class="mi" type="button" data-page="pgPawns"><svg class="mi-ic" viewBox="0 0 24 24" width="22" height="22" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="6.5" r="3"/><path d="M9.5 10.5h5M10.2 10.5c0 3.2-1.4 5.3-3.2 6.8h10c-1.8-1.5-3.2-3.6-3.2-6.8M6 20.5h12"/></svg><span class="mi-l">Trénink: pěšci proti pěšcům</span><svg class="mi-chev" viewBox="0 0 24 24" width="18" height="18" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 6l6 6-6 6"/></svg></button>
+      <button class="mi" type="button" data-page="pgWolves"><svg class="mi-ic" viewBox="0 0 24 24" width="22" height="22" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M7.5 15.5a3 3 0 0 1-1-5.5 3.5 3.5 0 0 1 5-3.5 3.5 3.5 0 0 1 6 1.5 3 3 0 0 1 0 6 3 3 0 0 1-4 1.5h-3a3 3 0 0 1-3 0z"/><path d="M9.5 16.5v3.5M14.5 16.5v3.5"/></svg><span class="mi-l">Trénink: vlci a ovečka</span><svg class="mi-chev" viewBox="0 0 24 24" width="18" height="18" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 6l6 6-6 6"/></svg></button>
       <div class="msep"></div>
       <button class="mi" type="button" id="openFile"><svg class="mi-ic" viewBox="0 0 24 24" width="22" height="22" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M3 7a2 2 0 0 1 2-2h4l2 2h8a2 2 0 0 1 2 2v1"/><path d="M3 7v11a2 2 0 0 0 2 2h12.5a2 2 0 0 0 1.9-1.4L22 11H7.5a2 2 0 0 0-1.9 1.4L3 18"/></svg><span class="mi-l">Otevřít soubor</span></button>
       <button class="mi" type="button" id="saveFile"><svg class="mi-ic" viewBox="0 0 24 24" width="22" height="22" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M12 4v11M7.5 10.5L12 15l4.5-4.5"/><path d="M5 19h14"/></svg><span class="mi-l">Uložit</span></button>
@@ -896,7 +897,7 @@ textarea.fen { min-height: 0; font-size: 14px; word-break: break-all; }
         <div class="dr-ch dr-train">
           <div class="dr-head"><b>Série</b><small id="pwSeriesWins"></small></div>
           <p class="dr-rule" id="pwSeriesInfo"></p>
-          <div class="seg pw-level" role="group" aria-label="Obtížnost">
+          <div class="seg pw-level" data-game="pesci" role="group" aria-label="Obtížnost">
             <button class="btn" type="button" data-level="easy" aria-pressed="true">Lehká</button>
             <button class="btn" type="button" data-level="medium" aria-pressed="false">Střední</button>
             <button class="btn" type="button" data-level="hard" aria-pressed="false">Těžká</button>
@@ -910,6 +911,36 @@ textarea.fen { min-height: 0; font-size: 14px; word-break: break-all; }
           <li>Vyhrává, kdo první dojde pěšcem na poslední řadu, nebo kdo sebere soupeři všechny pěšce.</li>
           <li>Když hráč na tahu nemůže táhnout: při stejném počtu pěšců vyhrávají černí, jinak vyhrává ten, kdo má pěšců méně.</li>
           <li>Bílí začínají. Při menším počtu pěšců chybí celé sloupce v pořadí a, h, b, g, c, f, d, e.</li>
+        </ul>
+    </div>
+  </section>
+  <section class="dpage" id="pgWolves" hidden>
+    <div class="phead">
+      <button class="icon-btn plain" type="button" data-back aria-label="Zpět"><svg viewBox="0 0 24 24" width="22" height="22" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M15 6l-6 6 6 6"/></svg></button>
+      <h2>Trénink: vlci a ovečka</h2>
+    </div>
+    <div class="pbody">
+        <p class="note">Ovečka chce utéct na osmou řadu, čtyři vlci ji chtějí chytit. Hra učí počítat dopředu: co udělá soupeř, když táhnu sem?</p>
+        <div class="dr-ch dr-train">
+          <div class="dr-head"><b>Hra</b></div>
+          <p class="dr-rule" id="vlStats"></p>
+          <div class="seg vl-side" role="group" aria-label="Za koho hraješ">
+            <button class="btn" type="button" data-side="sheep" aria-pressed="true">Za ovečku</button>
+            <button class="btn" type="button" data-side="wolves" aria-pressed="false">Za vlky</button>
+          </div>
+          <div class="seg pw-level" data-game="vlci" role="group" aria-label="Obtížnost">
+            <button class="btn" type="button" data-level="normal" aria-pressed="true">Normální</button>
+            <button class="btn" type="button" data-level="perfect" aria-pressed="false">Dokonalá</button>
+          </div>
+          <p class="dr-rule" id="vlWarn" hidden>Pozor: dokonalí vlci vyhrají vždy, ovečka proti nim nemá šanci. Můžeš se ale od nich učit, jak ovečku chytit.</p>
+          <button class="btn primary" id="vlPlay" type="button">Hrát</button>
+        </div>
+        <h3 class="dr-sub">Pravidla</h3>
+        <ul class="pw-rules">
+          <li>Hraje se jen na bílých polích. Čtyři vlci začínají na a8, c8, e8 a g8, ovečka na jednom bílém poli první řady.</li>
+          <li>Začíná ovečka, stejně jako v šachu začíná bílý.</li>
+          <li>Všichni táhnou o jedno pole šikmo. Ovečka může i dozadu, vlci jen dopředu (dolů). Nebere se.</li>
+          <li>Ovečka vyhraje, když dojde na osmou řadu. Vlci vyhrají, když se ovečka nemůže pohnout.</li>
         </ul>
     </div>
   </section>
@@ -1106,7 +1137,7 @@ textarea.fen { min-height: 0; font-size: 14px; word-break: break-all; }
     </div>
     <div class="pbody prose">
 
-        <p><strong>PGN editor</strong> <span class="ver-badge">verze 0.29</span></p>
+        <p><strong>PGN editor</strong> <span class="ver-badge">verze 0.30</span></p>
         <p>Jednoduchý editor pro zápis a úpravu šachových partií ve formátu PGN, určený hlavně pro telefon s Androidem. Aplikaci programuje Claude (umělá inteligence od společnosti Anthropic) ve spolupráci s Michalem Slivou, který určuje, co má aplikace umět a jak má vypadat.</p>
         <h3>Co aplikace umí</h3>
         <ul>
@@ -1136,6 +1167,7 @@ textarea.fen { min-height: 0; font-size: 14px; word-break: break-all; }
           <li>Načte i zápis v české notaci (J, S, V, D).</li>
           <li>Výuka tahů figur pro začátečníky: 36 úrovní pro věž, střelce, dámu, krále, jezdce a pěšce, hodnocení hvězdami podle počtu tahů.</li>
           <li>Trénink pěšci proti pěšcům: hra jen s pěšci proti počítači ve třech obtížnostech, série kol s handicapem pro vítěze.</li>
+          <li>Trénink vlci a ovečka: za ovečku nebo za vlky proti počítači, normální a dokonalý soupeř.</li>
           <li>Výuka: přes 6 000 úloh z databáze Lichessu od úplných začátečníků po mistrovskou úroveň, výběr podle obtížnosti a tématu, vlastní úroveň a opakování chybných úloh. Funguje bez internetu.</li>
           <li>Partie nebo pozice jako QR kód pro přenos do jiného telefonu, načtení QR kódu fotoaparátem nebo z obrázku.</li>
           <li>Potvrzení před smazáním nebo přepsáním partie.</li>
@@ -1172,6 +1204,13 @@ textarea.fen { min-height: 0; font-size: 14px; word-break: break-all; }
       <h2>Verze a změny</h2>
     </div>
     <div class="pbody log">
+        <section>
+          <div class="head"><span class="ver-badge">0.30</span><span class="date">17. 11. 2026</span></div>
+          <ul>
+            <li>Nový Trénink: vlci a ovečka (menu). Ovečka chce utéct na osmou řadu, čtyři vlci ji chtějí chytit. Hraje se jen na bílých polích, s vlastními obrázky vlka a ovečky. Hraješ za ovečku (vybereš si, kde začne), nebo za vlky, obtížnost normální a dokonalá. Počítadlo výher za každou stranu, rozehraná hra se pamatuje.</li>
+            <li>Dokonalí vlci vyhrají vždy, aplikace na to upozorní. Ovečka se od nich může učit, jak ji chytají.</li>
+          </ul>
+        </section>
         <section>
           <div class="head"><span class="ver-badge">0.29</span><span class="date">16. 11. 2026</span></div>
           <ul>
@@ -1571,6 +1610,8 @@ textarea.fen { min-height: 0; font-size: 14px; word-break: break-all; }
 <script src="vyuka/figury.js"></script>
 <script src="trenink/pesci.js"></script>
 <script src="trenink/pesci-engine.js"></script>
+<script src="trenink/vlci.js"></script>
+<script src="trenink/vlci-engine.js"></script>
 <script>
 (function () {
   // Jednorázový přesun uložených dat ze staré adresy aplikace (file://) na novou (https),
@@ -1750,7 +1791,7 @@ textarea.fen { min-height: 0; font-size: 14px; word-break: break-all; }
   function renderBoard() {
     if (editor) { renderEditorBoard(); return; }
     if (drill) { renderDrillBoard(); return; }
-    if (pw) { renderPawnBoard(); return; }
+    if (hra) { renderHraBoard(); return; }
     const g = boardGame();
     if ($('fenCur')) $('fenCur').value = g.fen();
     if (typeof renderPlayers === 'function') renderPlayers();
@@ -1809,7 +1850,7 @@ textarea.fen { min-height: 0; font-size: 14px; word-break: break-all; }
 
   function onSquare(sq) {
     if (editor) { editSquare(sq); return; }
-    if (pw) { pwTap(sq); return; }
+    if (hra) { hraTap(sq); return; }
     if (eng.checking && !puz) { toast('Počkej, až Stockfish dokončí kontrolu partie.'); return; }
     if (drill) { drillTap(sq); return; }
     if (puz && puz.wait) { puzPremove(sq); return; }
@@ -2505,7 +2546,7 @@ textarea.fen { min-height: 0; font-size: 14px; word-break: break-all; }
   }
   function drillStart(lv) {
     if (puz) puzEnd();
-    if (pw) pwStop();
+    if (hra) hraStop();
     if (drawerOpen()) setDrawer(false);
     if (engineOn) setEngineOn(false);
     if (voice.on) voiceStop();
@@ -2609,114 +2650,111 @@ textarea.fen { min-height: 0; font-size: 14px; word-break: break-all; }
   });
   $('drEnd').addEventListener('click', () => { drillEnd(); setDrawer(true); openPage('pgDrill'); });
 
-  /* ---------- Trénink: pěšci proti pěšcům ---------- */
-  // Pravidla a série kol jsou v trenink/pesci.js, počítačový soupeř v trenink/pesci-engine.js.
-  // Hráč hraje bílými, počítač černými. Tah počítače se počítá v samostatném vlákně (Web Worker),
-  // aby obrazovka při přemýšlení nezamrzla. Když vlákno nejde spustit, počítá se tady.
-  const PW = window.PESCI, PWE = window.PESCI_ENGINE;
-  const PW_KEY = 'pgn-pesci';
-  // Uložený stav: série (počty pěšců pro kolo, vyhraná kola), obtížnost, vyhrané série, tahy rozehraného kola
-  let pwData = { series: PW.newSeries(), level: 'easy', seriesWins: { w: 0, b: 0 }, moves: [] };
-  try {
-    const o = JSON.parse(localStorage.getItem(PW_KEY) || 'null');
-    if (o && o.series && o.series.minPawns === PW.MIN_PAWNS && Array.isArray(o.moves)) pwData = Object.assign(pwData, o);
-  } catch (e) {}
-  let pw = null; // rozehrané kolo: { pos, moves: [[z, na]], sel, last, lastText, thinking, over, engine }
-  let pwJob = 0, pwWorker = null, pwWorkerFailed = false;
-  const pwSave = () => { if (pw && !pw.over) pwData.moves = pw.moves; try { localStorage.setItem(PW_KEY, JSON.stringify(pwData)); } catch (e) {} };
-  const pwLevel = () => PWE.LEVELS.find(l => l.id === pwData.level) || PWE.LEVELS[0];
-  const pawns = n => n + '\u00a0' + plural(n, 'pěšec', 'pěšci', 'pěšců');
-  window.pawnState = () => pw; // jen pro automatické zkoušky
+  /* ---------- Hry proti počítači: společná část ---------- */
+  // Pěšci proti pěšcům a vlci a ovečka se hrají stejně: hráč táhne na šachovnici, počítač odpovídá.
+  // Společné je vykreslení šachovnice, panel pod ní, ovládání a tah počítače v samostatném vlákně
+  // (Web Worker), aby obrazovka při přemýšlení nezamrzla. Když vlákno nejde spustit, počítá se tady.
+  // Každá hra (HRY.pesci, HRY.vlci) dodá pravidla (R), soupeře (E), rozestavení, figurky a texty.
+  let hra = null; // rozehraná hra: { g, me, pos, moves: [[z, na]], sel, last, lastText, thinking, over, engine, pick, preview }
+  let hraJob = 0;
+  const hraWorkers = {}; // vlákno každé hry (Promise na Worker, nebo null, když nejde spustit)
+  window.hraState = () => hra; // jen pro automatické zkoušky
+  const nbsp = ' ';
+  const skore = (a, b) => a + nbsp + ':' + nbsp + b;
 
-  function renderPawnPage() {
-    const s = pwData.series, sw = pwData.seriesWins;
-    $('pwSeriesWins').textContent = (sw.w || sw.b) ? 'vyhrané série ' + sw.w + '\u00a0:\u00a0' + sw.b : '';
-    if (s.winner) {
-      $('pwSeriesInfo').textContent = 'Poslední série skončila ' + (s.winner === 'w' ? 'tvou výhrou' : 'výhrou počítače') + ', kola ' + s.wins.w + '\u00a0:\u00a0' + s.wins.b + '.';
-      $('pwPlay').textContent = 'Začít novou sérii';
-    } else {
-      $('pwSeriesInfo').textContent = 'Kolo ' + s.round + ': ty ' + pawns(s.white) + ', počítač ' + pawns(s.black) + '. Vyhraná kola ' + s.wins.w + '\u00a0:\u00a0' + s.wins.b + '.';
-      $('pwPlay').textContent = pwData.moves.length ? 'Pokračovat v kole' : 'Hrát kolo ' + s.round;
-    }
-    $('pwNew').hidden = !!s.winner || (s.round === 1 && !pwData.moves.length);
-    pwLevelButtons();
-  }
-  function pwLevelButtons() {
-    document.querySelectorAll('.pw-level .btn').forEach(b => b.setAttribute('aria-pressed', String(b.dataset.level === pwData.level)));
-  }
-  document.querySelectorAll('.pw-level .btn').forEach(b => b.addEventListener('click', () => {
-    pwData.level = b.dataset.level; pwSave(); pwLevelButtons(); if (pw) pwPanel();
-  }));
-  $('pwPlay').addEventListener('click', () => {
-    if (pwData.series.winner) { pwData.series = PW.newSeries(); pwData.moves = []; pwSave(); }
-    pawnStart();
-  });
-  $('pwNew').addEventListener('click', async () => {
-    if (!await askConfirm('Začít novou sérii?', 'Rozehraná série se ztratí a začne se znovu 8 proti 8.', 'Nová série')) return;
-    pwData.series = PW.newSeries(); pwData.moves = []; pwSave();
-    pawnStart();
-  });
-
-  // Začne nebo obnoví kolo podle uložené série
-  function pawnStart() {
+  // Začne nebo obnoví hru podle uloženého stavu hry g
+  function hraStart(g) {
     if (puz) puzEnd();
     if (drill) drillEnd();
+    if (hra) hraStop();
     if (drawerOpen()) setDrawer(false);
     if (engineOn) setEngineOn(false);
     if (voice.on) voiceStop();
     selected = null;
-    let pos = PW.startPosition(pwData.series.white, pwData.series.black), last = null;
+    // ng: { me: strana hráče, pos (null, když hráč nejdřív vybírá výchozí pole), moves: uložené tahy,
+    //       pick: pole k výběru, preview: co je na šachovnici do výběru vidět }
+    const ng = g.newGame();
+    let pos = ng.pos, last = null;
     const moves = [];
-    for (const [f, t] of pwData.moves) { // rozehrané kolo se přehraje z uložených tahů
-      const m = PW.findMove(pos, f, t);
-      if (!m || PW.result(pos)) break;
-      pos = PW.play(pos, m); moves.push([f, t]); last = m;
+    if (pos) for (const [f, t] of ng.moves || []) { // rozehraná hra se přehraje z uložených tahů
+      const m = g.R.findMove(pos, f, t);
+      if (!m || g.R.result(pos)) break;
+      pos = g.R.play(pos, m); moves.push([f, t]); last = m;
     }
-    pw = { pos, moves, sel: null, last, lastText: '', thinking: false, over: null, engine: '' };
-    document.body.classList.add('puzzle', 'pawns');
-    $('pawnBox').hidden = false;
-    pwRender();
+    hra = { g, me: ng.me, pos, moves, sel: null, last, lastText: '', thinking: false, over: null, engine: '', pick: ng.pick || null, preview: ng.preview || null };
+    document.body.classList.add('puzzle', 'hra', 'hra-' + g.id);
+    $('hraBox').hidden = false;
+    hraLevelButtons();
+    hraRender();
     window.scrollTo(0, 0);
-    if (PW.result(pos)) { pwData.moves = []; pwSave(); } // nemělo by nastat, kolo se ukládá jen rozehrané
-    else if (pos.turn === 'b') pwComputer();
+    if (pos && !g.R.result(pos) && pos.turn !== hra.me) hraComputer();
   }
   // Konec režimu bez překreslení (při přechodu do jiného cvičení)
-  function pwStop() {
-    pw = null; pwJob++;
-    document.body.classList.remove('pawns');
-    $('pawnBox').hidden = true;
+  function hraStop() {
+    if (!hra) return;
+    document.body.classList.remove('hra', 'hra-' + hra.g.id);
+    hra = null; hraJob++;
+    $('hraBox').hidden = true;
   }
-  function pawnEnd() {
-    pwStop();
+  function hraEnd() {
+    const g = hra && hra.g;
+    hraStop();
     selected = null;
     document.body.classList.remove('puzzle');
     renderAll();
+    return g;
   }
-  $('pwEnd').addEventListener('click', () => { pawnEnd(); setDrawer(true); openPage('pgPawns'); });
-  $('pwNext').addEventListener('click', () => {
-    if (pwData.series.winner) { pwData.series = PW.newSeries(); pwData.moves = []; pwSave(); }
-    pawnStart();
+  $('hraEnd').addEventListener('click', () => { const g = hraEnd(); setDrawer(true); openPage(g.page); });
+  $('hraNext').addEventListener('click', () => { const g = hra.g; if (g.onNext) g.onNext(); hraStart(g); });
+
+  // Obtížnost: tlačítka na stránce hry (data-game) a v panelu pod šachovnicí (podle rozehrané hry)
+  function hraLevelButtons() {
+    const box = $('hraLevels');
+    box.innerHTML = '';
+    hra.g.E.LEVELS.forEach(l => {
+      const b = document.createElement('button');
+      b.type = 'button'; b.className = 'btn'; b.dataset.level = l.id; b.textContent = l.name;
+      box.appendChild(b);
+    });
+    hraLevelPressed();
+  }
+  function hraLevelPressed() {
+    document.querySelectorAll('.pw-level').forEach(box => {
+      const g = box.dataset.game ? HRY[box.dataset.game] : hra && hra.g;
+      if (g) box.querySelectorAll('.btn[data-level]').forEach(b => b.setAttribute('aria-pressed', String(b.dataset.level === g.levelId())));
+    });
+  }
+  document.addEventListener('click', e => {
+    const b = e.target.closest && e.target.closest('.pw-level .btn[data-level]');
+    if (!b) return;
+    const box = b.closest('.pw-level'), g = box.dataset.game ? HRY[box.dataset.game] : hra && hra.g;
+    if (!g) return;
+    g.setLevel(b.dataset.level);
+    hraLevelPressed();
+    if (g.renderPage && curPage === g.page) g.renderPage();
+    if (hra) hraPanel();
   });
 
-  function pwRender() { renderBoard(); pwPanel(); }
-  function renderPawnBoard() {
-    const p = pw, files = 'abcdefgh';
-    const targets = p.sel !== null && !p.over ? PW.legalMoves(p.pos).filter(m => m.from === p.sel) : [];
+  function hraRender() { renderBoard(); hraPanel(); }
+  function renderHraBoard() {
+    const h = hra, g = h.g, files = 'abcdefgh', pos = h.pos || h.preview;
+    const targets = h.sel !== null && !h.over && h.pos ? g.R.legalMoves(h.pos).filter(m => m.from === h.sel) : [];
     boardEl.innerHTML = '';
     for (let vr = 0; vr < 8; vr++) for (let vc = 0; vc < 8; vc++) {
-      const sq = files[vc] + (8 - vr), i = PW.idx(sq);
+      const sq = files[vc] + (8 - vr), i = g.R.idx(sq);
       const btn = document.createElement('button');
       btn.type = 'button';
       btn.className = 'sq ' + ((vr + vc) % 2 === 0 ? 'light' : 'dark');
       btn.dataset.sq = sq;
-      if (p.last && (p.last.from === i || p.last.to === i)) btn.classList.add('last');
-      if (p.sel === i) btn.classList.add('sel');
-      if (p.over && p.over.r.reason === 'lastRank' && p.last && p.last.to === i) btn.classList.add('hint');
+      if (g.dim && g.dim(i)) btn.classList.add('off');
+      if (h.last && (h.last.from === i || h.last.to === i)) btn.classList.add('last');
+      if (h.sel === i) btn.classList.add('sel');
+      if ((h.over && g.endHint(h, i)) || (h.pick && h.pick.indexOf(i) !== -1)) btn.classList.add('hint');
       let label = sq;
-      const pc = PW.pieceAt(p.pos, i);
+      const pc = pos && g.piece(pos, i);
       if (pc) {
-        const s = document.createElement('span'); s.className = 'piece p-' + pc + 'p'; btn.appendChild(s);
-        label += pc === 'w' ? ', bílý pěšec' : ', černý pěšec';
+        const s = document.createElement('span'); s.className = 'piece ' + pc.cls; btn.appendChild(s);
+        label += ', ' + pc.label;
       }
       const m = targets.find(x => x.to === i);
       if (m) { const k = document.createElement('span'); k.className = m.capture ? 'ring' : 'dot'; btn.appendChild(k); }
@@ -2726,114 +2764,265 @@ textarea.fen { min-height: 0; font-size: 14px; word-break: break-all; }
       boardEl.appendChild(btn);
     }
   }
-  function pwPanel() {
-    const p = pw;
-    if (!p) return;
-    const s = pwData.series, round = p.over ? p.over.before.round : s.round;
-    $('puzTitle').textContent = 'Pěšci proti pěšcům · kolo ' + round;
-    $('pwWhite').textContent = p.pos.white;
-    $('pwBlack').textContent = p.pos.black;
-    $('pwRounds').textContent = s.wins.w + ' : ' + s.wins.b;
-    pwLevelButtons();
-    const msg = $('pwMsg');
-    let text, kind = '', info;
-    if (p.over) {
-      const r = p.over.r, won = r.winner === 'w';
-      text = s.winner ? (won ? 'Série je tvoje! 🏆' : 'Sérii vyhrál počítač.') : (won ? 'Výhra!' : 'Tentokrát vyhrál počítač.');
-      kind = won ? 'ok' : 'bad';
-      const why = r.reason === 'lastRank' ? (won ? 'Tvůj pěšec došel na poslední řadu.' : 'Pěšec počítače došel na poslední řadu.') :
-        r.reason === 'noPawns' ? (won ? 'Počítači nezůstal žádný pěšec.' : 'Počítač ti sebral všechny pěšce.') :
-        (r.stalemated === 'w' ? 'Nemáš žádný tah.' : 'Počítač nemá žádný tah.') + ' ' +
-        (p.pos.white === p.pos.black ? 'Při stejném počtu pěšců vyhrávají černí.' : 'Vyhrává ten, kdo má pěšců méně.');
-      const next = s.winner ? ' Kola ' + s.wins.w + '\u00a0:\u00a0' + s.wins.b + '.' : ' Příští kolo: ty ' + pawns(s.white) + ', počítač ' + pawns(s.black) + '.';
-      info = why + next;
-    } else if (p.thinking) {
-      text = 'Počítač přemýšlí…';
-      info = p.lastText;
-    } else {
-      text = 'Jsi na tahu.';
-      info = p.moves.length ? p.lastText : 'Hraješ bílými a začínáš. Klepni na pěšce a pak na pole, kam má táhnout.';
+  // Panel pod šachovnicí: zpráva, skóre (hra dodá title, left, right, mid, next) a pomocný text
+  function hraPanel() {
+    const h = hra;
+    if (!h) return;
+    const g = h.g, t = g.board(h);
+    let msg, kind = '', info;
+    if (h.over) ({ msg, kind, info } = g.endText(h));
+    else if (h.pick) ({ msg, info } = g.pickText(h));
+    else if (h.thinking) { msg = 'Počítač přemýšlí…'; info = h.lastText; }
+    else { msg = 'Jsi na tahu.'; info = h.moves.length ? h.lastText : g.startInfo(h); }
+    $('puzTitle').textContent = t.title;
+    for (const side of ['left', 'right']) {
+      const id = side === 'left' ? 'hraLeft' : 'hraRight';
+      $(id + 'Pc').className = 'piece ' + t[side].pc;
+      $(id + 'Name').textContent = t[side].name;
+      $(id).textContent = t[side].value;
     }
-    msg.textContent = text;
-    msg.className = 'puz-msg' + (kind ? ' ' + kind : '');
-    $('pwInfo').textContent = info || '';
-    $('pwNext').hidden = !p.over;
-    $('pwNext').textContent = s.winner ? 'Nová série' : 'Další kolo';
+    $('hraMidName').textContent = t.mid.name;
+    $('hraMid').textContent = t.mid.value;
+    $('hraMsg').textContent = msg;
+    $('hraMsg').className = 'puz-msg' + (kind ? ' ' + kind : '');
+    $('hraInfo').textContent = info || '';
+    $('hraNext').hidden = !t.next;
+    if (t.next) $('hraNext').textContent = t.next;
+    hraLevelPressed();
   }
 
-  function pwTap(sq) {
-    const p = pw;
-    if (!p || p.over || p.thinking || p.pos.turn !== 'w') return;
-    const i = PW.idx(sq);
-    if (p.sel !== null && p.sel !== i && pwApply(p.sel, i)) return;
-    p.sel = PW.pieceAt(p.pos, i) === 'w' && p.sel !== i ? i : null;
+  const hraCanMove = () => hra && !hra.over && !hra.thinking && !hra.pick && hra.pos.turn === hra.me;
+  function hraTap(sq) {
+    const h = hra;
+    if (!h || h.over || h.thinking) return;
+    const g = h.g, i = g.R.idx(sq);
+    if (h.pick) { // výběr výchozího pole
+      if (h.pick.indexOf(i) === -1) return;
+      h.pos = g.R.startPosition(i); h.pick = null; h.preview = null;
+      if (g.onPick) g.onPick(h, g.R.name(i));
+      g.save(h);
+      hraRender();
+      if (h.pos.turn !== h.me) hraComputer();
+      return;
+    }
+    if (!hraCanMove()) return;
+    if (h.sel !== null && h.sel !== i && hraApply(h.sel, i)) return;
+    h.sel = g.mine(h, i) && h.sel !== i ? i : null;
     renderBoard();
   }
   // Provede tah (z, na jsou indexy polí). Vrací false, když tah není legální.
-  function pwApply(from, to) {
-    const p = pw, m = PW.findMove(p.pos, from, to);
+  function hraApply(from, to) {
+    const h = hra, g = h.g, m = g.R.findMove(h.pos, from, to);
     if (!m) return false;
-    const who = p.pos.turn === 'w' ? 'Ty: ' : 'Počítač: ';
-    p.pos = PW.play(p.pos, m);
-    p.moves.push([m.from, m.to]);
-    p.last = m; p.sel = null;
-    p.lastText = who + PW.moveText(m);
+    const who = h.pos.turn === h.me ? 'Ty: ' : 'Počítač: ';
+    h.pos = g.R.play(h.pos, m);
+    h.moves.push([m.from, m.to]);
+    h.last = m; h.sel = null;
+    h.lastText = who + g.R.moveText(m);
     haptic(m.capture ? 40 : 20);
-    const r = PW.result(p.pos);
-    if (r) pwRoundEnd(r); else pwSave();
-    pwRender();
-    if (!r && p.pos.turn === 'b') pwComputer();
+    const r = g.R.result(h.pos);
+    if (r) { h.over = { r }; g.onEnd(h, r); haptic(r.winner === h.me ? 80 : 30); }
+    g.save(h);
+    hraRender();
+    if (!r && h.pos.turn !== h.me) hraComputer();
     return true;
   }
-  function pwRoundEnd(r) {
-    const before = pwData.series;
-    pwData.series = PW.nextRound(before, r.winner);
-    if (pwData.series.winner) pwData.seriesWins[r.winner]++;
-    pwData.moves = [];
-    pw.over = { r, before };
-    pwSave();
-    haptic(r.winner === 'w' ? 80 : 30);
-  }
 
-  // Vlákno s počítačovým soupeřem: sestaví se z obou modulů, stejně jako Stockfish se spouští z paměti
-  async function pwWorkerGet() {
-    if (pwWorker || pwWorkerFailed) return pwWorker;
-    try {
-      const src = await Promise.all(['trenink/pesci.js', 'trenink/pesci-engine.js'].map(u => fetch(u).then(r => { if (!r.ok) throw new Error(u); return r.text(); })));
-      const main = 'self.onmessage = function (e) { var d = e.data;' +
-        ' var pos = { board: Int8Array.from(d.pos.board), turn: d.pos.turn, ep: d.pos.ep, white: d.pos.white, black: d.pos.black };' +
-        ' var m = self.PESCI_ENGINE.chooseMove(pos, d.level); self.postMessage({ id: d.id, move: m ? { from: m.from, to: m.to } : null }); };';
-      const url = URL.createObjectURL(new Blob([src.join('\n;\n') + '\n' + main], { type: 'text/javascript' }));
-      pwWorker = new Worker(url);
-    } catch (e) { pwWorkerFailed = true; pwWorker = null; }
-    return pwWorker;
+  // Vlákno s počítačovým soupeřem: sestaví se z modulů hry, stejně jako Stockfish se spouští z paměti
+  function hraWorker(g) {
+    if (!hraWorkers[g.id]) hraWorkers[g.id] = (async () => {
+      try {
+        const src = await Promise.all(g.sources.map(u => fetch(u).then(r => { if (!r.ok) throw new Error(u); return r.text(); })));
+        const main = 'self.onmessage = function (e) { var d = e.data, pos = d.pos;' +
+          ' if (pos.board) pos.board = Int8Array.from(pos.board);' +
+          ' var m = self[' + JSON.stringify(g.engineName) + '].chooseMove(pos, d.level);' +
+          ' self.postMessage({ id: d.id, move: m ? { from: m.from, to: m.to } : null }); };';
+        return new Worker(URL.createObjectURL(new Blob([src.join('\n;\n') + '\n' + main], { type: 'text/javascript' })));
+      } catch (e) { return null; }
+    })();
+    return hraWorkers[g.id];
   }
-  async function pwComputer() {
-    const p = pw;
-    if (!p || p.over || p.pos.turn !== 'b') return;
-    const id = ++pwJob, level = pwLevel(), t0 = Date.now();
-    p.thinking = true; pwPanel();
+  async function hraComputer() {
+    const h = hra;
+    if (!h || h.over || !h.pos || h.pos.turn === h.me) return;
+    const g = h.g, id = ++hraJob, level = g.level(), t0 = Date.now();
+    h.thinking = true; hraPanel();
     let mv;
-    const w = await pwWorkerGet();
+    const w = await hraWorker(g);
     if (w) mv = await new Promise(res => {
       w.onmessage = e => { if (e.data && e.data.id === id) res(e.data.move); };
-      w.onerror = e => { if (e && e.preventDefault) e.preventDefault(); pwWorkerFailed = true; pwWorker = null; w.terminate(); res(undefined); };
-      w.postMessage({ id, pos: { board: Array.from(p.pos.board), turn: p.pos.turn, ep: p.pos.ep, white: p.pos.white, black: p.pos.black }, level });
+      w.onerror = e => { if (e && e.preventDefault) e.preventDefault(); hraWorkers[g.id] = Promise.resolve(null); w.terminate(); res(undefined); };
+      w.postMessage({ id, pos: Object.assign({}, h.pos, h.pos.board ? { board: Array.from(h.pos.board) } : {}), level });
     });
-    if (id !== pwJob || pw !== p) return; // mezitím konec nebo jiné kolo
+    if (id !== hraJob || hra !== h) return; // mezitím konec nebo jiná hra
     if (mv === undefined) { // bez vlákna se počítá tady
       await new Promise(r => setTimeout(r, 30));
-      if (id !== pwJob || pw !== p) return;
-      const m = PWE.chooseMove(p.pos, level);
+      if (id !== hraJob || hra !== h) return;
+      const m = g.E.chooseMove(h.pos, level);
       mv = m && { from: m.from, to: m.to };
-      p.engine = 'main';
-    } else p.engine = 'worker';
+      h.engine = 'main';
+    } else h.engine = 'worker';
     const wait = 450 - (Date.now() - t0); // ať je tah počítače vidět, i když ho má hned
     if (wait > 0) await new Promise(r => setTimeout(r, wait));
-    if (id !== pwJob || pw !== p) return;
-    p.thinking = false;
-    if (mv) pwApply(mv.from, mv.to); else pwPanel();
+    if (id !== hraJob || hra !== h) return;
+    h.thinking = false;
+    if (mv) hraApply(mv.from, mv.to); else hraPanel();
   }
+
+  const HRY = {};
+
+  /* ---------- Trénink: pěšci proti pěšcům ---------- */
+  // Pravidla a série kol jsou v trenink/pesci.js, počítačový soupeř v trenink/pesci-engine.js.
+  // Hráč hraje bílými, počítač černými.
+  const PW = window.PESCI, PWE = window.PESCI_ENGINE;
+  const PW_KEY = 'pgn-pesci';
+  // Uložený stav: série (počty pěšců pro kolo, vyhraná kola), obtížnost, vyhrané série, tahy rozehraného kola
+  let pwData = { series: PW.newSeries(), level: 'easy', seriesWins: { w: 0, b: 0 }, moves: [] };
+  try {
+    const o = JSON.parse(localStorage.getItem(PW_KEY) || 'null');
+    if (o && o.series && o.series.minPawns === PW.MIN_PAWNS && Array.isArray(o.moves)) pwData = Object.assign(pwData, o);
+  } catch (e) {}
+  const pwSave = () => { try { localStorage.setItem(PW_KEY, JSON.stringify(pwData)); } catch (e) {} };
+  const pawns = n => n + nbsp + plural(n, 'pěšec', 'pěšci', 'pěšců');
+
+  HRY.pesci = {
+    id: 'pesci', R: PW, E: PWE, page: 'pgPawns', engineName: 'PESCI_ENGINE', sources: ['trenink/pesci.js', 'trenink/pesci-engine.js'],
+    levelId: () => pwData.level,
+    level: () => PWE.LEVELS.find(l => l.id === pwData.level) || PWE.LEVELS[0],
+    setLevel(id) { pwData.level = id; pwSave(); },
+    newGame: () => ({ me: 'w', pos: PW.startPosition(pwData.series.white, pwData.series.black), moves: pwData.moves }),
+    save(h) { pwData.moves = h.over ? [] : h.moves.slice(); pwSave(); },
+    mine: (h, i) => PW.pieceAt(h.pos, i) === 'w',
+    dragClass: () => 'p-wp',
+    piece(pos, i) { const pc = PW.pieceAt(pos, i); return pc && { cls: 'p-' + pc + 'p', label: pc === 'w' ? 'bílý pěšec' : 'černý pěšec' }; },
+    endHint: (h, i) => h.over.r.reason === 'lastRank' && h.last && h.last.to === i,
+    onEnd(h, r) {
+      const before = pwData.series;
+      pwData.series = PW.nextRound(before, r.winner);
+      if (pwData.series.winner) pwData.seriesWins[r.winner]++;
+      h.over.before = before;
+    },
+    onNext() { if (pwData.series.winner) pwData.series = PW.newSeries(); },
+    renderPage: () => renderPawnPage(),
+    startInfo: () => 'Hraješ bílými a začínáš. Klepni na pěšce a pak na pole, kam má táhnout.',
+    endText(h) {
+      const s = pwData.series, r = h.over.r, won = r.winner === 'w';
+      const msg = s.winner ? (won ? 'Série je tvoje! 🏆' : 'Sérii vyhrál počítač.') : (won ? 'Výhra!' : 'Tentokrát vyhrál počítač.');
+      const why = r.reason === 'lastRank' ? (won ? 'Tvůj pěšec došel na poslední řadu.' : 'Pěšec počítače došel na poslední řadu.') :
+        r.reason === 'noPawns' ? (won ? 'Počítači nezůstal žádný pěšec.' : 'Počítač ti sebral všechny pěšce.') :
+        (r.stalemated === 'w' ? 'Nemáš žádný tah.' : 'Počítač nemá žádný tah.') + ' ' +
+        (h.pos.white === h.pos.black ? 'Při stejném počtu pěšců vyhrávají černí.' : 'Vyhrává ten, kdo má pěšců méně.');
+      const next = s.winner ? ' Kola ' + skore(s.wins.w, s.wins.b) + '.' : ' Příští kolo: ty ' + pawns(s.white) + ', počítač ' + pawns(s.black) + '.';
+      return { msg, kind: won ? 'ok' : 'bad', info: why + next };
+    },
+    board(h) {
+      const s = pwData.series, round = h.over ? h.over.before.round : s.round;
+      return {
+        title: 'Pěšci proti pěšcům · kolo ' + round,
+        left: { pc: 'p-wp', name: 'Ty', value: h.pos.white }, right: { pc: 'p-bp', name: 'Počítač', value: h.pos.black },
+        mid: { name: 'Kola', value: s.wins.w + ' : ' + s.wins.b },
+        next: h.over ? (s.winner ? 'Nová série' : 'Další kolo') : null
+      };
+    }
+  };
+
+  function renderPawnPage() {
+    const s = pwData.series, sw = pwData.seriesWins;
+    $('pwSeriesWins').textContent = (sw.w || sw.b) ? 'vyhrané série ' + skore(sw.w, sw.b) : '';
+    if (s.winner) {
+      $('pwSeriesInfo').textContent = 'Poslední série skončila ' + (s.winner === 'w' ? 'tvou výhrou' : 'výhrou počítače') + ', kola ' + skore(s.wins.w, s.wins.b) + '.';
+      $('pwPlay').textContent = 'Začít novou sérii';
+    } else {
+      $('pwSeriesInfo').textContent = 'Kolo ' + s.round + ': ty ' + pawns(s.white) + ', počítač ' + pawns(s.black) + '. Vyhraná kola ' + skore(s.wins.w, s.wins.b) + '.';
+      $('pwPlay').textContent = pwData.moves.length ? 'Pokračovat v kole' : 'Hrát kolo ' + s.round;
+    }
+    $('pwNew').hidden = !!s.winner || (s.round === 1 && !pwData.moves.length);
+    hraLevelPressed();
+  }
+  $('pwPlay').addEventListener('click', () => {
+    if (pwData.series.winner) { pwData.series = PW.newSeries(); pwData.moves = []; pwSave(); }
+    hraStart(HRY.pesci);
+  });
+  $('pwNew').addEventListener('click', async () => {
+    if (!await askConfirm('Začít novou sérii?', 'Rozehraná série se ztratí a začne se znovu 8 proti 8.', 'Nová série')) return;
+    pwData.series = PW.newSeries(); pwData.moves = []; pwSave();
+    hraStart(HRY.pesci);
+  });
+
+  /* ---------- Trénink: vlci a ovečka ---------- */
+  // Pravidla jsou v trenink/vlci.js, počítačový soupeř v trenink/vlci-engine.js. Hráč si vybere,
+  // jestli hraje za ovečku (začíná, sama si vybere výchozí pole), nebo za vlky. Při dokonalé hře
+  // vyhrají vždy vlci, takže proti dokonalým vlkům se ovečka může jen učit, jak ji chytají.
+  const VL = window.VLCI, VLE = window.VLCI_ENGINE;
+  const VL_KEY = 'pgn-vlci';
+  // Uložený stav: za koho hráč hraje, obtížnost, výhry hráče a počítače za každou stranu, rozehraná hra
+  let vlData = { side: 'sheep', level: 'normal', wins: { sheep: { me: 0, pc: 0 }, wolves: { me: 0, pc: 0 } }, game: null };
+  try {
+    const o = JSON.parse(localStorage.getItem(VL_KEY) || 'null');
+    if (o && o.wins && o.wins.sheep && o.wins.wolves) vlData = Object.assign(vlData, o);
+  } catch (e) {}
+  const vlSave = () => { try { localStorage.setItem(VL_KEY, JSON.stringify(vlData)); } catch (e) {} };
+  const vlPerfect = () => vlData.level === 'perfect';
+  const VL_WARN = 'Dokonalí vlci vyhrají vždy. Sleduj, jak ovečku chytají, a pak si to vyzkoušej za vlky.';
+
+  HRY.vlci = {
+    id: 'vlci', R: VL, E: VLE, page: 'pgWolves', engineName: 'VLCI_ENGINE', sources: ['trenink/vlci.js', 'trenink/vlci-engine.js'],
+    levelId: () => vlData.level,
+    level: () => VLE.LEVELS.find(l => l.id === vlData.level) || VLE.LEVELS[0],
+    setLevel(id) { vlData.level = id; vlSave(); },
+    newGame() {
+      let gm = vlData.game;
+      if (!gm || gm.side !== vlData.side || !Array.isArray(gm.moves)) {
+        // za vlky: výchozí pole ovečky vybere počítač; za ovečku si ho hráč vybere klepnutím
+        gm = vlData.game = { side: vlData.side, start: vlData.side === 'wolves' ? VLE.chooseStart() : null, moves: [] };
+        vlSave();
+      }
+      const preview = { sheep: -1, wolves: VL.WOLF_STARTS.map(VL.idx), turn: 'sheep' };
+      return { me: gm.side, pos: gm.start ? VL.startPosition(gm.start) : null, moves: gm.moves, pick: gm.start ? null : VL.SHEEP_STARTS.map(VL.idx), preview };
+    },
+    onPick(h, sq) { vlData.game.start = sq; },
+    save(h) { if (h.over) vlData.game = null; else if (vlData.game) vlData.game.moves = h.moves.slice(); vlSave(); },
+    mine: (h, i) => h.me === 'sheep' ? h.pos.sheep === i : h.pos.wolves.indexOf(i) !== -1,
+    dragClass: h => h.me === 'sheep' ? 'p-sheep' : 'p-wolf',
+    piece: (pos, i) => pos.sheep === i ? { cls: 'p-sheep', label: 'ovečka' } : pos.wolves.indexOf(i) !== -1 ? { cls: 'p-wolf', label: 'vlk' } : null,
+    dim: i => !VL.isLight(i),
+    endHint: (h, i) => h.pos.sheep === i,
+    onEnd(h, r) { vlData.wins[h.me][r.winner === h.me ? 'me' : 'pc']++; },
+    renderPage: () => renderWolvesPage(),
+    pickText: () => ({ msg: 'Kde začne ovečka?', info: 'Klepni na jedno ze zvýrazněných polí první řady.' + (vlPerfect() ? ' ' + VL_WARN : '') }),
+    startInfo: h => h.me === 'sheep' ? 'Uteč vlkům na osmou řadu. Táhneš o jedno pole šikmo, i dozadu.' + (vlPerfect() ? ' ' + VL_WARN : '') :
+      'Chyť ovečku tak, aby se nemohla pohnout. Vlci táhnou jen šikmo dolů.',
+    endText(h) {
+      const r = h.over.r, won = r.winner === h.me, w = vlData.wins[h.me];
+      let msg, why;
+      if (r.reason === 'escaped') { msg = won ? 'Výhra! Ovečka utekla.' : 'Ovečka utekla.'; why = 'Došla na osmou řadu.'; }
+      else if (r.reason === 'trapped') { msg = won ? 'Výhra! Ovečka je chycená.' : 'Vlci tě chytili.'; why = 'Ovečka nemá kam táhnout.'; }
+      else { msg = won ? 'Výhra! Vlci už nemůžou táhnout.' : 'Vlci už nemůžou táhnout.'; why = 'Ovečka jim utekla.'; }
+      if (!won && h.me === 'sheep' && vlPerfect()) why += ' ' + VL_WARN;
+      return { msg, kind: won ? 'ok' : 'bad', info: why + ' Výhry za ' + (h.me === 'sheep' ? 'ovečku' : 'vlky') + ' ' + skore(w.me, w.pc) + '.' };
+    },
+    board(h) {
+      const w = vlData.wins[h.me], mine = h.me === 'sheep' ? 'p-sheep' : 'p-wolf', theirs = h.me === 'sheep' ? 'p-wolf' : 'p-sheep';
+      return {
+        title: 'Vlci a ovečka · hraješ za ' + (h.me === 'sheep' ? 'ovečku' : 'vlky'),
+        left: { pc: mine, name: 'Ty', value: '' }, right: { pc: theirs, name: 'Počítač', value: '' },
+        mid: { name: 'Výhry', value: w.me + ' : ' + w.pc },
+        next: h.over ? 'Hrát znovu' : null
+      };
+    }
+  };
+
+  function renderWolvesPage() {
+    const w = vlData.wins;
+    $('vlStats').textContent = 'Tvoje výhry a výhry počítače: za ovečku ' + skore(w.sheep.me, w.sheep.pc) + ', za vlky ' + skore(w.wolves.me, w.wolves.pc) + '.';
+    document.querySelectorAll('.vl-side .btn').forEach(b => b.setAttribute('aria-pressed', String(b.dataset.side === vlData.side)));
+    $('vlWarn').hidden = !(vlData.side === 'sheep' && vlPerfect());
+    const gm = vlData.game;
+    $('vlPlay').textContent = gm && gm.side === vlData.side && gm.moves.length ? 'Pokračovat ve hře' : 'Hrát';
+    hraLevelPressed();
+  }
+  document.querySelectorAll('.vl-side .btn').forEach(b => b.addEventListener('click', () => { vlData.side = b.dataset.side; vlSave(); renderWolvesPage(); }));
+  $('vlPlay').addEventListener('click', () => hraStart(HRY.vlci));
 
   /* ---------- Výuka: řešení úloh ---------- */
   // Sbírka úloh je ve vyuka/ulohy.txt (vybraná z databáze úloh Lichessu, nástroj tools/ulohy.js).
@@ -2935,7 +3124,7 @@ textarea.fen { min-height: 0; font-size: 14px; word-break: break-all; }
   async function puzStart(onlyWrong) {
     anaStop();
     if (drill) drillEnd();
-    if (pw) pwStop();
+    if (hra) hraStop();
     try { await loadPuzzles(); } catch (e) { showInfo('Výuka', 'Sbírku úloh se nepodařilo načíst.'); return; }
     const p = pickPuzzle(onlyWrong);
     if (!p) { toast(onlyWrong ? 'Žádné chybné úlohy k opakování.' : 'Pro tuto volbu nejsou žádné úlohy.'); return; }
@@ -4073,7 +4262,7 @@ textarea.fen { min-height: 0; font-size: 14px; word-break: break-all; }
     if (!$('scanBox').hidden) { scanStop(); return true; }
     if (puz && puz.ana && $('modal').hidden && !drawerOpen()) { puzMsg(puz.ana.msg, ''); puz.ana = null; anaStop(); puz.chess = new Chess(puz.p.fen); puz.p.moves.forEach(u => uciMove(puz.chess, u)); puz.last = null; puz.lock = true; puzButtons(); renderBoard(); return true; }
     if (drill && $('modal').hidden && !drawerOpen()) { drillEnd(); return true; }
-    if (pw && $('modal').hidden && !drawerOpen()) { pawnEnd(); return true; }
+    if (hra && $('modal').hidden && !drawerOpen()) { hraEnd(); return true; }
     if (voice.on && $('modal').hidden && $('chModal').hidden) { voiceStop(); $('voiceBar').hidden = true; return true; }
     if (editor && $('modal').hidden) { closeEditor(); return true; }
     if (puz && $('modal').hidden && $('chModal').hidden && !drawerOpen()) { puzEnd(); return true; }
@@ -4256,7 +4445,7 @@ textarea.fen { min-height: 0; font-size: 14px; word-break: break-all; }
 
   // Průběžný rozbor zobrazené pozice
   function analyzeCurrent() {
-    if (!engineOn || eng.checking || editor || puz || drill || pw || document.hidden) return;
+    if (!engineOn || eng.checking || editor || puz || drill || hra || document.hidden) return;
     const g = gameAt(state.ply), fen = g.fen();
     if (fen === eng.liveFen) return;
     eng.liveFen = fen; eng.liveDone = false; eng.lines = []; eng.depth = 0; eng.error = '';
@@ -4906,6 +5095,7 @@ textarea.fen { min-height: 0; font-size: 14px; word-break: break-all; }
     if (id === 'pgLearn') renderLearn();
     if (id === 'pgDrill') renderDrillPage();
     if (id === 'pgPawns') renderPawnPage();
+    if (id === 'pgWolves') renderWolvesPage();
     const pb = $(id).querySelector('.pbody, .mlist');
     if (pb && id !== 'pgGames') pb.scrollTop = 0;
   }
@@ -4934,7 +5124,10 @@ textarea.fen { min-height: 0; font-size: 14px; word-break: break-all; }
   if (location.hash === '#editor') ready.then(openEditor);
   if (location.hash === '#pesci') ready.then(() => { setDrawer(true); openPage('pgPawns'); });
   // rozehrané kolo: 1. e4 d5, vybraný pěšec e4 ukazuje tah i braní
-  if (location.hash === '#pesci-hra') ready.then(() => { pwData.moves = [[12, 28], [51, 35]]; pawnStart(); pw.sel = 28; pw.lastText = 'Počítač: d5'; pwRender(); });
+  if (location.hash === '#pesci-hra') ready.then(() => { pwData.moves = [[12, 28], [51, 35]]; hraStart(HRY.pesci); hra.sel = 28; hra.lastText = 'Počítač: d5'; hraRender(); });
+  if (location.hash === '#vlci') ready.then(() => { setDrawer(true); openPage('pgWolves'); });
+  // rozehraná hra za ovečku: d1-e2, c8-d7, vybraná ovečka ukazuje, kam může
+  if (location.hash === '#vlci-hra') ready.then(() => { vlData.side = 'sheep'; vlData.game = { side: 'sheep', start: 'd1', moves: [[3, 12], [58, 51]] }; hraStart(HRY.vlci); hra.sel = 12; hra.lastText = 'Počítač: c8-d7'; hraRender(); });
   if (location.hash === '#motor') ready.then(() => { opts.engine = true; opts.engLines = 3; applyOpts(); goPath([0, 0, 0, 0, 0, 0, 0, 0]); setEngineOn(true); });
   if (location.hash === '#varianty') ready.then(() => {
     loadFile('[Event "Ukazka"]\n[White "Novak, Jan"]\n[Black "Dvorak, Petr"]\n[Result "*"]\n\n1. e4 e5 (1... c5 2. Nf3 (2. c3 d5) 2... d6) 2. Nf3 $1 Nc6 {Hlavni pokracovani} 3. Bb5 a6 $6 (3... Nf6 4. O-O) 4. Ba4 *\n\n[Event "Ukazka"]\n[White "Svoboda"]\n[Black "Cerny"]\n[Result "1/2-1/2"]\n\n1. d4 d5 1/2-1/2', 'ukazka.pgn');
@@ -4961,7 +5154,7 @@ textarea.fen { min-height: 0; font-size: 14px; word-break: break-all; }
     const ignore = el => el.closest('.board-wrap, .strip, .graph, input, textarea, select, .engine, .sugg, .moves .var');
     document.querySelector('.app').addEventListener('touchstart', e => {
       t0 = null;
-      if (e.touches.length !== 1 || FILE.games.length < 2 || editor || puz || drill || pw || eng.checking || drawerOpen()) return;
+      if (e.touches.length !== 1 || FILE.games.length < 2 || editor || puz || drill || hra || eng.checking || drawerOpen()) return;
       const t = e.touches[0];
       if (t.clientX < 28 || t.clientX > window.innerWidth - 28 || ignore(e.target)) return; // okraje patří gestu Zpět
       t0 = { x: t.clientX, y: t.clientY, time: Date.now() };
@@ -5348,9 +5541,9 @@ textarea.fen { min-height: 0; font-size: 14px; word-break: break-all; }
       drag = { from: btn.dataset.sq, x: e.clientX, y: e.clientY, started: false, ghost: null, cls: 'p-w' + drill.lv.piece };
       return;
     }
-    if (pw) { // pěšci proti pěšcům: táhne se vlastním pěšcem, když je hráč na tahu
-      if (pw.over || pw.thinking || pw.pos.turn !== 'w' || PW.pieceAt(pw.pos, btn.dataset.sq) !== 'w') return;
-      drag = { from: btn.dataset.sq, x: e.clientX, y: e.clientY, started: false, ghost: null, cls: 'p-wp' };
+    if (hra) { // hra proti počítači: táhne se vlastní figurkou, když je hráč na tahu
+      if (!hraCanMove() || !hra.g.mine(hra, hra.g.R.idx(btn.dataset.sq))) return;
+      drag = { from: btn.dataset.sq, x: e.clientX, y: e.clientY, started: false, ghost: null, cls: hra.g.dragClass(hra) };
       return;
     }
     const g = boardGame();
@@ -5365,7 +5558,7 @@ textarea.fen { min-height: 0; font-size: 14px; word-break: break-all; }
     if (!drag.started) {
       if (Math.hypot(e.clientX - drag.x, e.clientY - drag.y) < 8) return;
       drag.started = true;
-      if (pw) pw.sel = PW.idx(drag.from); else selected = drag.from;
+      if (hra) hra.sel = hra.g.R.idx(drag.from); else selected = drag.from;
       renderBoard();
       const fromEl = boardEl.querySelector('[data-sq="' + drag.from + '"]');
       if (fromEl) fromEl.classList.add('from');
@@ -5388,12 +5581,12 @@ textarea.fen { min-height: 0; font-size: 14px; word-break: break-all; }
     setTimeout(() => { suppressClick = false; }, 60);
     const el = cancelled ? null : document.elementFromPoint(e.clientX, e.clientY);
     const target = el && el.closest ? el.closest('.sq') : null;
-    if (target && target.dataset.sq !== d.from && (drill || pw || (puz && puz.wait))) {
+    if (target && target.dataset.sq !== d.from && (drill || hra || (puz && puz.wait))) {
       if (drill) { drillTap(target.dataset.sq); return; }
-      if (pw) { if (!pwApply(pw.sel, PW.idx(target.dataset.sq))) renderBoard(); return; }
+      if (hra) { if (!hraApply(hra.sel, hra.g.R.idx(target.dataset.sq))) renderBoard(); return; }
       selected = d.from; puzPremove(target.dataset.sq); return;
     }
-    if (drill || pw) { renderBoard(); return; }
+    if (drill || hra) { renderBoard(); return; }
     if (target && target.dataset.sq !== d.from) {
       const g = boardGame();
       const legal = g.moves({ square: d.from, verbose: true }).some(m => m.to === target.dataset.sq);
@@ -5413,12 +5606,12 @@ textarea.fen { min-height: 0; font-size: 14px; word-break: break-all; }
   $('navEnd').addEventListener('click', () => go(state.moves.length));
   $('undo').addEventListener('click', undo);
   $('flip').addEventListener('click', () => {
-    if (drill || pw) return;
+    if (drill || hra) return;
     if (puz) { puz.flip = !puz.flip; renderBoard(); return; }
     state.flipped = !state.flipped; renderBoard(); persist();
   });
   document.addEventListener('keydown', e => {
-    if (/^(INPUT|TEXTAREA|SELECT)$/.test(e.target.tagName) || !$('modal').hidden || !$('cModal').hidden || !$('kModal').hidden || puz || drill || pw) return;
+    if (/^(INPUT|TEXTAREA|SELECT)$/.test(e.target.tagName) || !$('modal').hidden || !$('cModal').hidden || !$('kModal').hidden || puz || drill || hra) return;
     if (e.key === 'ArrowLeft') go(state.ply - 1);
     else if (e.key === 'ArrowRight') go(state.ply + 1);
     else if (e.key === 'Home') go(0);

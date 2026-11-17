@@ -514,12 +514,12 @@ const OLD = JSON.stringify({ games: [{ headers: { Event: 'Stary', Site: '?', Dat
     await tap(page, 'e2');
     assert.deepEqual(await page.$$eval('#board .sq .dot', e => e.map(x => x.parentElement.dataset.sq).sort()), ['e3', 'e4']);
     await tap(page, 'e4');
-    await page.waitForFunction(() => pawnState().moves.length === 2 && /Jsi na tahu/.test(document.getElementById('pwMsg').textContent), { timeout: 15000 });
-    assert.equal(await page.evaluate(() => pawnState().engine), 'worker', 'počítač přemýšlí ve vlákně');
-    assert.match(await text(page, 'pwInfo'), /^Počítač: /);
+    await page.waitForFunction(() => hraState().moves.length === 2 && /Jsi na tahu/.test(document.getElementById('hraMsg').textContent), { timeout: 15000 });
+    assert.equal(await page.evaluate(() => hraState().engine), 'worker', 'počítač přemýšlí ve vlákně');
+    assert.match(await text(page, 'hraInfo'), /^Počítač: /);
     assert.ok((await pawnsOn(page, 'w')).includes('e4'));
     // obtížnost se uloží, rozehrané kolo vydrží znovunačtení
-    await page.$eval('#pawnBox .pw-level .btn[data-level="medium"]', e => e.click());
+    await page.$eval('#hraLevels .btn[data-level="medium"]', e => e.click());
     await open(page);
     assert.equal(await page.evaluate(() => JSON.parse(localStorage.getItem('pgn-pesci')).level), 'medium');
     await click(page, 'menuBtn');
@@ -527,15 +527,15 @@ const OLD = JSON.stringify({ games: [{ headers: { Event: 'Stary', Site: '?', Dat
     assert.equal(await text(page, 'pwPlay'), 'Pokračovat v kole');
     await click(page, 'pwPlay');
     assert.ok((await pawnsOn(page, 'w')).includes('e4'));
-    assert.equal(await page.evaluate(() => pawnState().moves.length), 2);
+    assert.equal(await page.evaluate(() => hraState().moves.length), 2);
     // konec kola: bílý pěšec dojde na poslední řadu
-    await page.evaluate(() => { pawnState().pos = PESCI.fromSquares({ white: ['b7', 'e4'], black: ['h7', 'e5'], turn: 'w' }); });
+    await page.evaluate(() => { hraState().pos = PESCI.fromSquares({ white: ['b7', 'e4'], black: ['h7', 'e5'], turn: 'w' }); });
     await tap(page, 'b7'); await tap(page, 'b8');
-    assert.match(await text(page, 'pwMsg'), /Výhra/);
-    assert.match(await text(page, 'pwInfo'), /poslední řadu.*Příští kolo: ty 7\spěšců, počítač 8\spěšců/);
-    assert.equal(await text(page, 'pwRounds'), '1 : 0');
-    assert.equal(await text(page, 'pwNext'), 'Další kolo');
-    await click(page, 'pwNext');
+    assert.match(await text(page, 'hraMsg'), /Výhra/);
+    assert.match(await text(page, 'hraInfo'), /poslední řadu.*Příští kolo: ty 7\spěšců, počítač 8\spěšců/);
+    assert.equal(await text(page, 'hraMid'), '1 : 0');
+    assert.equal(await text(page, 'hraNext'), 'Další kolo');
+    await click(page, 'hraNext');
     assert.match(await text(page, 'puzTitle'), /kolo 2/);
     assert.deepEqual(await pawnsOn(page, 'w'), ['b2', 'c2', 'd2', 'e2', 'f2', 'g2', 'h2'], 'chybí sloupec a');
     // konec série: výhra kola se 4 pěšci
@@ -545,18 +545,83 @@ const OLD = JSON.stringify({ games: [{ headers: { Event: 'Stary', Site: '?', Dat
     await page.$eval('[data-page=pgPawns]', e => e.click());
     await click(page, 'pwPlay');
     assert.deepEqual(await pawnsOn(page, 'w'), ['c2', 'd2', 'e2', 'f2']);
-    await page.evaluate(() => { pawnState().pos = PESCI.fromSquares({ white: ['c7'], black: ['h7', 'a7'], turn: 'w' }); });
+    await page.evaluate(() => { hraState().pos = PESCI.fromSquares({ white: ['c7'], black: ['h7', 'a7'], turn: 'w' }); });
     await tap(page, 'c7'); await tap(page, 'c8');
-    assert.match(await text(page, 'pwMsg'), /Série je tvoje/);
-    assert.equal(await text(page, 'pwNext'), 'Nová série');
+    assert.match(await text(page, 'hraMsg'), /Série je tvoje/);
+    assert.equal(await text(page, 'hraNext'), 'Nová série');
     assert.deepEqual(await page.evaluate(() => JSON.parse(localStorage.getItem('pgn-pesci')).seriesWins), { w: 1, b: 0 });
-    await click(page, 'pwNext');
+    await click(page, 'hraNext');
     assert.match(await text(page, 'puzTitle'), /kolo 1/);
     assert.equal((await pawnsOn(page, 'w')).length, 8);
     // Ukončit vrátí do menu na stránku tréninku
-    await click(page, 'pwEnd');
+    await click(page, 'hraEnd');
     assert.ok(await page.$eval('#pgPawns', e => !e.hidden));
-    assert.ok(await page.evaluate(() => !document.body.classList.contains('pawns') && document.getElementById('pawnBox').hidden));
+    assert.ok(await page.evaluate(() => !document.body.classList.contains('hra') && document.getElementById('hraBox').hidden));
+  });
+
+  await step('vlci a ovečka: výběr pole, tahy, odpověď počítače, konec hry, počítadlo, hra za vlky', async page => {
+    await open(page);
+    await click(page, 'menuBtn');
+    await page.$eval('[data-page=pgWolves]', e => e.click());
+    assert.equal(await text(page, 'vlPlay'), 'Hrát');
+    assert.ok(await page.$eval('#vlWarn', e => e.hidden), 'upozornění jen u dokonalých vlků');
+    await page.$eval('#pgWolves .pw-level .btn[data-level="perfect"]', e => e.click());
+    assert.ok(await page.$eval('#vlWarn', e => !e.hidden));
+    await page.$eval('#pgWolves .pw-level .btn[data-level="normal"]', e => e.click());
+    await click(page, 'vlPlay');
+    assert.match(await text(page, 'puzTitle'), /Vlci a ovečka · hraješ za ovečku/);
+    const on = (page, cls) => page.$$eval('#board .' + cls, e => e.map(x => x.parentElement.dataset.sq).sort());
+    assert.deepEqual(await on(page, 'p-wolf'), ['a8', 'c8', 'e8', 'g8']);
+    assert.deepEqual(await on(page, 'p-sheep'), []);
+    // černá pole jsou ztlumená, výchozí pole ovečky zvýrazněná
+    assert.equal(await page.$$eval('#board .sq.off', e => e.length), 32);
+    assert.deepEqual(await page.$$eval('#board .sq.hint', e => e.map(x => x.dataset.sq).sort()), ['b1', 'd1', 'f1', 'h1']);
+    assert.match(await text(page, 'hraMsg'), /Kde začne ovečka/);
+    await tap(page, 'c1'); // černé pole nejde
+    assert.deepEqual(await on(page, 'p-sheep'), []);
+    await tap(page, 'd1');
+    assert.deepEqual(await on(page, 'p-sheep'), ['d1']);
+    assert.match(await text(page, 'hraMsg'), /Jsi na tahu/);
+    await tap(page, 'd1');
+    assert.deepEqual(await page.$$eval('#board .sq .dot', e => e.map(x => x.parentElement.dataset.sq).sort()), ['c2', 'e2']);
+    await tap(page, 'e2');
+    await page.waitForFunction(() => hraState().moves.length === 2 && /Jsi na tahu/.test(document.getElementById('hraMsg').textContent), { timeout: 15000 });
+    assert.equal(await page.evaluate(() => hraState().engine), 'worker', 'počítač přemýšlí ve vlákně');
+    assert.match(await text(page, 'hraInfo'), /^Počítač: [aceg]8-[a-h]7$/);
+    // rozehraná hra vydrží znovunačtení
+    await open(page);
+    await click(page, 'menuBtn');
+    await page.$eval('[data-page=pgWolves]', e => e.click());
+    assert.equal(await text(page, 'vlPlay'), 'Pokračovat ve hře');
+    await click(page, 'vlPlay');
+    assert.deepEqual(await on(page, 'p-sheep'), ['e2']);
+    // konec hry: ovečka dojde na osmou řadu
+    await page.evaluate(() => { hraState().pos = VLCI.fromSquares({ sheep: 'd7', wolves: ['b7', 'f7', 'h7', 'a8'], turn: 'sheep' }); });
+    await tap(page, 'd7'); await tap(page, 'e8');
+    assert.match(await text(page, 'hraMsg'), /Výhra! Ovečka utekla/);
+    assert.equal(await text(page, 'hraMid'), '1 : 0');
+    assert.equal(await text(page, 'hraNext'), 'Hrát znovu');
+    assert.deepEqual(await page.evaluate(() => JSON.parse(localStorage.getItem('pgn-vlci')).wins.sheep), { me: 1, pc: 0 });
+    assert.equal(await page.evaluate(() => JSON.parse(localStorage.getItem('pgn-vlci')).game), null);
+    // hra za vlky: ovečka (počítač) začne sama, hráč táhne vlkem jen dolů
+    await click(page, 'hraEnd');
+    assert.ok(await page.$eval('#pgWolves', e => !e.hidden));
+    assert.match(await text(page, 'vlStats'), /za ovečku 1\s:\s0, za vlky 0\s:\s0/);
+    await page.$eval('.vl-side .btn[data-side="wolves"]', e => e.click());
+    await click(page, 'vlPlay');
+    assert.match(await text(page, 'puzTitle'), /hraješ za vlky/);
+    await page.waitForFunction(() => hraState().moves.length === 1 && /Jsi na tahu/.test(document.getElementById('hraMsg').textContent), { timeout: 15000 });
+    assert.equal((await on(page, 'p-sheep')).length, 1);
+    await tap(page, 'c8');
+    assert.deepEqual(await page.$$eval('#board .sq .dot', e => e.map(x => x.parentElement.dataset.sq).sort()), ['b7', 'd7']);
+    await tap(page, 'd7');
+    await page.waitForFunction(() => hraState().moves.length === 3, { timeout: 15000 });
+    // vlci chytí ovečku
+    await page.waitForFunction(() => /Jsi na tahu/.test(document.getElementById('hraMsg').textContent));
+    await page.evaluate(() => { hraState().pos = VLCI.fromSquares({ sheep: 'h1', wolves: ['h3', 'a8', 'c8', 'e8'], turn: 'wolves' }); });
+    await tap(page, 'h3'); await tap(page, 'g2');
+    assert.match(await text(page, 'hraMsg'), /Výhra! Ovečka je chycená/);
+    assert.deepEqual(await page.evaluate(() => JSON.parse(localStorage.getItem('pgn-vlci')).wins.wolves), { me: 1, pc: 0 });
   });
 
   await step('nepovedené uložení do paměti telefonu se ohlásí', async page => {
