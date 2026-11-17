@@ -499,6 +499,25 @@ const OLD = JSON.stringify({ games: [{ headers: { Event: 'Stary', Site: '?', Dat
     assert.deepEqual(await page.evaluate(() => JSON.parse(localStorage.getItem('pgn-trenink')).n2), { n: 1, s3: 1 });
   });
 
+  await step('menu: výuka a trénink na samostatné stránce, zpět se vrací na ni', async page => {
+    await open(page);
+    await click(page, 'menuBtn');
+    const main = await page.$$eval('#pgMain [data-page]', e => e.map(x => x.dataset.page));
+    assert.ok(main.includes('pgTeach'));
+    for (const pg of ['pgLearn', 'pgDrill', 'pgPawns', 'pgWolves']) assert.ok(!main.includes(pg), pg + ' nemá být v hlavním menu');
+    await page.$eval('#pgMain [data-page=pgTeach]', e => e.click());
+    assert.deepEqual(await page.$$eval('#pgTeach [data-page]', e => e.map(x => x.dataset.page)), ['pgLearn', 'pgDrill', 'pgPawns', 'pgWolves']);
+    await page.$eval('#pgTeach [data-page=pgWolves]', e => e.click());
+    assert.ok(await page.$eval('#pgWolves', e => !e.hidden));
+    await page.$eval('#pgWolves [data-back]', e => e.click());
+    assert.ok(await page.$eval('#pgTeach', e => !e.hidden), 'šipka zpět vede na Výuku a trénink');
+    await page.$eval('#pgTeach [data-page=pgLearn]', e => e.click());
+    assert.equal(await page.evaluate(() => androidBack()), true);
+    assert.ok(await page.$eval('#pgTeach', e => !e.hidden), 'tlačítko Zpět v Androidu také');
+    await page.$eval('#pgTeach [data-back]', e => e.click());
+    assert.ok(await page.$eval('#pgMain', e => !e.hidden));
+  });
+
   await step('pěšci proti pěšcům: tahy, odpověď počítače, konec kola, uložení a konec série', async page => {
     await open(page);
     await click(page, 'menuBtn');

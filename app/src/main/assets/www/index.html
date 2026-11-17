@@ -384,6 +384,8 @@ body.booting { pointer-events: none; }
 .mi:focus-visible { outline: 2px solid var(--accent); outline-offset: -2px; }
 .mi .mi-ic { flex: none; color: var(--muted); }
 .mi .mi-l { flex: 1; min-width: 0; }
+.mi .mi-l small { display: block; font-size: 12.5px; color: var(--muted); line-height: 1.3; }
+.mgroup { padding: 14px 10px 4px; font-size: 12.5px; color: var(--muted); text-transform: uppercase; letter-spacing: .06em; }
 .mi .mi-chev { flex: none; color: var(--muted); }
 .mi.danger, .mi.danger .mi-ic { color: var(--warn); }
 .mi-badge { min-width: 24px; padding: 1px 7px; border-radius: 11px; background: var(--accent-soft); font-size: 13px; text-align: center; }
@@ -769,10 +771,7 @@ textarea.fen { min-height: 0; font-size: 14px; word-break: break-all; }
     </div>
     <nav class="mlist">
       <button class="mi" type="button" data-page="pgGames"><svg class="mi-ic" viewBox="0 0 24 24" width="22" height="22" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M8 6h12M8 12h12M8 18h12"/><circle cx="4" cy="6" r="1"/><circle cx="4" cy="12" r="1"/><circle cx="4" cy="18" r="1"/></svg><span class="mi-l">Partie v souboru</span><span class="mi-badge" id="gamesCount"></span><svg class="mi-chev" viewBox="0 0 24 24" width="18" height="18" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 6l6 6-6 6"/></svg></button>
-      <button class="mi" type="button" data-page="pgLearn"><svg class="mi-ic" viewBox="0 0 24 24" width="22" height="22" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M2 9l10-5 10 5-10 5z"/><path d="M6 11v5c0 1.7 2.7 3 6 3s6-1.3 6-3v-5"/><path d="M22 9v6"/></svg><span class="mi-l">Výuka: úlohy</span><svg class="mi-chev" viewBox="0 0 24 24" width="18" height="18" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 6l6 6-6 6"/></svg></button>
-      <button class="mi" type="button" data-page="pgDrill"><svg class="mi-ic" viewBox="0 0 24 24" width="22" height="22" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3l2.6 5.4 5.9.8-4.3 4.1 1 5.8L12 16.4 6.8 19.1l1-5.8L3.5 9.2l5.9-.8z"/></svg><span class="mi-l">Výuka: tahy figur</span><svg class="mi-chev" viewBox="0 0 24 24" width="18" height="18" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 6l6 6-6 6"/></svg></button>
-      <button class="mi" type="button" data-page="pgPawns"><svg class="mi-ic" viewBox="0 0 24 24" width="22" height="22" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="6.5" r="3"/><path d="M9.5 10.5h5M10.2 10.5c0 3.2-1.4 5.3-3.2 6.8h10c-1.8-1.5-3.2-3.6-3.2-6.8M6 20.5h12"/></svg><span class="mi-l">Trénink: pěšci proti pěšcům</span><svg class="mi-chev" viewBox="0 0 24 24" width="18" height="18" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 6l6 6-6 6"/></svg></button>
-      <button class="mi" type="button" data-page="pgWolves"><svg class="mi-ic" viewBox="0 0 24 24" width="22" height="22" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M7.5 15.5a3 3 0 0 1-1-5.5 3.5 3.5 0 0 1 5-3.5 3.5 3.5 0 0 1 6 1.5 3 3 0 0 1 0 6 3 3 0 0 1-4 1.5h-3a3 3 0 0 1-3 0z"/><path d="M9.5 16.5v3.5M14.5 16.5v3.5"/></svg><span class="mi-l">Trénink: vlci a ovečka</span><svg class="mi-chev" viewBox="0 0 24 24" width="18" height="18" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 6l6 6-6 6"/></svg></button>
+      <button class="mi" type="button" data-page="pgTeach"><svg class="mi-ic" viewBox="0 0 24 24" width="22" height="22" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M4 4.5A2.5 2.5 0 0 1 6.5 2H20v17H6.5A2.5 2.5 0 0 0 4 21.5z"/><path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"/></svg><span class="mi-l">Výuka a trénink</span><svg class="mi-chev" viewBox="0 0 24 24" width="18" height="18" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 6l6 6-6 6"/></svg></button>
       <div class="msep"></div>
       <button class="mi" type="button" id="openFile"><svg class="mi-ic" viewBox="0 0 24 24" width="22" height="22" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M3 7a2 2 0 0 1 2-2h4l2 2h8a2 2 0 0 1 2 2v1"/><path d="M3 7v11a2 2 0 0 0 2 2h12.5a2 2 0 0 0 1.9-1.4L22 11H7.5a2 2 0 0 0-1.9 1.4L3 18"/></svg><span class="mi-l">Otevřít soubor</span></button>
       <button class="mi" type="button" id="saveFile"><svg class="mi-ic" viewBox="0 0 24 24" width="22" height="22" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M12 4v11M7.5 10.5L12 15l4.5-4.5"/><path d="M5 19h14"/></svg><span class="mi-l">Uložit</span></button>
@@ -913,6 +912,20 @@ textarea.fen { min-height: 0; font-size: 14px; word-break: break-all; }
           <li>Bílí začínají. Při menším počtu pěšců chybí celé sloupce v pořadí a, h, b, g, c, f, d, e.</li>
         </ul>
     </div>
+  </section>
+  <section class="dpage" id="pgTeach" hidden>
+    <div class="phead">
+      <button class="icon-btn plain" type="button" data-back aria-label="Zpět"><svg viewBox="0 0 24 24" width="22" height="22" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M15 6l-6 6 6 6"/></svg></button>
+      <h2>Výuka a trénink</h2>
+    </div>
+    <nav class="mlist">
+      <div class="mgroup">Výuka</div>
+      <button class="mi" type="button" data-page="pgLearn"><svg class="mi-ic" viewBox="0 0 24 24" width="22" height="22" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M2 9l10-5 10 5-10 5z"/><path d="M6 11v5c0 1.7 2.7 3 6 3s6-1.3 6-3v-5"/><path d="M22 9v6"/></svg><span class="mi-l">Úlohy<small>Přes 6 000 úloh od začátečníků po mistry</small></span><svg class="mi-chev" viewBox="0 0 24 24" width="18" height="18" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 6l6 6-6 6"/></svg></button>
+      <button class="mi" type="button" data-page="pgDrill"><svg class="mi-ic" viewBox="0 0 24 24" width="22" height="22" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3l2.6 5.4 5.9.8-4.3 4.1 1 5.8L12 16.4 6.8 19.1l1-5.8L3.5 9.2l5.9-.8z"/></svg><span class="mi-l">Tahy figur<small>Pro nejmenší: jak táhnou figury</small></span><svg class="mi-chev" viewBox="0 0 24 24" width="18" height="18" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 6l6 6-6 6"/></svg></button>
+      <div class="mgroup">Trénink: hry proti počítači</div>
+      <button class="mi" type="button" data-page="pgPawns"><svg class="mi-ic" viewBox="0 0 24 24" width="22" height="22" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="6.5" r="3"/><path d="M9.5 10.5h5M10.2 10.5c0 3.2-1.4 5.3-3.2 6.8h10c-1.8-1.5-3.2-3.6-3.2-6.8M6 20.5h12"/></svg><span class="mi-l">Pěšci proti pěšcům<small>Hra jen s pěšci proti počítači</small></span><svg class="mi-chev" viewBox="0 0 24 24" width="18" height="18" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 6l6 6-6 6"/></svg></button>
+      <button class="mi" type="button" data-page="pgWolves"><svg class="mi-ic" viewBox="0 0 24 24" width="22" height="22" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M7.5 15.5a3 3 0 0 1-1-5.5 3.5 3.5 0 0 1 5-3.5 3.5 3.5 0 0 1 6 1.5 3 3 0 0 1 0 6 3 3 0 0 1-4 1.5h-3a3 3 0 0 1-3 0z"/><path d="M9.5 16.5v3.5M14.5 16.5v3.5"/></svg><span class="mi-l">Vlci a ovečka<small>Hra na počítání dopředu</small></span><svg class="mi-chev" viewBox="0 0 24 24" width="18" height="18" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 6l6 6-6 6"/></svg></button>
+    </nav>
   </section>
   <section class="dpage" id="pgWolves" hidden>
     <div class="phead">
@@ -1209,6 +1222,7 @@ textarea.fen { min-height: 0; font-size: 14px; word-break: break-all; }
           <ul>
             <li>Nový Trénink: vlci a ovečka (menu). Ovečka chce utéct na osmou řadu, čtyři vlci ji chtějí chytit. Hraje se jen na bílých polích, s vlastními obrázky vlka a ovečky. Hraješ za ovečku (vybereš si, kde začne), nebo za vlky, obtížnost normální a dokonalá. Počítadlo výher za každou stranu, rozehraná hra se pamatuje.</li>
             <li>Dokonalí vlci vyhrají vždy, aplikace na to upozorní. Ovečka se od nich může učit, jak ji chytají.</li>
+            <li>Menu je kratší: úlohy, tahy figur a obě hry proti počítači jsou pod jednou položkou Výuka a trénink.</li>
           </ul>
         </section>
         <section>
@@ -5085,7 +5099,7 @@ textarea.fen { min-height: 0; font-size: 14px; word-break: break-all; }
 
   /* ---------- Menu ---------- */
   let curPage = 'pgMain';
-  const PARENT = { pgChanges: 'pgAbout', pgLicense: 'pgAbout' };
+  const PARENT = { pgChanges: 'pgAbout', pgLicense: 'pgAbout', pgLearn: 'pgTeach', pgDrill: 'pgTeach', pgPawns: 'pgTeach', pgWolves: 'pgTeach' };
   function openPage(id) {
     document.querySelectorAll('#drawer .dpage').forEach(p => { p.hidden = p.id !== id; });
     curPage = id;
@@ -5126,6 +5140,7 @@ textarea.fen { min-height: 0; font-size: 14px; word-break: break-all; }
   // rozehrané kolo: 1. e4 d5, vybraný pěšec e4 ukazuje tah i braní
   if (location.hash === '#pesci-hra') ready.then(() => { pwData.moves = [[12, 28], [51, 35]]; hraStart(HRY.pesci); hra.sel = 28; hra.lastText = 'Počítač: d5'; hraRender(); });
   if (location.hash === '#vlci') ready.then(() => { setDrawer(true); openPage('pgWolves'); });
+  if (location.hash === '#vyuka') ready.then(() => { setDrawer(true); openPage('pgTeach'); });
   // rozehraná hra za ovečku: d1-e2, c8-d7, vybraná ovečka ukazuje, kam může
   if (location.hash === '#vlci-hra') ready.then(() => { vlData.side = 'sheep'; vlData.game = { side: 'sheep', start: 'd1', moves: [[3, 12], [58, 51]] }; hraStart(HRY.vlci); hra.sel = 12; hra.lastText = 'Počítač: c8-d7'; hraRender(); });
   if (location.hash === '#motor') ready.then(() => { opts.engine = true; opts.engLines = 3; applyOpts(); goPath([0, 0, 0, 0, 0, 0, 0, 0]); setEngineOn(true); });
