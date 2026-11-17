@@ -1,7 +1,7 @@
 // Snímky obrazovky aplikace ve skutečném prohlížeči (Chrome) pro kontrolu vzhledu při sestavení
 const fs = require('fs');
 const puppeteer = require('puppeteer-core');
-const SHOTS = [['nahled', ''], ['nahled-menu', '#menu'], ['nahled-vse', '#vse'], ['nahled-editor', '#editor'], ['nahled-varianty', '#varianty'], ['nahled-motor', '#motor'], ['nahled-nastaveni', '#nastaveni'], ['nahled-partie', '#partie'], ['nahled-obrazek', '#obrazek'], ['nahled-pesci', '#pesci'], ['nahled-pesci-hra', '#pesci-hra']];
+const SHOTS = [['nahled', ''], ['nahled-menu', '#menu'], ['nahled-vse', '#vse'], ['nahled-editor', '#editor'], ['nahled-varianty', '#varianty'], ['nahled-motor', '#motor'], ['nahled-nastaveni', '#nastaveni'], ['nahled-partie', '#partie'], ['nahled-obrazek', '#obrazek'], ['nahled-pesci', '#pesci'], ['nahled-pesci-hra', '#pesci-hra'], ['nahled-vyuka', '#vyuka'], ['nahled-vlci', '#vlci'], ['nahled-vlci-hra', '#vlci-hra']];
 (async () => {
   const browser = await puppeteer.launch({ executablePath: '/usr/bin/google-chrome', args: ['--no-sandbox'] });
   const log = [];

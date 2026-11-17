@@ -37,6 +37,7 @@ VÝUKA
 • Rozbor vyřešené úlohy se Stockfishem: o kolik je tvůj tah horší a proč.
 • Tahy figur pro nejmenší: 36 úrovní, hvězdičky za co nejméně tahů.
 • Pěšci proti pěšcům: hra jen s pěšci proti počítači, tři obtížnosti a série kol s handicapem.
+• Vlci a ovečka: hra na počítání dopředu, za ovečku nebo za vlky proti počítači.
 
 ROZBOR
 • Volitelně šachový motor Stockfish: hodnocení pozice, nejlepší pokračování a kontrola celé partie.
