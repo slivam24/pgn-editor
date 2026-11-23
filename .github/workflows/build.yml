@@ -26,7 +26,7 @@ jobs:
 
       # Když testy neprojdou, APK se nesestaví
       - name: Testy PGN
-        run: node --test tests/pgn.test.js tests/verze.test.js tests/ulohy.test.js tests/figury.test.js tests/pesci.test.js tests/pesci-engine.test.js tests/vlci.test.js tests/vlci-engine.test.js
+        run: node --test tests/pgn.test.js tests/verze.test.js tests/ulohy.test.js tests/figury.test.js tests/pesci.test.js tests/pesci-engine.test.js tests/vlci.test.js tests/vlci-engine.test.js tests/koncovky.test.js
 
       - name: Testy v prohlížeči
         run: |
