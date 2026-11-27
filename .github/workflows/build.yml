@@ -147,3 +147,32 @@ jobs:
           gh release view nahled >/dev/null 2>&1 || gh release create nahled --prerelease --title "Náhled obrazovky (jen pro kontrolu)" --notes "Automatické snímky obrazovky z posledního sestavení."
           find app/build/outputs/androidTest-results -name '*.xml' -exec cat {} + > emulator-zkousky.xml 2>/dev/null || true
           for f in emulator.png emulator-zkousky.xml; do [ -s "$f" ] && gh release upload nahled "$f" --clobber; done
+
+  # Webová verze na GitHub Pages: stejné soubory jako v APK (složka www), jen z hlavní větve
+  # a jen když sestavení s testy prošlo. Pages se musí jednou zapnout, viz README.
+  pages:
+    needs: build
+    if: github.ref_name == github.event.repository.default_branch
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      pages: write
+      id-token: write
+    concurrency:
+      group: pages
+      cancel-in-progress: false
+    environment:
+      name: github-pages
+      url: ${{ steps.nasadit.outputs.page_url }}
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/configure-pages@v5
+
+      - uses: actions/upload-pages-artifact@v3
+        with:
+          path: app/src/main/assets/www
+
+      - name: Zveřejnit na GitHub Pages
+        id: nasadit
+        uses: actions/deploy-pages@v4
