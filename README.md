@@ -32,14 +32,14 @@ Při změně verze se číslo mění na třech místech: `versionCode` a `versio
 
 Při každém sestavení na GitHubu běží tři sady zkoušek. Když první dvě neprojdou, APK se nevytvoří.
 
-- `tests/pgn.test.js` zkouší čtení a zápis PGN: varianty, komentáře, chybné partie, FEN, českou notaci, názvy zahájení, odkazy na partie. `tests/verze.test.js` hlídá shodu čísla verze. `tests/ulohy.test.js` zahraje všechny úlohy ze sbírky a hlídá, že jsou platné. `tests/figury.test.js` ověří, že každá úroveň tahů figur jde vyřešit a pohyb figur odpovídá pravidlům. `tests/pesci.test.js` zkouší pravidla tréninku pěšci proti pěšcům (tahy porovnává s chess.js, braní mimochodem, konec hry včetně patu) a sérii kol. `tests/pesci-engine.test.js` porovnává výsledky počítačového soupeře s prostým prohledáním všech tahů a hraje partie mezi úrovněmi obtížnosti (nejlehčí musí jít porazit). `tests/vlci.test.js` zkouší pravidla hry vlci a ovečka (tahy jen po bílých polích, konec hry). `tests/vlci-engine.test.js` porovnává počítačového soupeře s prostým prohledáním a hraje zápasy (dokonalí vlci vyhrají vždy, normální úroveň jde porazit za obě strany).
-- `tests/prohlizec.js` otevře aplikaci v prohlížeči Chrome a zkouší ukládání do paměti telefonu, velké soubory, seznam partií, zálohu, tisk, trénink pěšci proti pěšcům, vlci a ovečka a další funkce.
+- `tests/pgn.test.js` zkouší čtení a zápis PGN: varianty, komentáře, chybné partie, FEN, českou notaci, názvy zahájení, odkazy na partie. `tests/verze.test.js` hlídá shodu čísla verze. `tests/ulohy.test.js` zahraje všechny úlohy ze sbírky a hlídá, že jsou platné. `tests/figury.test.js` ověří, že každá úroveň tahů figur jde vyřešit a pohyb figur odpovídá pravidlům. `tests/pesci.test.js` zkouší pravidla tréninku pěšci proti pěšcům (tahy porovnává s chess.js, braní mimochodem, konec hry včetně patu) a sérii kol. `tests/pesci-engine.test.js` porovnává výsledky počítačového soupeře s prostým prohledáním všech tahů a hraje partie mezi úrovněmi obtížnosti (nejlehčí musí jít porazit). `tests/vlci.test.js` zkouší pravidla hry vlci a ovečka (tahy jen po bílých polích, konec hry). `tests/vlci-engine.test.js` porovnává počítačového soupeře s prostým prohledáním a hraje zápasy (dokonalí vlci vyhrají vždy, normální úroveň jde porazit za obě strany). `tests/koncovky.test.js` ověří výpočet délky matu u matových koncovek (nejdelší maty podle teorie, tahy porovnané s chess.js), sbírku výchozích pozic a pravidla cvičení (mat, pat, ztráta figury, 50 tahů, hvězdy, náhradní obrana bez Stockfishe).
+- `tests/prohlizec.js` otevře aplikaci v prohlížeči Chrome a zkouší ukládání do paměti telefonu, velké soubory, seznam partií, zálohu, tisk, trénink pěšci proti pěšcům, vlci a ovečka, matové koncovky se Stockfishem a další funkce.
 - `app/src/androidTest/` jsou zkoušky na emulátoru Androidu: start aplikace ve skutečném WebView, otevření souboru z jiné aplikace, uložení zpět do souboru a uložení partie přes restart. Běží jako samostatná úloha `android`, takže APK vznikne, i kdyby emulátor na GitHubu zrovna nenaběhl. Snímek obrazovky z emulátoru se ukládá do vydání `nahled`.
 
 Ruční spuštění v počítači s nainstalovaným Node.js:
 
 ```bash
-node --test tests/pgn.test.js tests/verze.test.js tests/ulohy.test.js tests/figury.test.js tests/pesci.test.js tests/pesci-engine.test.js tests/vlci.test.js tests/vlci-engine.test.js
+node --test tests/pgn.test.js tests/verze.test.js tests/ulohy.test.js tests/figury.test.js tests/pesci.test.js tests/pesci-engine.test.js tests/vlci.test.js tests/vlci-engine.test.js tests/koncovky.test.js
 ```
 
 ## Vydání a zkušební sestavení
@@ -85,6 +85,9 @@ Při sestavení v počítači (Android Studio, **Build > Generate App Bundles or
 | `app/src/main/assets/www/trenink/vlci.js` | Trénink vlci a ovečka: pravidla hry (tahy po bílých polích, výchozí postavení, konec hry) |
 | `app/src/main/assets/www/trenink/vlci-engine.js` | Počítačový soupeř pro vlky a ovečku: hru prohledá vždy do konce, úrovně Normální (dělá chyby) a Dokonalá |
 | `tools/pesci-analyza.js` | Analýza pěšců proti pěšcům: teoretický výsledek při dokonalé hře pro každou dvojici počtů pěšců a co z toho plyne pro sérii kol. Výsledky jsou v `tools/pesci-analyza.md`, rozpracovaný výpočet v `tools/pesci-analyza.json` |
+| `tools/koncovky.js` | Matové koncovky: přesná délka matu pro všechny pozice (zpětná analýza) a výběr výchozích pozic do `vyuka/koncovky.txt` |
+| `app/src/main/assets/www/vyuka/koncovky.js` | Výuka matových koncovek: pravidla cvičení (počítadlo 50 tahů, mat, pat, ztráta figury), hvězdy a náhradní obrana černého krále, když Stockfish nejde spustit. Černého krále jinak hraje Stockfish |
+| `app/src/main/assets/www/vyuka/koncovky.txt` | Sbírka výchozích pozic pro matové koncovky s délkou nejkratšího matu, vytváří ji `tools/koncovky.js` |
 | `play/` | podklady pro Google Play (texty, ikona, snímky, zásady soukromí) |
 | `app/build.gradle` | číslo verze, podpis, cílová verze Androidu |
 | `.github/workflows/build.yml` | návod pro GitHub, jak APK sestavit a zveřejnit webovou verzi |

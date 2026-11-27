@@ -36,6 +36,7 @@ VÝUKA
 • Vlastní úroveň, která roste s vyřešenými úlohami, a opakování úloh s chybou.
 • Rozbor vyřešené úlohy se Stockfishem: o kolik je tvůj tah horší a proč.
 • Tahy figur pro nejmenší: 36 úrovní, hvězdičky za co nejméně tahů.
+• Matové koncovky: mat dámou, věží, dvěma střelci nebo jezdcem a střelcem proti králi, který se brání co nejlépe. Počítadlo 50 tahů a hvězdičky.
 • Pěšci proti pěšcům: hra jen s pěšci proti počítači, tři obtížnosti a série kol s handicapem.
 • Vlci a ovečka: hra na počítání dopředu, za ovečku nebo za vlky proti počítači.
 
