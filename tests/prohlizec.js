@@ -504,9 +504,9 @@ const OLD = JSON.stringify({ games: [{ headers: { Event: 'Stary', Site: '?', Dat
     await click(page, 'menuBtn');
     const main = await page.$$eval('#pgMain [data-page]', e => e.map(x => x.dataset.page));
     assert.ok(main.includes('pgTeach'));
-    for (const pg of ['pgLearn', 'pgDrill', 'pgPawns', 'pgWolves']) assert.ok(!main.includes(pg), pg + ' nemá být v hlavním menu');
+    for (const pg of ['pgLearn', 'pgDrill', 'pgMates', 'pgPawns', 'pgWolves']) assert.ok(!main.includes(pg), pg + ' nemá být v hlavním menu');
     await page.$eval('#pgMain [data-page=pgTeach]', e => e.click());
-    assert.deepEqual(await page.$$eval('#pgTeach [data-page]', e => e.map(x => x.dataset.page)), ['pgLearn', 'pgDrill', 'pgPawns', 'pgWolves']);
+    assert.deepEqual(await page.$$eval('#pgTeach [data-page]', e => e.map(x => x.dataset.page)), ['pgLearn', 'pgDrill', 'pgMates', 'pgPawns', 'pgWolves']);
     await page.$eval('#pgTeach [data-page=pgWolves]', e => e.click());
     assert.ok(await page.$eval('#pgWolves', e => !e.hidden));
     await page.$eval('#pgWolves [data-back]', e => e.click());
@@ -641,6 +641,96 @@ const OLD = JSON.stringify({ games: [{ headers: { Event: 'Stary', Site: '?', Dat
     await tap(page, 'h3'); await tap(page, 'g2');
     assert.match(await text(page, 'hraMsg'), /Výhra! Ovečka je chycená/);
     assert.deepEqual(await page.evaluate(() => JSON.parse(localStorage.getItem('pgn-vlci')).wins.wolves), { me: 1, pc: 0 });
+  });
+
+  await step('matové koncovky: výběr materiálu, odpověď Stockfishe, nápověda, mat a hvězdy, pat, ztráta figury, 50 tahů', async page => {
+    await open(page);
+    await click(page, 'menuBtn');
+    await page.$eval('[data-page=pgTeach]', e => e.click());
+    await page.$eval('#pgTeach [data-page=pgMates]', e => e.click());
+    await page.waitForFunction(() => document.querySelectorAll('#kcList .kc-var').length === 6, { timeout: 10000 });
+    assert.deepEqual(await page.$$eval('#kcList .kc-var b', e => e.map(x => x.textContent)), ['Dáma a věž', 'Dvě věže', 'Dáma', 'Věž', 'Dva střelci', 'Jezdec a střelec']);
+    await page.$eval('#kcList .kc-var[data-v="q"]', e => e.click());
+    assert.match(await text(page, 'puzTitle'), /Matové koncovky · Dáma/);
+    assert.equal(await text(page, 'hraMid'), '1 z 50');
+    assert.match(await text(page, 'hraInfo'), /Nejkratší mat má (9|10)\stahů: ★★★ do 1[12], ★★ do 1[57] tahů/);
+    assert.ok(await page.$eval('#hraLevels', e => e.hidden), 'bez obtížnosti');
+    assert.ok(await page.$eval('#hraHint', e => !e.hidden && !e.disabled));
+    const on = (page, cls) => page.$$eval('#board .' + cls, e => e.map(x => x.parentElement.dataset.sq));
+    assert.equal((await on(page, 'p-wq')).length, 1);
+    assert.equal((await on(page, 'p-bk')).length, 1);
+    // tah dámou, za černého krále táhne Stockfish
+    const q = (await on(page, 'p-wq'))[0];
+    await tap(page, q);
+    const to = await page.evaluate(q => { const h = hraState(); return KONCOVKY.legalMoves(h.pos).filter(m => KONCOVKY.name(m.from) === q).map(m => KONCOVKY.name(m.to)); }, q);
+    assert.deepEqual((await page.$$eval('#board .sq .dot', e => e.map(x => x.parentElement.dataset.sq))).sort(), to.sort());
+    // tah, po kterém král nemůže sebrat dámu
+    const safe = await page.evaluate((q, to) => to.find(t => { const h = hraState(), m = KONCOVKY.findMove(h.pos, KONCOVKY.idx(q), KONCOVKY.idx(t)), p = KONCOVKY.play(h.pos, m); return !KONCOVKY.legalMoves(p).some(x => x.capture) && !KONCOVKY.result(p); }), q, to);
+    await tap(page, safe);
+    await page.waitForFunction(() => hraState().moves.length === 2 && /Jsi na tahu/.test(document.getElementById('hraMsg').textContent), { timeout: 60000 });
+    assert.equal(await page.evaluate(() => hraState().engine), 'stockfish', 'černého krále hraje Stockfish');
+    assert.match(await text(page, 'hraInfo'), /^Počítač: K[a-h][1-8]$/);
+    assert.equal(await text(page, 'hraMid'), '2 z 50');
+    // rozehrané cvičení vydrží znovunačtení
+    await open(page);
+    await click(page, 'menuBtn');
+    await page.$eval('[data-page=pgTeach]', e => e.click());
+    await page.$eval('#pgTeach [data-page=pgMates]', e => e.click());
+    await page.waitForFunction(() => /rozehráno/.test(document.querySelector('#kcList .kc-var[data-v="q"] small').textContent), { timeout: 10000 });
+    await page.$eval('#kcList .kc-var[data-v="q"]', e => e.click());
+    assert.equal(await page.evaluate(() => hraState().moves.length), 2);
+    assert.deepEqual(await on(page, 'p-wq'), [safe]);
+    // nápověda: Stockfish ukáže tah, ubere hvězdu
+    await click(page, 'hraHint');
+    await page.waitForFunction(() => hraState().hint, { timeout: 60000 });
+    assert.equal(await page.$$eval('#board .sq.hint', e => e.length), 2);
+    assert.match(await text(page, 'hraInfo'), /^Nápověda: Q[a-h][1-8]\+?\. Každá nápověda ubere hvězdu, zatím 1×\.$/);
+    assert.equal(await page.evaluate(() => JSON.parse(localStorage.getItem('pgn-koncovky')).game.hints), 1);
+    // mat: hvězdy podle počtu tahů, nápověda jednu ubrala
+    await page.evaluate(() => { hraState().pos = Object.assign(KONCOVKY.startPosition('k7/8/1K6/8/8/8/8/7Q w - - 0 1'), { n: 1 }); hraRedraw(); });
+    assert.equal(await page.$$eval('#board .sq.hint', e => e.length), 2, 'nápověda platí do dalšího tahu');
+    await tap(page, 'h1'); await tap(page, 'h8');
+    assert.equal(await text(page, 'hraMsg'), 'Mat! ★★☆');
+    assert.match(await text(page, 'hraInfo'), /^Mat za 2\stahy\. Při nejlepší obraně jde mat dát za (9|10)\stahů\. Nápověda 1×\. Na tři hvězdy dej mat do 1[12] tahů bez nápovědy\.$/);
+    assert.deepEqual(await page.$$eval('#board .sq.hint', e => e.map(x => x.dataset.sq)), ['a8'], 'zvýrazněný matovaný král');
+    assert.ok(await page.$eval('#hraHint', e => e.hidden));
+    assert.equal(await text(page, 'hraAgain'), 'Zkusit znovu');
+    assert.equal(await text(page, 'hraNext'), 'Další pozice');
+    const saved = await page.evaluate(() => JSON.parse(localStorage.getItem('pgn-koncovky')));
+    assert.deepEqual(saved.best.q, { [saved.game.i]: 2 });
+    assert.deepEqual(saved.mates, { q: 1 });
+    assert.equal(saved.game.done, true);
+    // zkusit znovu: stejná pozice od začátku, bez nápověd
+    await click(page, 'hraAgain');
+    assert.equal(await page.evaluate(() => hraState().moves.length), 0);
+    assert.equal(await page.evaluate(() => JSON.parse(localStorage.getItem('pgn-koncovky')).game.i), saved.game.i);
+    assert.equal(await page.evaluate(() => JSON.parse(localStorage.getItem('pgn-koncovky')).game.hints), 0);
+    // pat
+    await page.evaluate(() => { hraState().pos = KONCOVKY.startPosition('k7/8/1K6/8/8/8/8/2Q5 w - - 0 1'); hraRedraw(); });
+    await tap(page, 'c1'); await tap(page, 'c7');
+    assert.equal(await text(page, 'hraMsg'), 'Pat, to je remíza.');
+    assert.match(await text(page, 'hraInfo'), /nemá kam táhnout, ale není v šachu/);
+    // další pozice je jiná než předchozí
+    await click(page, 'hraNext');
+    assert.notEqual(await page.evaluate(() => JSON.parse(localStorage.getItem('pgn-koncovky')).game.i), saved.game.i);
+    assert.equal(await text(page, 'hraMid'), '1 z 50');
+    // ztráta figury: Stockfish sebere nekrytou dámu
+    await page.evaluate(() => { hraState().pos = KONCOVKY.startPosition('8/8/8/3k4/8/8/8/K3Q3 w - - 0 1'); hraRedraw(); });
+    await tap(page, 'e1'); await tap(page, 'e4');
+    await page.waitForFunction(() => hraState().over, { timeout: 60000 });
+    assert.equal(await text(page, 'hraMsg'), 'Král ti sebral dámu.');
+    assert.deepEqual(await page.$$eval('#board .sq.hint', e => e.map(x => x.dataset.sq)), ['e4']);
+    // 50 tahů bez matu
+    await click(page, 'hraNext');
+    await page.evaluate(() => { hraState().pos = Object.assign(KONCOVKY.startPosition('8/8/8/3k4/8/8/8/K6Q w - - 0 1'), { n: 49 }); hraRedraw(); });
+    assert.equal(await text(page, 'hraMid'), '50 z 50');
+    await tap(page, 'h1'); await tap(page, 'h2');
+    assert.equal(await text(page, 'hraMsg'), '50 tahů bez matu, to je remíza.');
+    assert.equal(await page.evaluate(() => JSON.parse(localStorage.getItem('pgn-koncovky')).mates.q), 1, 'remíza se mezi maty nepočítá');
+    // Ukončit vrátí na stránku koncovek se statistikou
+    await click(page, 'hraEnd');
+    assert.ok(await page.$eval('#pgMates', e => !e.hidden));
+    assert.match(await page.$eval('#kcList .kc-var[data-v="q"] small', e => e.textContent), /^mat v 1 z 40 pozic$/);
   });
 
   await step('nepovedené uložení do paměti telefonu se ohlásí', async page => {
