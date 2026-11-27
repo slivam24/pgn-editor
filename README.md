@@ -8,6 +8,18 @@ V [Releases](https://github.com/slivam24/pgn-editor/releases) je u každého vyd
 
 Novou verzi stačí nainstalovat přes starou, partie i nastavení zůstanou. Pro jistotu jde v Nastavení udělat zálohu všech partií a nastavení do jednoho souboru.
 
+## Webová verze
+
+Stejná aplikace běží i v prohlížeči na adrese https://slivam24.github.io/pgn-editor/. Web i APK vznikají ze stejných souborů ve složce `app/src/main/assets/www`, takže každá změna sloučená do `main` se po úspěšném sestavení objeví v obou. Zkušební větve se na web nedostávají.
+
+Rozdíly proti aplikaci pro Android:
+
+- Partie a nastavení se ukládají do paměti prohlížeče, zvlášť v každém prohlížeči a zařízení. S aplikací v telefonu se nesdílejí. Přenést je jde zálohou v Nastavení.
+- E-mail se otevře v poštovním programu s vyplněnou zprávou, ale bez přílohy `.pgn`.
+- Bez připojení k internetu se stránka neotevře.
+
+Zapnutí (jen jednou): v repozitáři **Settings > Pages** a u **Source** zvolit **GitHub Actions**. Dokud to není zapnuté, úloha `pages` v záložce **Actions** skončí chybou. APK to neovlivní.
+
 ## Jak vzniká nová verze
 
 1. Změny se dělají na vedlejší větvi. Každé odeslání na GitHub spustí sestavení (záložka **Actions**).
@@ -75,7 +87,7 @@ Při sestavení v počítači (Android Studio, **Build > Generate App Bundles or
 | `tools/pesci-analyza.js` | Analýza pěšců proti pěšcům: teoretický výsledek při dokonalé hře pro každou dvojici počtů pěšců a co z toho plyne pro sérii kol. Výsledky jsou v `tools/pesci-analyza.md`, rozpracovaný výpočet v `tools/pesci-analyza.json` |
 | `play/` | podklady pro Google Play (texty, ikona, snímky, zásady soukromí) |
 | `app/build.gradle` | číslo verze, podpis, cílová verze Androidu |
-| `.github/workflows/build.yml` | návod pro GitHub, jak APK sestavit |
+| `.github/workflows/build.yml` | návod pro GitHub, jak APK sestavit a zveřejnit webovou verzi |
 
 ## Licence
 
